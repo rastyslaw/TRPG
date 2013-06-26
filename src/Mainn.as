@@ -75,7 +75,10 @@
 		
 		private var masWater:Vector.<Point> = new Vector.<Point>;
 		private var masPath:Vector.<Point> = new Vector.<Point>;  
-		  
+		private var sqUnderPoint:Point = new Point();   
+		private var masPoint:Vector.<Point>; 
+		private var lines:Shape = new Shape;  
+		
 		public function Mainn() { 
 			var animationManager:AnimationManager = new AnimationManager();
 			animationManager.addAnimation("gnomd");
@@ -127,18 +130,20 @@
 			addChild(ramka);
 			ramka.mouseEnabled = false; 
 			ramka.mouseChildren = false;
+			ramka.width = ramka.height = grid_size; 
 			addEventListener(MouseEvent.MOUSE_MOVE, moveramk);
 			addEventListener(MouseEvent.CLICK, clickedOnMap);
 			 
 			obj = animationManager.getAnimation("gnomd");
 			obj.scaleX = obj.scaleY = 0.8;
-			mas[0][16].unit = obj; 
+			mas[4][5].unit = obj;
 			var obj2:Animation = animationManager.getAnimation("gnomd");
 			obj2.scaleX = obj2.scaleY = 0.8; 
 			mas[2][6].unit = obj2;
-			
+			 
 			addChild(unit_cont);
 			unit_cont.addChild(sqCont);
+			unit_cont.addChild(lines);
 			unit_cont.x = -viewXOffset; 
 			unit_cont.y = -viewYOffset;
 			
@@ -150,46 +155,46 @@
 		private function clickedOnMap(e:MouseEvent):void {
 			var numX:int = (mouseX + viewXOffset)/ grid_size;
 		 	var numY:int = (mouseY + viewYOffset)/ grid_size;
-			//trace(mas[numY][numX].coff); 
+			//trace(mas[numY][numX].coff);
+			//trace(sqCont.hitTestPoint(mouseX,mouseY,true));    
 			clearSq();
 			if (mas[numY][numX].unit != undefined) {
-				clearWater();
 				mas[numY][numX].water = -1; 
 				getSquare(numY, numX); 
 				masWater.push(new Point(numX, numY));   
-				getPath(3); 
+				getPath(6); 
 			}
 		}
-		
-		private function clearSq():void {
+		 
+		private function clearSq():void { 
 			while (sqCont.numChildren>0) {
 				sqCont.removeChildAt(0);
 			}
 			masWater.splice(0, masWater.length);
+			clearWater();
+			lines.graphics.clear();
 		}
 		
 		private function clearWater():void {
 			for each (var s:Vector.<Object> in mas) {
 				for each (var k:Object in s) {
 					k.water = 0;
+					k.sq = false;  
 				}  
 			}  
 		} 
 	
 		private function getPath(spd:int):void {
-			var bol:Boolean = true;
-			var i:int;
+			var bol:Boolean = true;  
 			while(bol) {  
 				bol = scanPath(spd);
-				i++;
-				if (i > 5) break;
-			}
+			} 
 		}      
 		
 		private function getSquare(y:int, x:int):void {
 			var fig:Shape = new Shape;
-			fig.graphics.beginFill(0xff0000, 0.3); 
-			fig.graphics.drawRect(4, 4, grid_size-8, grid_size-8);
+			fig.graphics.beginFill(0xff0000, 0.3);  
+			fig.graphics.drawRect(4, 4, grid_size-6, grid_size-6);
 			fig.graphics.endFill();
 			sqCont.addChildAt(fig, 0);
 			fig.x = x * grid_size; 
@@ -211,14 +216,19 @@
 					dirX = p.x + direction[i][0];
 					dirY = p.y + direction[i][1];    
 					if (getIndex(dirX, dirY)) {  
-						index = mas[dirY][dirX].coff;  
+						index = mas[dirY][dirX].coff;   
 						var op:Object = mas[dirY][dirX];
-						if (op.water == 0 || op.water > index + curIndex) { 
-							op.water = index + curIndex;
-							timeMas.push(new Point(dirX, dirY));
-							if (op.water <= spd) {
-								getSquare(dirY, dirX);  
-								b = true;  
+						if (op.water == 0 || (op.water > index + curIndex)) { 
+							op.water = index + curIndex; 
+							if(op.unit==undefined) { 
+								timeMas.push(new Point(dirX, dirY));
+								if (op.water <= spd) {
+									if (!op.sq) {
+										getSquare(dirY, dirX);
+										op.sq = true; 
+									}
+									b = true;   
+								}
 							}
 						}
 					} 
@@ -233,14 +243,63 @@
 			return true;
 		}
  
-		private function moveramk(e:MouseEvent):void { 
-			ramka.x = int((mouseX + viewXOffset%grid_size)/ grid_size) * grid_size - viewXOffset%grid_size;    
-			ramka.y = int((mouseY + viewYOffset%grid_size)/ grid_size) * grid_size - viewYOffset%grid_size;     
+		private function moveramk(e:MouseEvent):void {
+			var numX:int = (mouseX + viewXOffset % grid_size) / grid_size;
+			var numY:int = (mouseY + viewYOffset % grid_size) / grid_size;
+			ramka.x = numX * grid_size - viewXOffset % grid_size;     
+			ramka.y = numY * grid_size - viewYOffset % grid_size;  
+			
+			if (sqCont.hitTestPoint(mouseX, mouseY, true)) {
+				var tarX:int = (mouseX + viewXOffset) / grid_size; 
+				var tarY:int = (mouseY + viewYOffset) / grid_size;
+				if (mas[tarY][tarX].unit != undefined) return;  
+				if ((sqUnderPoint.x != tarX) || (sqUnderPoint.y != tarY)) { 
+					sqUnderPoint = new Point(tarX, tarY);
+					masPoint = new Vector.<Point>();
+					var p:Point = getGoodPath(sqUnderPoint);
+					masPoint.push(p); 
+					while (mas[p.y][p.x].unit == undefined) {
+						p = getGoodPath(p); 
+						masPoint.push(p);   
+					} 
+					masPoint.splice(0, 0, new Point(tarX, tarY)); 
+					lines.graphics.clear();
+					lines.graphics.lineStyle(6, 0xff0000, 0.7);
+					var len:int = masPoint.length; 
+					lines.graphics.moveTo(masPoint[len-1].x*grid_size+(grid_size>>1), masPoint[len-1].y*grid_size+(grid_size>>1));  
+					for (var s:int=len-2; s >= 0; s--) {  
+						lines.graphics.lineTo(masPoint[s].x*grid_size+(grid_size>>1), masPoint[s].y*grid_size+(grid_size>>1));
+					}
+				}
+			}  
+		} 
+		
+		private function getGoodPath(point:Point):Point {
+			var min:int = 99;
+			var dirX:int;
+			var dirY:int; 
+			var curWater:int; 
+			var p:Point = new Point(); 
+			var direction:Array = [[ -1, 0], [1, 0], [0, -1], [0, 1]];
+			for (var i:int = 0; i < direction.length; i++) {  
+				dirX = point.x + direction[i][0];
+				dirY = point.y + direction[i][1];
+				if (getIndex(dirX, dirY)) {  
+					curWater = mas[dirY][dirX].water;
+					if (curWater == -1) return new Point(dirX, dirY); 
+					if (curWater < min) {
+						min = curWater;
+						p.x = dirX;
+						p.y = dirY;   
+					}
+				}
+			}
+			return p;
 		}
-
+		
 		private function getPointToPixels(n:int, b:Boolean):Number {
 			var r:int = n * grid_size;
-			if (b) return r - (grid_size >> 1);
+			if (b) return r - (grid_size >> 1); 
 			return r; 
 		}
 		 
