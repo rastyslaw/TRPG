@@ -3,12 +3,17 @@ package units {
 	 * ...
 	 * @author waltasar
 	 */
-	internal class Death extends Unit {
+	internal class Death extends EnemyUnit {
 		
-		override internal function draw():void { 
-			var bmp:Animation = Main.animationManager.getAnimation("death");
-			addChild(bmp);   
-			bmp.scaleX = bmp.scaleY = 0.8;  
+		override internal function setSname():void {
+			sname = "death";   
+		}
+		
+		override internal function setAttributes():void {
+			hp = max_hp = 120;
+			att = 14;
+			def = 8;
+			agi = 5; 
 		}
 //-----	
 	}

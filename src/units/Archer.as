@@ -5,10 +5,23 @@ package units {
 	 */
 	internal class Archer extends Unit {
 		 
-		override internal function draw():void { 
-			var bmp:Animation = Main.animationManager.getAnimation("archer");
-			addChild(bmp);  
-			bmp.scaleX = bmp.scaleY = 0.8;  
+		override internal function setSname():void {
+			sname = "archer";   
+		}
+		 
+		override internal function setType():void { 
+			type = "archer"; 
+		} 
+		
+		override internal function setSpd():void { 
+			speed = 2; 
+		}
+		
+		override internal function setAttributes():void {
+			hp = max_hp = 70;
+			att = 12;
+			def = 8;
+			agi = 8; 
 		}
 //-----		
 	}

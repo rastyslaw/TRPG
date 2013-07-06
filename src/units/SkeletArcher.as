@@ -3,12 +3,25 @@ package units {
 	 * ...
 	 * @author waltasar
 	 */
-	internal class SkeletArcher extends Unit {
+	internal class SkeletArcher extends EnemyUnit {
 		
-		override internal function draw():void { 
-			var bmp:Animation = Main.animationManager.getAnimation("skeletarcher");
-			addChild(bmp);     
-			bmp.scaleX = bmp.scaleY = 0.8;  
+		override internal function setSname():void {
+			sname = "skeletarcher";   
+		}
+		
+		override internal function setType():void { 
+			type = "archer"; 
+		}
+		
+		override internal function setSpd():void { 
+			speed = 2; 
+		}
+		
+		override internal function setAttributes():void {
+			hp = max_hp = 20;
+			att = 26;
+			def = 2;
+			agi = 19; 
 		}
 //-----		
 	}
