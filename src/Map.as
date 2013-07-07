@@ -157,15 +157,20 @@ package  {
 		  _speedY += val;
 		}
 		
-		private function updMapPos():void {
-			var curX:Number = (game._turn) ? mouseX : game._ramka.x; 
-			var curY:Number = (game._turn) ? mouseY : game._ramka.y; 
+		private function updMapPos():void { 
+			//var curX:Number = (game._turn) ? mouseX : game._ramka.x; 
+			//var curY:Number = (game._turn) ? mouseY : game._ramka.y; 
+			var curX:Number;
+			var curY:Number; 
 			if (tracking != null) {
 				var p:Point = game.unit_cont.localToGlobal(new Point(tracking.x, tracking.y));
 				curX = p.x;
-				curY = p.y; 
+				curY = p.y;  
 			}
-		
+			else {
+				curX = mouseX;
+				curY = mouseY;
+			}
 		  if (curX < border) hScroll(-2);
 		  else if (curX > viewWidth - border)  
 		  	hScroll(2);
@@ -184,7 +189,7 @@ package  {
 					//trace("hit end of world width");
 				}
 				_speedX *= .86;
-			}
+			} 
 			if(int(_speedY)!=0) {
 				viewYOffset += int(_speedY);   
 				if (viewYOffset < 0) viewYOffset=0;
@@ -194,11 +199,9 @@ package  {
 				}
 				_speedY *= .86;
 			} 	    
-			if (!ui.hitTestPoint(mouseX, mouseY, true) || !game._turn) {
-				if(!game._autoscroll) updMapPos();    
-			}
+			if (!ui.hitTestPoint(mouseX, mouseY, true) || !game._turn)  updMapPos();    
 			game.unit_cont.x = -viewXOffset; 
-			game.unit_cont.y = -viewYOffset; 
+			game.unit_cont.y = -viewYOffset;  
 		}  
 		
 		private function clearUnit():void {

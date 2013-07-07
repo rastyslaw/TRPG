@@ -70,7 +70,7 @@ package units {
 		}
 		
 		internal function setSpd():void {
-			_speed = 5;   
+			_speed = 4;   
 		} 
 		
 		internal function setType():void { 

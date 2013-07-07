@@ -3,10 +3,14 @@ package units {
 	 * ...
 	 * @author waltasar
 	 */
-	internal class SkeletArcher extends ArrowUnit {
-		
+	internal class SkeletArcher extends EnemyUnit { 
+		 
 		override internal function setSname():void {
 			sname = "skeletarcher";   
+		}
+		
+		override internal function setType():void { 
+			type = "archer"; 
 		}
 		
 		override internal function setEnemy():void { 
