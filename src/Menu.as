@@ -102,11 +102,7 @@ package  {
 		private function scanMas():Boolean {
 			var dirX:int;
 			var dirY:int; 
-			var direction:Array;
-			if (type == "soldier") direction = [[ -1, 0], [1, 0], [0, -1], [0, 1]];   
-			else direction = [ [-1, 0], [1, 0], [0, -1], [0, 1],
-							 [-2, 0], [2, 0], [0, -2], [0, 2],
-							 [-1,-1], [1, 1], [-1, 1], [1,-1] ];    
+			var direction:Array = obg.direction;
 			
 				for (var i:int = 0; i < direction.length; i++) {  
 					dirX = target.x + direction[i][0]; 

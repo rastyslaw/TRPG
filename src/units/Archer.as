@@ -3,16 +3,12 @@ package units {
 	 * ...
 	 * @author waltasar
 	 */
-	internal class Archer extends Unit {
+	internal class Archer extends ArrowUnit {
 		 
 		override internal function setSname():void {
 			sname = "archer";   
 		}
 		 
-		override internal function setType():void { 
-			type = "archer"; 
-		} 
-		
 		override internal function setSpd():void { 
 			speed = 2; 
 		}

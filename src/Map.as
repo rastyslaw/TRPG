@@ -19,7 +19,7 @@ package  {
 		private var backgroundBD:BitmapData;
 		private var backgroundRect:Rectangle;
 		private var backgroundPoint:Point; 
-		private var border:int = 80;   
+		public var border:int = 80;   
 		private var aWorld:Array = []
 		private var mas:Vector.<Object>;
 		
@@ -37,14 +37,14 @@ package  {
 		private var viewHeight:int;
 		private var viewCols:int;
 		private var viewRows:int;
-		private var viewXOffset:Number;
-		private var viewYOffset:Number;
+		public var viewXOffset:int;
+		public var viewYOffset:int;
 		private var tileRect:Rectangle;
 		private var tilePoint:Point;
 			
 		private var sprites_width:int;
 		private var sprites_height:int;
-		private var sprites16x16:BitmapData;
+		private var sprites64x64:BitmapData;
 		private var sprites_perRow:int;
 		
 		private var _speedX:int;  
@@ -61,10 +61,11 @@ package  {
 		private var gameTimer:Timer;
 		private var game:Game;
 		private var ui:UI;
+		public var tracking:Unit; 
 		
 		public function Map(ar:Array, cont:Game) { 
 			aWorld = ar;
-			game = cont;
+			game = cont; 
 			ui = game.ui;  
 			worldCols = 20;    
 			worldRows = 16; 
@@ -78,7 +79,8 @@ package  {
 					 c = aWorld[i][j];
 					 obj = new Object;    
 					 if(c == 1 || c == 2) obj.coff = 2;   
-					 else if(c == 3) obj.coff = 3; 
+					 else if (c == 3 || c == 4) obj.coff = 3;
+					 else if (c == 5) obj.coff = 9;  
 					 else obj.coff = 1;
 					 vector[j] = obj;  
 				}   
@@ -103,9 +105,9 @@ package  {
 			canvasBitmap = new Bitmap(canvasBD); 
 			addChild(canvasBitmap);   
 			  
-			sprites_width=256;  
-			sprites_height=256;  
-			sprites16x16=new sprites_png(sprites_width,sprites_height);
+			sprites_width=384;  
+			sprites_height=64;  
+			sprites64x64=new tileset(sprites_width,sprites_height);
 			sprites_perRow=sprites_width/grid_size;
 			
 			gameTimer = new Timer(_period,1); 
@@ -156,12 +158,20 @@ package  {
 		}
 		
 		private function updMapPos():void {
-		  if (mouseX < border) hScroll(-2);
-		  else if (mouseX > viewWidth - border) 
+			var curX:Number = (game._turn) ? mouseX : game._ramka.x; 
+			var curY:Number = (game._turn) ? mouseY : game._ramka.y; 
+			if (tracking != null) {
+				var p:Point = game.unit_cont.localToGlobal(new Point(tracking.x, tracking.y));
+				curX = p.x;
+				curY = p.y; 
+			}
+		
+		  if (curX < border) hScroll(-2);
+		  else if (curX > viewWidth - border)  
 		  	hScroll(2);
-			  
-		  if (mouseY < border) vScroll(-2);
-		  else if (mouseY > viewHeight - border)
+			   
+		  if (curY < border) vScroll(-2); 
+		  else if (curY > viewHeight - border) 
 			vScroll(2);
 		}
 		
@@ -177,18 +187,18 @@ package  {
 			}
 			if(int(_speedY)!=0) {
 				viewYOffset += int(_speedY);   
-				if (viewYOffset < 0) {  
-					viewYOffset=0;
-				} 
+				if (viewYOffset < 0) viewYOffset=0;
 				else if (viewYOffset > (worldHeight-viewHeight)-1) {
 					viewYOffset = (worldHeight-viewHeight)-1;
 					//trace("hit end of world height");
 				}
 				_speedY *= .86;
-			} 	 
-			if(!ui.hitTestPoint(mouseX, mouseY, true)) updMapPos(); 
-			game.unit_cont.x = -viewXOffset;
-			game.unit_cont.y = -viewYOffset;
+			} 	    
+			if (!ui.hitTestPoint(mouseX, mouseY, true) || !game._turn) {
+				if(!game._autoscroll) updMapPos();    
+			}
+			game.unit_cont.x = -viewXOffset; 
+			game.unit_cont.y = -viewYOffset; 
 		}  
 		
 		private function clearUnit():void {
@@ -218,14 +228,14 @@ package  {
 					tileNum = aWorld[rowper][colper];
 					
 					if (mas[rowper][colper].unit != undefined) {
-						obj = mas[rowper][colper].unit;
+						obj = mas[rowper][colper].unit; 
 						obj.visible = true;   
 					} 
-					tilePoint.x=colCtr*grid_size; 
+					tilePoint.x=colCtr*grid_size;  
 					tilePoint.y=rowCtr*grid_size; 
 					tileRect.x = int((tileNum % sprites_perRow))*grid_size;
 					tileRect.y = int((tileNum / sprites_perRow))*grid_size;
-					bufferBD.copyPixels(sprites16x16,tileRect,tilePoint);
+					bufferBD.copyPixels(sprites64x64,tileRect,tilePoint);
 				} 
 			} 
 			bufferRect.x=viewXOffset % grid_size;
@@ -234,8 +244,16 @@ package  {
 		}
 		
 		public function get _mas():Vector.<Object> { return mas; } 
-		public function get corX():Number { return viewXOffset; }
-		public function get corY():Number { return viewYOffset; }
+		public function get corX():int { return viewXOffset; }
+		public function get corY():int { return viewYOffset; }
+		public function set corX(value:int):void {
+			viewXOffset = value;
+		}
+		public function set corY(value:int):void {
+			viewYOffset = value;
+			
+		}
+		
 //-----		
 	}
 }

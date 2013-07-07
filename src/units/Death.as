@@ -3,10 +3,14 @@ package units {
 	 * ...
 	 * @author waltasar
 	 */
-	internal class Death extends EnemyUnit {
+	internal class Death extends MageUnit {
 		
 		override internal function setSname():void {
 			sname = "death";   
+		}
+		
+		override internal function setEnemy():void { 
+			enemy = true;  
 		}
 		
 		override internal function setAttributes():void {

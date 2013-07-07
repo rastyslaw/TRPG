@@ -13,6 +13,12 @@ package units {
 			type = "mage"; 
 		}
 		
+		override internal function initDirection():void {
+			_direction = [ [-1, 0], [1, 0], [0, -1], [0, 1], 
+						   [-2, 0], [2, 0], [0, -2], [0, 2],
+						   [-1,-1], [1, 1], [-1, 1], [1,-1] ]; 
+		}
+		
 		public function get mp():int { return _mp; }
 		public function set mp(value:int):void { _mp = value; }
 		

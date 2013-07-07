@@ -17,25 +17,25 @@
 
 	public class Game extends Sprite implements IReceiver { 
 		 
-		private var map1:Array = [[1,2,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], 
-									[2,0,0,0,0,2,2,2,0,1,3,3,3,0,1,0,0,0,0,1],
-									[0,3,3,3,0,2,1,2,0,1,3,0,0,0,1,0,0,0,0,1],
-									[0,3,3,3,0,2,1,2,0,1,2,2,0,0,1,0,0,0,0,1],
-									[3,0,1,3,0,2,2,2,0,1,0,0,0,0,1,0,0,0,0,1], 
-									[3,3,0,3,0,0,0,0,0,1,0,0,3,0,1,0,0,0,0,1],
-									[1,0,2,0,0,0,0,0,0,1,0,0,0,3,1,0,0,0,0,1], 
-									[1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,1], 
-									[1,0,0,3,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1],
-									[1,2,0,0,3,0,2,2,2,0,0,0,0,0,0,0,0,0,0,1],
-									[1,2,0,3,0,0,3,0,0,0,0,3,3,3,0,0,0,0,0,1],
-									[1,0,0,0,3,3,3,0,0,0,0,0,2,1,0,0,0,0,0,1],
+		private var map1:Array = [  [1,2,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5], 
+									[2,0,0,0,0,2,4,2,0,1,3,3,3,0,1,0,0,0,0,5],
+									[0,3,3,3,0,2,4,2,0,1,3,0,0,0,1,0,0,0,0,5],
+									[0,3,3,3,0,0,1,2,0,1,2,2,0,0,1,0,0,0,0,5],
+									[3,0,1,3,1,2,2,2,0,1,0,0,0,0,1,0,5,5,5,5], 
+									[3,3,0,3,0,5,3,1,0,1,0,0,3,0,1,0,5,0,0,1],
+									[1,0,2,0,0,0,0,5,0,1,0,0,0,3,1,0,5,0,0,1], 
+									[1,0,0,0,0,0,0,0,0,2,4,4,0,0,0,0,0,0,0,1], 
+									[5,0,0,3,0,0,0,2,0,4,4,4,0,0,0,0,0,0,0,1],
+									[5,5,5,0,3,0,2,2,4,4,0,0,0,0,0,0,0,0,0,1],
+									[5,5,5,3,0,0,3,0,4,0,0,3,3,3,0,0,0,0,5,1],
+									[1,0,0,0,3,3,3,4,4,0,0,0,2,1,0,0,0,0,0,1],
 									[1,0,3,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
-									[1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1],
-									[1,0,3,2,0,0,0,0,0,0,3,0,0,0,0,1,0,0,0,1],
-									[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]]; 
+									[1,0,0,0,1,0,0,0,0,0,0,0,0,1,5,0,0,0,4,4],
+									[1,0,3,2,0,0,5,0,0,0,3,0,0,0,0,1,0,4,4,4],
+									[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,4,4,4]]; 
 			
 		
-		private var ramka:Ramka; 
+		private var ramka:Ramka;    
 		public var unit_cont:Sprite = new Sprite;
 		private var sqCont:Sprite = new Sprite; 
 		public var masGoodUnit:Vector.<Unit> = new Vector.<Unit>;
@@ -54,9 +54,12 @@
 		private var curhero:Point; 
 		private var attack_mode:Boolean;
 		private var enemyMas:Vector.<Point> = new Vector.<Point>();
-		private var tar:Tar; 
-		private var turn:Boolean = true;
+		private var tar:Tar;  
+		private var turn:Boolean;  
 		public var ui:UI; 
+		private var autoscroll:Boolean;
+		private var enemyPoint:Point; 
+		private var angle:Number; 
 		
 		public function Game() {
 			ui = new UI(this);
@@ -65,7 +68,7 @@
 			mas = map._mas; 
 			grid_size = Map.grid_size;
 				
-			ramka = new Ramka;
+			ramka = new Ramka; 
 			addChild(ramka);
 			ramka.mouseEnabled = false;  
 			ramka.mouseChildren = false; 
@@ -77,16 +80,16 @@
 			var badFactory:CreatorUnits = new EnemyCreator;
 			 
 			addChild(unit_cont);
-			unit_cont.addChild(sqCont);
+			unit_cont.addChild(sqCont); 
 			lines = new DrawPath;  
 			unit_cont.addChild(lines);
 			
 			goodFactory.creating(HeroCreator.GNOM, mas[4][4], 4, 4, unit_cont, masGoodUnit);
 			goodFactory.creating(HeroCreator.ARCHER, mas[3][5], 3, 5, unit_cont, masGoodUnit);
 			goodFactory.creating(HeroCreator.MAGE, mas[2][5], 2, 5, unit_cont, masGoodUnit);
-			badFactory.creating(EnemyCreator.TROLL, mas[2][6], 2, 6, unit_cont, masBadUnit);
-			badFactory.creating(EnemyCreator.SKELARCHER, mas[3][6], 3, 6, unit_cont, masBadUnit);
-			badFactory.creating(EnemyCreator.DEATH, mas[4][6], 4, 6, unit_cont, masBadUnit);   
+			badFactory.creating(EnemyCreator.TROLL, mas[2][4], 2, 4, unit_cont, masBadUnit);
+			badFactory.creating(EnemyCreator.SKELARCHER, mas[3][13], 3, 13, unit_cont, masBadUnit);
+			badFactory.creating(EnemyCreator.DEATH, mas[8][9], 8, 9, unit_cont, masBadUnit);   
 			 
 			menu = new Menu(mas); 
 			unit_cont.addChild(menu);  
@@ -100,8 +103,11 @@
 			unit_cont.y = -map.corY;
 			ui.addEventListener("END_TURN", livesTurn); 
 			addChild(ui);
-		} 
-		
+			var tween:TurnTweener = new TurnTweener("YOU TURN");
+			addChild(tween);
+			turn = true; 
+		}  
+		 
 		private function clickedOnMap(e:MouseEvent):void { 
 			if (!turn || menu.hitTestPoint(mouseX, mouseY, true)) return;
 			if (menu.cons && !menu.hitTestPoint(mouseX, mouseY, true) && menu.first) {
@@ -175,7 +181,7 @@
 							damage *= 2; 
 							hero.getDamage(0, true);   
 						} 
-						if (damage < 0) damage = 1; 
+						if (damage <= 0) damage = 1; 
 						enemy.getDamage(damage);       
 					}
 					//
@@ -185,7 +191,6 @@
 				} 
 			} 
 			attack_mode = false; 
-			//hero.addEventListener(Event.ENTER_FRAME, restate);
 		} 
 		
 		private function endTurn(obg:Unit):void {
@@ -201,11 +206,67 @@
 			for each (var unit:Unit in masGoodUnit) {
 				endTurn(unit);  
 			}
-		} 
+		}  
 		
-		private function EnemyTurn():void { 
+		private function EnemyTurn():void {
+			if (!turn) return;
 			var tween:TurnTweener = new TurnTweener("ENEMY TURN");
-			addChild(tween);
+			addChild(tween); 
+			turn = false;
+			removeEventListener(MouseEvent.MOUSE_MOVE, moveramk); 
+			removeEventListener(MouseEvent.CLICK, clickedOnMap, true);
+			enemyPoint = new Point(masBadUnit[0].x, masBadUnit[0].y);
+			//var dx:Number = enemyPoint.x - 400 - map.corX;     
+			//var dy:Number = enemyPoint.y - 240 - map.corY;
+			//angle = Math.atan2(dy, dx);
+			map.tracking = masBadUnit[0];
+			map.border = 200;  
+			addEventListener(Event.ENTER_FRAME, moveRamka2);
+			ramka.visible = false;  
+		}    
+		
+		private function moveRamka2(e:Event):void {
+			if ( masBadUnit[0].visible) {
+				var timer:Timer = new Timer(1000, 1);
+				timer.addEventListener(TimerEvent.TIMER_COMPLETE, ShowRamka);
+				timer.start(); 
+			}
+		}
+		
+		private function ShowRamka(e:TimerEvent):void {
+			e.target.removeEventListener(TimerEvent.TIMER_COMPLETE, ShowRamka);
+			e.target.stop();
+			map.border = 80;
+			ramka.visible = true;
+			removeEventListener(Event.ENTER_FRAME, moveRamka2);
+			var p:Point = unit_cont.localToGlobal(new Point(enemyPoint.x, enemyPoint.y));
+			ramka.x = p.x+8;
+			ramka.y = p.y+8;  
+		}
+		 
+		private function moveRamka(e:Event):void {
+			var p:Point = unit_cont.localToGlobal(new Point(enemyPoint.x+8, enemyPoint.y+8));
+			var dx:Number = p.x - ramka.x;     
+			var dy:Number = p.y - ramka.y; 
+			
+			var angle:Number = Math.atan2(dy, dx); 
+			 ramka.x += 8 * Math.cos(angle);
+			ramka.y += 8 * Math.sin(angle); 
+		}
+		 
+		private function corrRamka(e:Event):void { 
+			var p:Point = unit_cont.localToGlobal(new Point(enemyPoint.x, enemyPoint.y));
+			ramka.x = p.x+8;
+			ramka.y = p.y+8;
+		}
+		
+		private function reborder(e:TimerEvent):void {
+			ramka.removeEventListener(Event.ENTER_FRAME, corrRamka); 
+			e.target.stop();
+			e.target.removeEventListener(TimerEvent.TIMER_COMPLETE, reborder);
+			map.border = 80;
+			autoscroll = true;
+			//ramka.visible = true;  
 		}
 		
 		private function killUnit(e:MenuEvent):void {
@@ -221,13 +282,7 @@
 			unit.removeEventListener(MouseEvent.MOUSE_OVER, over_enemy);
 		}  
 		
-		private function restate(e:Event):void {
-			if (e.currentTarget.state.index == "stay") {
-				e.currentTarget.removeEventListener(Event.ENTER_FRAME, restate);  
-			} 
-		}
-		
-		private function comes(e:Event):void { 
+		private function comes(e:Event):void {  
 			e.target.removeEventListener("LAST_POINT", comes);
 			var obg:Unit = mas[curhero.y][curhero.x].unit;
 			obg.stay();
@@ -408,13 +463,8 @@
 		public function attack(tar:Unit):void {
 			var dirX:int;
 			var dirY:int;  
-			var direction:Array;
+			var direction:Array = tar.direction;
 			var unit:Unit;
-			
-			if (tar.type == "soldier") direction = [[ -1, 0], [1, 0], [0, -1], [0, 1]];   
-			else direction = [ [-1, 0], [1, 0], [0, -1], [0, 1],
-							 [-2, 0], [2, 0], [0, -2], [0, 2],
-							 [-1,-1], [1, 1], [-1, 1], [1,-1] ];  
 
 			var target:Point = gerCoord(tar.x, tar.y);  
 			
@@ -458,6 +508,10 @@
 			tar = null;   
 			e.target.addEventListener(MouseEvent.MOUSE_OVER, over_enemy);
 		}
+		
+		public function get _ramka():Ramka { return ramka; }
+		public function get _turn():Boolean { return turn; }
+		public function get _autoscroll():Boolean { return autoscroll; }
 //-----
 	}
 }

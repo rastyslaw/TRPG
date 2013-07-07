@@ -9,7 +9,7 @@ package  {
 	public class UI extends Sprite {
 		
 		public function UI(main:Game) { 
-			var endTurn:EndTurn = new EndTurn; 
+			var endTurn:EndTurn = new EndTurn;  
 			endTurn.y = endTurn.height;
 			endTurn.x = Constants.STAGE_WIDTH - endTurn.width; 
 			addChild(endTurn);

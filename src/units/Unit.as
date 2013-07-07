@@ -29,6 +29,8 @@ package units {
 		private var _def:uint;  
 		private var _agi:uint;   
 		private var hpBar:HpBar;
+		 
+		internal var _direction:Array; 
 		
 		//Abstract method  
 		internal function setSname():void {  
@@ -43,10 +45,15 @@ package units {
 			stay();  
 			setSpd();
 			setType(); 
-			setEnemy();
+			setEnemy(); 
 			_turn = true;
 			createBar();
-			setAttributes();  
+			setAttributes();
+			initDirection(); 
+		}
+		
+		internal function initDirection():void {
+			_direction = [[ -1, 0], [1, 0], [0, -1], [0, 1]]; 
 		}
 		
 		private function createBar():void {
@@ -136,6 +143,8 @@ package units {
 				
 		public function get agi():uint {	return _agi; }
 		public function set agi(value:uint):void { _agi = value; }
+		
+		public function get direction():Array {	return _direction; }
 			
 //-----		 
 	}

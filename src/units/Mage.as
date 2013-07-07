@@ -3,7 +3,7 @@ package units {
 	 * ...
 	 * @author waltasar
 	 */
-	internal class Mage extends MageUnit {
+	internal class Mage extends MageUnit { 
 		
 		override internal function setSname():void {
 			sname = "mage";   
