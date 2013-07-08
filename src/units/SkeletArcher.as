@@ -18,7 +18,7 @@ package units {
 		}
 		
 		override internal function setSpd():void { 
-			speed = 2; 
+			speed = 3; 
 		}
 		
 		override internal function setAttributes():void {

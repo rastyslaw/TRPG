@@ -14,7 +14,7 @@ package units {
 		}
 		
 		override internal function setAttributes():void {
-			hp = max_hp = 110;
+			hp = max_hp = 100;
 			att = 22;
 			def = 11;
 			agi = 6; 

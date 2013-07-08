@@ -31,6 +31,8 @@ package units {
 		private var hpBar:HpBar;
 		 
 		internal var _direction:Array; 
+		public var target:Unit; 
+		private var _agro:Unit; 
 		
 		//Abstract method  
 		internal function setSname():void {  
@@ -70,7 +72,7 @@ package units {
 		}
 		
 		internal function setSpd():void {
-			_speed = 4;   
+			_speed = 5;   
 		} 
 		
 		internal function setType():void { 
@@ -102,7 +104,7 @@ package units {
 			if (dodge) tween.value = "dodge"; 
 			else if (crit) tween.value = "crit";
 			else {
-				tween.value = String(value);
+				tween.value = String(value);  
 				hp -= value; 
 				if (hp <= 0) dispatchEvent(new MenuEvent("DEAD", this));  
 			}
@@ -144,8 +146,10 @@ package units {
 		public function get agi():uint {	return _agi; }
 		public function set agi(value:uint):void { _agi = value; }
 		
-		public function get direction():Array {	return _direction; }
-			
+		public function get direction():Array { return _direction; }
+		
+		public function get agro():Unit { return _agro; } 
+		public function set agro(value:Unit):void { _agro = value; }
 //-----		 
 	}
 }

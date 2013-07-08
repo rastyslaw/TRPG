@@ -40,6 +40,7 @@ package units {
 			}
 			return _direction; 
 		}
+		 
 //-----		
 	}
 }

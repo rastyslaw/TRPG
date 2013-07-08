@@ -7,13 +7,13 @@
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
 	import flash.geom.Point;
+	import flash.utils.setTimeout;
 	import flash.utils.Timer;
 	import units.*;  
 	import command.*;
 	
 	import com.greensock.*; 
 	import com.greensock.easing.*;
-
 
 	public class Game extends Sprite implements IReceiver { 
 		private static var distance:int = 400;   
@@ -22,7 +22,7 @@
 									[0,3,3,3,0,2,4,2,0,1,3,0,0,0,1,0,0,0,0,5],
 									[0,3,3,3,3,0,1,2,0,1,2,2,0,0,1,0,0,0,0,5],
 									[3,0,1,3,1,2,2,2,0,1,0,0,0,0,1,0,5,5,5,5], 
-									[3,3,0,3,0,5,3,1,0,1,0,0,3,0,1,0,5,0,0,1],
+									[3,3,0,3,0,1,3,1,0,1,0,0,3,0,1,0,5,0,0,1],
 									[1,0,2,0,0,0,0,5,0,1,0,0,0,3,1,0,5,0,0,1], 
 									[1,0,0,0,0,0,0,0,0,2,4,4,0,0,0,0,0,0,0,1], 
 									[5,0,0,3,0,0,0,2,0,4,4,4,0,0,0,0,0,0,0,1],
@@ -61,6 +61,7 @@
 		private var enemyPoint:Point;
 		private var cutTurnEnemy:int;  
 		private var skipper:Boolean; 
+		private var ai:AI;
 		
 		public function Game() {
 			ui = new UI(this);
@@ -82,18 +83,18 @@
 			 
 			addChild(unit_cont);
 			unit_cont.addChild(sqCont);  
-			lines = new DrawPath;  
-			unit_cont.addChild(lines);
-			
+			lines = new DrawPath;   
+			unit_cont.addChild(lines); 
+			 
 			goodFactory.creating(HeroCreator.GNOM, mas[3][3], 3, 3, unit_cont, masGoodUnit);
 			goodFactory.creating(HeroCreator.GNOM, mas[2][2], 2, 2, unit_cont, masGoodUnit);
-			goodFactory.creating(HeroCreator.ARCHER, mas[3][5], 3, 5, unit_cont, masGoodUnit);
+			goodFactory.creating(HeroCreator.ARCHER, mas[4][5], 4, 5, unit_cont, masGoodUnit);
 			goodFactory.creating(HeroCreator.MAGE, mas[2][5], 2, 5, unit_cont, masGoodUnit);
 			badFactory.creating(EnemyCreator.TROLL, mas[1][4], 1, 4, unit_cont, masBadUnit);
-			badFactory.creating(EnemyCreator.SKELARCHER, mas[3][13], 3, 13, unit_cont, masBadUnit);
+			//badFactory.creating(EnemyCreator.SKELARCHER, mas[3][13], 3, 13, unit_cont, masBadUnit);
 			badFactory.creating(EnemyCreator.DEATH, mas[7][9], 7, 9, unit_cont, masBadUnit);   
 			badFactory.creating(EnemyCreator.SKELARCHER, mas[7][10], 7, 10, unit_cont, masBadUnit);
-			// badFactory.creating(EnemyCreator.TROLL, mas[3][11], 3, 11, unit_cont, masBadUnit);
+			//badFactory.creating(EnemyCreator.TROLL, mas[3][11], 3, 11, unit_cont, masBadUnit);
 			 
 			menu = new Menu(mas); 
 			unit_cont.addChild(menu);   
@@ -116,16 +117,15 @@
 			if (!turn || menu.hitTestPoint(mouseX, mouseY, true)) return;
 			if (menu.cons && !menu.hitTestPoint(mouseX, mouseY, true) && menu.first) {
 				menu.killer(); 
-				return;  
-			} 
-			var numX:int = (mouseX + map.corX)/ grid_size;
+				return;    
+			}  
+			var numX:int = (mouseX + map.corX) / grid_size;
 		 	var numY:int = (mouseY + map.corY) / grid_size;
 			
 			var hero:Unit; 
 			var obj:Object; 
-			  
 			if (sqCont.hitTestPoint(mouseX, mouseY, true)) { 
-				if(!attack_mode){
+				if (!attack_mode) {
 					if (masPoint.length != 0) {
 						obj = mas[curhero.y][curhero.x]; 
 						hero = obj.unit; 
@@ -133,21 +133,27 @@
 						obj.unit = undefined;    
 						curhero = new Point(numX, numY);  
 						mas[numY][numX].unit = hero;   
-						hero.move();
+						hero.move(); 
 						var walker:Walke = new Walke(hero, masPoint, 5); 
-						walker.addEventListener("LAST_POINT", comes); 
+						walker.addEventListener("LAST_POINT", comes);  
 					}  
-				}
+				}  
 				else pressAttack(numX, numY); 
 				clearSq();   
 				return;
-			} 
-			clearSq();
-			
+			}   
+			clearSq();  
+			if (attack_mode) backMovement(mas[curhero.y][curhero.x].unit);  
+			attack_mode = false;   
 			if (mas[numY][numX].unit != undefined) { 
 				hero = mas[numY][numX].unit; 
-				if (hero.enemy || !hero.turn) return;  
-				curhero = new Point(numX, numY); 
+				if (hero.enemy || !hero.turn) return;
+				if (menu.cons) {
+					menu.killer();
+					backMovement(mas[curhero.y][curhero.x].unit);
+					return;
+				}
+				curhero = new Point(numX, numY);
 				menu.init(numX, numY, true); 
 				//unit_cont.setChildIndex(menu, unit_cont.numChildren-1);  
 				ramka.visible = false;     
@@ -156,14 +162,13 @@
 		 
 		private function pressAttack(x:int, y:int):void {
 			var s:String;
-			var hero:Unit;
+			var hero:Unit = mas[curhero.y][curhero.x].unit;
 			var enemy:Unit;
-			var cof:Number = 0;
+			var cof:Number = 1;
 			var damage:int;
 			
 			for (var i:int; i < enemyMas.length; i++ ) { 
 				if (enemyMas[i].x == x && enemyMas[i].y == y) {
-					hero = mas[curhero.y][curhero.x].unit;
 					enemy = mas[enemyMas[i].y][enemyMas[i].x].unit;
 					if (curhero.y == enemyMas[i].y) { 
 						if (curhero.x > enemyMas[i].x) s = "l";
@@ -178,8 +183,8 @@
 					if (Math.random() * 100 < enemy.agi) {
 						enemy.getDamage(0, false, true);
 					}
-					else {  
-						cof = 1 - mas[enemyMas[i].y][enemyMas[i].x].coff * .1;
+					else {   
+						if(mas[enemyMas[i].y][enemyMas[i].x].coff < 5) cof = 1 - mas[enemyMas[i].y][enemyMas[i].x].coff * .1;
 						damage = (hero.att - enemy.def) * cof;
 						if (Math.random() * 100 < hero.agi) {
 							damage *= 2; 
@@ -188,13 +193,18 @@
 						if (damage <= 0) damage = 1; 
 						enemy.getDamage(damage);       
 					}
-					//
-					enemy.addEventListener("DEAD", killUnit);
+					//  
+					//addEventListener(MenuEvent.DEAD, killUnit); 
+					if(enemy.hp <= 0) killUnit(enemy); 
 					endTurn(hero); 
+					hero.prev = null;  
 					break; 
 				} 
-			} 
-			attack_mode = false; 
+				else {
+					backMovement(hero); 
+				}
+			}
+			attack_mode = false;
 		} 
 		
 		private function endTurn(obg:Unit):void {
@@ -216,19 +226,35 @@
 			turn = true;  
 			YouTurn();   
 		}
-		
-		private function YouTurn():void {
-			trace("you turn"); 
-		}
+		 
+		private function YouTurn():void { 
+			var tween:TurnTweener = new TurnTweener("YOU TURN");
+			addChild(tween); 
+			for each (var unit:Unit in masBadUnit) {  
+				TweenMax.to(unit, 1.4, { colorMatrixFilter: { hue:0 }} );
+				unit.turn = true;
+				unit.agro = null; 
+				enemyTutnMas.splice(0, enemyTutnMas.length);
+			} 
+			addEventListener(MouseEvent.MOUSE_MOVE, moveramk);
+			addEventListener(MouseEvent.CLICK, clickedOnMap, true);
+			map.tracking = null;
+			map.border = 80; 
+		} 
 		 
 		private function livesTurn(e:Event):void {   
-			for each (var unit:Unit in masGoodUnit) {
-				endTurn(unit);  
-			}
+			//for each (var unit:Unit in masGoodUnit) {
+			//	endTurn(unit);
+			//}
+			EnemyTurn();  
 		}  
 		 
 		private function EnemyTurn():void {
-			if (!turn) return;
+			if (!turn) return; 
+			for each (var unit:Unit in masGoodUnit) { 
+				TweenMax.to(unit, 1.4, { colorMatrixFilter: { hue:0 }} );
+				unit.turn = true;   
+			} 
 			var tween:TurnTweener = new TurnTweener("ENEMY TURN");
 			addChild(tween); 
 			turn = false;
@@ -239,13 +265,14 @@
 			var dx:Number;     
 			var dy:Number;
 			var rast:Number;
-			for each (var badunit:Unit in masBadUnit) {
+			for each (var badunit:Unit in masBadUnit) { 
 				for each (var goodunit:Unit in masGoodUnit) {
 					dx = badunit.x - goodunit.x;
-					dy = badunit.y - goodunit.y; 
+					dy = badunit.y - goodunit.y;  
 					rast = Math.sqrt(dx * dx + dy * dy); 
 					if (rast < distance) {
-						RastLowerDistance(badunit); 
+						badunit.agro = goodunit;  
+						RastLowerDistance(badunit);  
 					}
 				}
 			} 
@@ -267,7 +294,10 @@
 					if (getIndex(dirX, dirY)) {   
 						unit = mas[dirY][dirX].unit;
 						if (unit != null) {
-							if (unit.enemy) RastLowerDistance(unit);
+							if (unit.enemy) { 
+								unit.agro = enemyTutnMas[j].agro;    
+								RastLowerDistance(unit);
+							}
 						}
 					}
 				}
@@ -311,17 +341,101 @@
 			var p:Point = unit_cont.localToGlobal(new Point(enemyPoint.x, enemyPoint.y));
 			ramka.x = p.x + 8; 
 			ramka.y = p.y + 8;
-			var ai:AI = new AI(EnemyUnit(enemyTutnMas[cutTurnEnemy]), gerCoord(enemyPoint.x, enemyPoint.y), mas, sqCont);  
-			/* 
-			p = gerCoord(enemyPoint.x, enemyPoint.y);  
-			var unit:EnemyUnit = mas[p.y][p.x].unit;
-			unit.skip();   
-			unit.addEventListener("FINISH", nextEnemy); 
-			*/
+			if (!skipper) {   
+				var pp:Point = gerCoord(enemyPoint.x, enemyPoint.y); 
+				ai = new AI(EnemyUnit(enemyTutnMas[cutTurnEnemy]), pp, mas, sqCont);  
+				var retMas:Array = ai.init();
+				if (retMas==null) {  
+					p = gerCoord(enemyPoint.x, enemyPoint.y);   
+					var unit2:EnemyUnit = mas[p.y][p.x].unit;
+					unit2.skip();   
+					unit2.addEventListener("FINISH", nextEnemy);
+					clearSq(); 
+					return;
+				} 
+				if ((pp.x != retMas[1].x) || (pp.y != retMas[1].y)) {
+					masPoint.splice(0, masPoint.length);  
+					p = getGoodPath(retMas[1]);   
+					masPoint.push(p);   
+					while (mas[p.y][p.x].unit == undefined) { 
+						p = getGoodPath(p);  
+						masPoint.push(p);    
+					} 
+					masPoint.splice(0, 0, retMas[1]); 
+					lines.masPath = masPoint; 
+					lines.scanAndDraw();   
+					 
+					if (masPoint.length != 0) { 
+						var obj:Object = mas[pp.y][pp.x];
+						var hero:Unit = enemyTutnMas[cutTurnEnemy];
+						hero.target = retMas[0];  
+						obj.unit = undefined; 
+						mas[retMas[1].y][retMas[1].x].unit = hero;
+						hero.move();
+						var walker:Walke = new Walke(hero, masPoint, 5); 
+						walker.addEventListener("LAST_POINT", enemyComes);   
+					}
+				}
+				else {
+					enemyTutnMas[cutTurnEnemy].target = retMas[0]; 
+					enemyComes(null); 
+				}
+				setTimeout(function():void { ramka.visible = false;}, 00);
+			}
+			else {  
+				p = gerCoord(enemyPoint.x, enemyPoint.y);   
+				var unit:EnemyUnit = mas[p.y][p.x].unit;
+				unit.skip();   
+				unit.addEventListener("FINISH", nextEnemy);  
+			}
 		}
-		 
-		private function nextEnemy(e:Event):void {
-			endTurnEnemy(Unit(e.target));
+		  
+		private function enemyComes(e:Event=null):void {   
+			if (e != null) e.target.removeEventListener("LAST_POINT", enemyComes);
+			clearSq();
+			var obg:Unit = enemyTutnMas[cutTurnEnemy];
+			var tar:Unit = obg.target;
+			if (tar == null) {
+				obg.stay();
+				nextEnemy();
+				return;
+			}
+			var s:String;  
+			var cof:Number = 1; 
+			var damage:int;  
+			obg.stay(); 
+			if (obg.y == tar.y) { 
+				if (obg.x > tar.x) s = "l";
+				else s = "r"; 
+			}  
+			else if (obg.y > tar.y) {   
+				 s = "t"; 
+			}
+			else s = "d";  
+			obg.attack(s); 
+			
+			if (Math.random() * 100 < tar.agi) {
+				tar.getDamage(0, false, true); 
+			}
+			else {
+				var p:Point = gerCoord(tar.x, tar.y); 
+				if(mas[p.y][p.x].coff < 5) cof = 1 - mas[p.y][p.x].coff * .1;  
+				damage = (obg.att - tar.def) * cof; 
+				if (Math.random() * 100 < obg.agi) { 
+					damage *= 2; 
+					obg.getDamage(0, true);   
+				} 
+				if (damage <= 0) damage = 1; 
+				tar.getDamage(damage);         
+			}
+			if (tar.hp <= 0) killUnit(tar);
+			nextEnemy(); 
+			//addEventListener(MenuEvent.DEAD, killUnit); 
+		} 
+		
+		private function nextEnemy(e:Event=null):void {
+			if (e == null) endTurnEnemy(enemyTutnMas[cutTurnEnemy]);
+			else endTurnEnemy(Unit(e.target));
 			if (turn) return; 
 			cutTurnEnemy++; 
 			nextStep();
@@ -375,13 +489,19 @@
 			map.border = 80;
 			//ramka.visible = true;  
 		}
-		*/
-		private function killUnit(e:MenuEvent):void {
-			var unit:Unit = e.tar;
+		*/ 
+		private function killUnit(unit:Unit):void {
 			var s:String;
 			unit_cont.removeChild(unit);
-			for (s in masBadUnit) {  
-				if (masBadUnit[s] == unit) masBadUnit.splice(int(s), 1);
+			if(unit.enemy){
+				for (s in masBadUnit) {  
+					if (masBadUnit[s] == unit) masBadUnit.splice(int(s), 1);
+				}
+			} 
+			else {  
+				for (s in masGoodUnit) {  
+					if (masGoodUnit[s] == unit) masGoodUnit.splice(int(s), 1);
+				}
 			}
 			var p:Point = gerCoord(unit.x, unit.y);  
 			mas[p.y][p.x].unit = undefined; 
@@ -405,6 +525,7 @@
 		
 		public function backMovement(tar:Unit):void {
 			var p:Point = tar.prev;
+			if (tar.prev == null) return; 
 			if(p.x == curhero.x && p.y == curhero.y) return; 
 			tar.x = p.x * grid_size - 8; 
 			tar.y = p.y * grid_size-8;
@@ -438,7 +559,7 @@
 			sqUnderPoint = new Point();
 		}  
 		   
-		private function clearWater():void {
+		private function clearWater():void { 
 			for each (var s:Vector.<Object> in mas) {
 				for each (var k:Object in s) {
 					k.water = 0;
@@ -526,7 +647,7 @@
 					masPoint.splice(0, masPoint.length); 
 					var p:Point = getGoodPath(sqUnderPoint); 
 					masPoint.push(p); 
-					while (mas[p.y][p.x].unit == undefined) {
+					while (mas[p.y][p.x].unit == undefined) { 
 						p = getGoodPath(p);  
 						masPoint.push(p);    
 					} 
@@ -537,20 +658,20 @@
 			}  
 		} 
 		
-		private function getGoodPath(point:Point):Point {
-			var min:int = 99;
-			var dirX:int;
-			var dirY:int; 
+		private function getGoodPath(point:Point):Point { 
+			var min:int = 99; 
+			var dirX:int; 
+			var dirY:int;  
 			var curWater:int; 
 			var p:Point = new Point(); 
 			var direction:Array = [[ -1, 0], [1, 0], [0, -1], [0, 1]];
 			for (var i:int = 0; i < direction.length; i++) {  
 				dirX = point.x + direction[i][0];
 				dirY = point.y + direction[i][1];
-				if (getIndex(dirX, dirY)) {  
+				if (getIndex(dirX, dirY)) {   
 					curWater = mas[dirY][dirX].water;
 					if (curWater == -1) return new Point(dirX, dirY); 
-					if (curWater < min) {
+					if (curWater < min && mas[dirY][dirX].unit==undefined) {
 						min = curWater;
 						p.x = dirX;
 						p.y = dirY;   
@@ -562,13 +683,13 @@
 		 
 		public static function gerCoord(x:Number, y:Number):Point {
 			var p:Point = new Point();
-			p.x = Math.floor((x+(Map.grid_size>>1)) / Map.grid_size);   
-			p.y = Math.floor((y+(Map.grid_size>>1)) / Map.grid_size);  
+			p.x = int((x+(Map.grid_size>>1)) / Map.grid_size);   
+			p.y = int((y+(Map.grid_size>>1)) / Map.grid_size);  
 			return p;
 		}
 		
 		public function attack(tar:Unit):void {
-			var dirX:int;
+			var dirX:int; 
 			var dirY:int;  
 			var direction:Array = tar.direction;
 			var unit:Unit;
@@ -615,7 +736,7 @@
 			tar = null;   
 			e.target.addEventListener(MouseEvent.MOUSE_OVER, over_enemy);
 		}
-		
+		 
 		public function get _ramka():Ramka { return ramka; }
 		public function get _turn():Boolean { return turn; }
 //-----

@@ -77,14 +77,26 @@ package  {
 				vector = new Vector.<Object>(worldCols, true); 
 				for(var j:int=0; j<worldCols; j++){ 
 					 c = aWorld[i][j];
-					 obj = new Object;    
-					 if(c == 1 || c == 2) obj.coff = 2;   
-					 else if (c == 3 || c == 4) obj.coff = 3;
-					 else if (c == 5) obj.coff = 9;  
-					 else obj.coff = 1;
+					 obj = new Object;
+					 switch(c) {
+						case 1:
+						case 2:
+							obj.coff = 2;   
+						break;
+						case 3:
+							obj.coff = 3;   
+						break;
+						case 4:
+							obj.coff = 5;    
+						break;
+						case 5: 
+							obj.coff = 9;    
+						break;
+						default: obj.coff = 1;   
+					 }
 					 vector[j] = obj;  
 				}   
-				mas[i] = vector;     
+				mas[i] = vector;      
 			}
 			viewWidth = 800;
 			viewHeight = 480; 
@@ -200,7 +212,7 @@ package  {
 				_speedY *= .86;
 			} 	    
 			if (!ui.hitTestPoint(mouseX, mouseY, true) || !game._turn)  updMapPos();    
-			game.unit_cont.x = -viewXOffset; 
+			game.unit_cont.x = -viewXOffset;  
 			game.unit_cont.y = -viewYOffset;  
 		}  
 		

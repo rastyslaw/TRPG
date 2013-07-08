@@ -9,10 +9,6 @@ package units {
 			sname = "death";   
 		}
 		
-		override internal function setType():void { 
-			type = "mage"; 
-		}
-		
 		override internal function setEnemy():void { 
 			enemy = true;  
 		}
