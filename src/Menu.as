@@ -32,16 +32,16 @@ package  {
 			enemyMas.splice(0, enemyMas.length);
 			obg = mas[numY][numX].unit;
 			type = obg.type;  
-			target = new Point(numX, numY);   
+			target = new Point(numX, numY);    
 			if (first) { 
 				elements.splice(4);     
 				if (!scanMas()) elements.splice(2); 
 				else if (type != "mage") elements.pop();    
 			}  
 			else {
-				elements.splice(1, 1);   
-				if (!scanMas()) elements.splice(1, 2); 
-				else if (type != "mage") elements.splice(2, 1);  
+				elements.splice(0, 2);   
+				if (!scanMas()) elements.splice(0, 2); 
+				else if (type != "mage") elements.splice(1, 1);  
 			}
 			this.x = numX * Map.grid_size;
 			this.y = numY * Map.grid_size;
@@ -88,14 +88,17 @@ package  {
 				case "B":  
 					eventName = MenuEvent.BACK;  
 				break;
-			}
+				case "C":  
+					eventName = MenuEvent.CHAR;  
+				break;
+			} 
 			dispatchEvent(new MenuEvent(eventName, obg)); 
-			killer(); 
+			if(s!="C") killer(); 
 		}
 		
-		public function killer():void {
+		public function killer():void { 
 			removeEventListener(MouseEvent.CLICK, sendNote);
-			removeChild(cont);  
+			if(this.contains(cont)) removeChild(cont);  
 			cons = false; 
 		}
 		

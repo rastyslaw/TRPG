@@ -12,6 +12,7 @@ package events {
 		public static const BACK:String  	= 'back';
 		public static const FINISH:String 	= 'finish'; 
 		public static const DEAD:String 	= 'dead'; 
+		public static const CHAR:String 	= 'char'; 
 		
 		public var tar:Unit;  
 		

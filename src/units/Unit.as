@@ -1,5 +1,6 @@
 package units {
 	import events.MenuEvent;
+	import flash.display.Bitmap;
 	import flash.errors.IllegalOperationError; 
 	import flash.display.Sprite; 
 	import flash.events.Event;
@@ -32,14 +33,38 @@ package units {
 		 
 		internal var _direction:Array; 
 		public var target:Unit; 
-		private var _agro:Unit; 
+		private var _agro:Unit;
+		private var _level:uint = 1;
+		private var _exp:uint = 10;
+		protected var _description:String;
+		protected var _itemMas:Array= []; 
 		
-		//Abstract method  
+		//Abstract method    
 		internal function setSname():void {  
 			throw new IllegalOperationError("Abstract method must be overridden in a subclass");
 		} 
-		 
-		internal function init():void {
+		
+		//Abstract method   
+		public function getIco():Bitmap {     
+			throw new IllegalOperationError("Abstract method must be overridden in a subclass");
+		}
+		
+		//Abstract method  
+		public function getName():String {   
+			throw new IllegalOperationError("Abstract method must be overridden in a subclass");
+		} 
+		
+		//Abstract method    
+		public function getClassName():String {     
+			throw new IllegalOperationError("Abstract method must be overridden in a subclass");
+		} 
+		
+		//Abstract method      
+		protected function setDescription():void {     
+			throw new IllegalOperationError("Abstract method must be overridden in a subclass");
+		}
+		
+		internal function init():void {  
 			moveState = new MoveState;
 			stayState = new StayState;
 			attackState = new AttackState;  
@@ -51,7 +76,8 @@ package units {
 			_turn = true;
 			createBar();
 			setAttributes();
-			initDirection(); 
+			initDirection();
+			setDescription(); 
 		}
 		
 		internal function initDirection():void {
@@ -150,6 +176,18 @@ package units {
 		
 		public function get agro():Unit { return _agro; } 
 		public function set agro(value:Unit):void { _agro = value; }
+		
+		public function get level():uint { return _level; } 
+		public function set level(value:uint):void { _level = value;}
+		 
+		public function get exp():uint { return _exp; }
+		public function set exp(value:uint):void { _exp = value; } 
+		
+		public function get description():String { return _description; }
+		public function get _sname():String { return sname; }
+		
+		public function get itemMas():Array { return _itemMas; }       
+		public function set itemMas(value:Array):void { _itemMas = value; }   
 //-----		 
 	}
 }

@@ -213,6 +213,7 @@ package  {
 			var damage:Number;
 			var p:Point;
 			var goodgay:Unit; 
+			var addIteration:int; 
 			
 			for (var i:int = 0; i < attMas.length; i++ ) {
 				if (attMas[i] != null) {
@@ -233,7 +234,8 @@ package  {
 					} 
 					if (smas.length > 1) {   
 					for (var s:int=0; s < smas.length-1; s++ ) {
-							masSq.splice(i, 0, masSq[i]);   
+							masSq.splice(i+addIteration, 0, masSq[i+addIteration]);
+							addIteration++;   
 						} 
 					}
 				} 
@@ -251,7 +253,8 @@ package  {
 					}  
 				} 
 				else arrackTransform.push(null);
-			} 
+			}
+			
 			var sortMas:Array = QSort.quickSort(damageMas, 0, damageMas.length - 1, masSq, true);
 			masSq = sortMas[1]; 
 			damageMas = sortMas[0]; 
@@ -261,7 +264,7 @@ package  {
 			sortMas = QSort.quickSort(damageMas, 0, damageMas.length - 1, placeMas);
 			placeMas = sortMas[1];  
 			damageMas = sortMas[0]; 
-
+			
 			resaltPoint = masSq[masSq.length-1];
 			resaltTarget = arrackTransform[arrackTransform.length-1];
 			for (var m:int=placeMas.length-1; m >= 0; m--) { 

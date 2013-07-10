@@ -25,7 +25,9 @@ package units {
 			removeChild(zzz); 
 			dispatchEvent(new Event("FINISH"));  
 		}
-		   
+		
+		override protected function setDescription():void {   }
+		
 		public function enemyDirection(s:String=null):Array {
 			switch(s) {
 				case "archer":

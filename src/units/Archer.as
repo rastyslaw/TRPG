@@ -1,10 +1,31 @@
 package units {
+	import flash.display.Bitmap;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
 	internal class Archer extends ArrowUnit {
+		
+		[Embed(source = "../../assets/faces/face_archer.png")]   
+		private var ico:Class; 
 		 
+		override public function getIco():Bitmap {   
+			return new ico(); 
+		}
+		 
+		override public function getName():String {   
+			return "Gess";
+		} 
+		
+		override public function getClassName():String {     
+			if (level <= 10) return "[Archer]";
+			else return "[Sniper]";
+		}
+		 
+		override protected function setDescription():void {   
+			_description = "1111";
+		}
+		
 		override internal function setSname():void {
 			sname = "archer";   
 		}

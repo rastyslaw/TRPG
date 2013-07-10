@@ -1,6 +1,7 @@
 ﻿package {
 	import command.MoveCommand;
 	import events.MenuEvent;
+	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -16,7 +17,8 @@
 	import com.greensock.easing.*;
 
 	public class Game extends Sprite implements IReceiver { 
-		private static var distance:int = 400;   
+		public static var distance:int = 400;
+		public static var scrolling:Boolean = true;  
 		private var map1:Array = [  [1,2,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5], 
 									[2,0,1,0,0,2,4,2,0,1,3,3,3,0,1,0,0,0,0,5],
 									[0,3,3,3,0,2,4,2,0,1,3,0,0,0,1,0,0,0,0,5],
@@ -32,10 +34,12 @@
 									[1,0,3,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
 									[1,0,0,0,1,0,0,0,0,0,0,0,0,1,5,0,0,0,4,4],
 									[1,0,3,2,0,0,5,0,0,0,3,0,0,0,0,1,0,4,4,4],
-									[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,4,4,4]]; 
-			
-		
-		private var ramka:Ramka;    
+									[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,4,4,4]];  
+			    
+		private var lootMas:Array = [["boots1_gnom", 2], ["chest1_gnom", 5], ["helm1_gnom", 4], ["shield1_gnom", 6], ["shield2_gnom", 12], ["weapon1_gnom", 4],
+									 ["weapon1_archer", 5], ["chest1_archer", 1], ["helm2_archer", 2], ["boots1_archer", 5], ["helm1_archer", 5],
+									 ["helm1_mage", 5], ["book1_mage", 1], ["book2_mage", 2], ["weapon1_mage", 2], ["chest2_mage", 2], ["chest1_mage", 2]];   
+		private var ramka:Ramka;     
 		public var unit_cont:Sprite = new Sprite;
 		private var sqCont:Sprite = new Sprite; 
 		public var masGoodUnit:Vector.<Unit> = new Vector.<Unit>;
@@ -62,6 +66,8 @@
 		private var cutTurnEnemy:int;  
 		private var skipper:Boolean; 
 		private var ai:AI;
+		private var infoLand:InfoLand;
+		private var charWindow:CharacterInfo; 
 		
 		public function Game() {
 			ui = new UI(this);
@@ -98,16 +104,19 @@
 			 
 			menu = new Menu(mas); 
 			unit_cont.addChild(menu);   
-			dispatcher = new Dispatcher(menu, this);
+			dispatcher = new Dispatcher(menu); 
 			dispatcher.setCommand(MenuEvent.MOVING, MoveCommand, this);   
 			dispatcher.setCommand(MenuEvent.ATTACK, AttackCommand, this); 
 			dispatcher.setCommand(MenuEvent.FINISH, FinishCommand, this);
 			dispatcher.setCommand(MenuEvent.BACK, BackCommand, this);   
+			dispatcher.setCommand(MenuEvent.CHAR, CharCommand, this);
 			
 			unit_cont.x = -map.corX;  
 			unit_cont.y = -map.corY;
 			ui.addEventListener("END_TURN", livesTurn); 
 			addChild(ui);
+			infoLand = new InfoLand;
+			addChild(infoLand);  
 			var tween:TurnTweener = new TurnTweener("YOU TURN");
 			addChild(tween);
 			turn = true; 
@@ -115,9 +124,9 @@
 		 
 		private function clickedOnMap(e:MouseEvent):void { 
 			if (!turn || menu.hitTestPoint(mouseX, mouseY, true)) return;
-			if (menu.cons && !menu.hitTestPoint(mouseX, mouseY, true) && menu.first) {
+			if (menu.cons && !menu.hitTestPoint(mouseX, mouseY, true) && menu.first) { 
 				menu.killer(); 
-				return;    
+				return;     
 			}  
 			var numX:int = (mouseX + map.corX) / grid_size;
 		 	var numY:int = (mouseY + map.corY) / grid_size;
@@ -149,10 +158,10 @@
 				hero = mas[numY][numX].unit; 
 				if (hero.enemy || !hero.turn) return;
 				if (menu.cons) {
-					menu.killer();
-					backMovement(mas[curhero.y][curhero.x].unit);
+					menu.killer(); 
+					if(!menu.first) backMovement(mas[curhero.y][curhero.x].unit);
 					return;
-				}
+				} 
 				curhero = new Point(numX, numY);
 				menu.init(numX, numY, true); 
 				//unit_cont.setChildIndex(menu, unit_cont.numChildren-1);  
@@ -245,7 +254,7 @@
 		private function livesTurn(e:Event):void {   
 			//for each (var unit:Unit in masGoodUnit) {
 			//	endTurn(unit);
-			//}
+			if (this.contains(charWindow)) charWindow.kill();  
 			EnemyTurn();  
 		}  
 		 
@@ -261,6 +270,8 @@
 			cutTurnEnemy = 0; 
 			removeEventListener(MouseEvent.MOUSE_MOVE, moveramk); 
 			removeEventListener(MouseEvent.CLICK, clickedOnMap, true);
+			infoLand.visible = false;
+			if (menu.cons) menu.killer();
 			
 			var dx:Number;     
 			var dy:Number;
@@ -342,7 +353,7 @@
 			ramka.x = p.x + 8; 
 			ramka.y = p.y + 8;
 			if (!skipper) {   
-				var pp:Point = gerCoord(enemyPoint.x, enemyPoint.y); 
+				var pp:Point = gerCoord(enemyPoint.x, enemyPoint.y);
 				ai = new AI(EnemyUnit(enemyTutnMas[cutTurnEnemy]), pp, mas, sqCont);  
 				var retMas:Array = ai.init();
 				if (retMas==null) {  
@@ -351,7 +362,7 @@
 					unit2.skip();   
 					unit2.addEventListener("FINISH", nextEnemy);
 					clearSq(); 
-					return;
+					return; 
 				} 
 				if ((pp.x != retMas[1].x) || (pp.y != retMas[1].y)) {
 					masPoint.splice(0, masPoint.length);  
@@ -364,7 +375,7 @@
 					masPoint.splice(0, 0, retMas[1]); 
 					lines.masPath = masPoint; 
 					lines.scanAndDraw();   
-					 
+					  
 					if (masPoint.length != 0) { 
 						var obj:Object = mas[pp.y][pp.x];
 						var hero:Unit = enemyTutnMas[cutTurnEnemy];
@@ -380,7 +391,7 @@
 					enemyTutnMas[cutTurnEnemy].target = retMas[0]; 
 					enemyComes(null); 
 				}
-				setTimeout(function():void { ramka.visible = false;}, 00);
+				setTimeout(relocateRamka, 200, retMas[1]);
 			}
 			else {  
 				p = gerCoord(enemyPoint.x, enemyPoint.y);   
@@ -389,7 +400,16 @@
 				unit.addEventListener("FINISH", nextEnemy);  
 			}
 		}
-		  
+		
+		private function relocateRamka(p:Point):void {
+			if (p != null) {
+				var num:Point = unit_cont.localToGlobal(new Point(p.x * grid_size, p.y * grid_size));
+				ramka.x = num.x;       
+				ramka.y = num.y; 
+			} 
+			lines.clear(); 
+		}
+		
 		private function enemyComes(e:Event=null):void {   
 			if (e != null) e.target.removeEventListener("LAST_POINT", enemyComes);
 			clearSq();
@@ -628,16 +648,21 @@
 		}
  
 		private function moveramk(e:MouseEvent):void {
-			if (menu.cons) return; 
+			if (menu.cons) return;
 				else ramka.visible = true; 
 			var numX:int = (mouseX + map.corX % grid_size) / grid_size;
 			var numY:int = (mouseY + map.corY % grid_size) / grid_size;
+			var tarX:int = (mouseX + map.corX) / grid_size; 
+			var tarY:int = (mouseY + map.corY) / grid_size;
+			
+			if(!infoLand.visible) infoLand.visible = true;
+			infoLand.percent.text = "0";
+			if (mas[tarY][tarX].coff < 5) infoLand.percent.text = String(mas[tarY][tarX].coff * 10);
+			
 			ramka.x = numX * grid_size - map.corX % grid_size;     
 			ramka.y = numY * grid_size - map.corY % grid_size;  
 			
 			if (sqCont.hitTestPoint(mouseX, mouseY, true) && !attack_mode) {
-				var tarX:int = (mouseX + map.corX) / grid_size; 
-				var tarY:int = (mouseY + map.corY) / grid_size;
 				if (mas[tarY][tarX].unit != undefined) {
 					masPoint.splice(0, masPoint.length);  
 					return;  
@@ -712,6 +737,26 @@
 				}
 			}
 			attack_mode = true; 
+		}  
+		
+		public function showChar(tar:Unit):void {   
+			removeEventListener(MouseEvent.MOUSE_MOVE, moveramk);
+			removeEventListener(MouseEvent.CLICK, clickedOnMap, true);
+			scrolling = false;
+			charWindow = new CharacterInfo(tar, lootMas); 
+			addChild(charWindow);  
+			charWindow.addEventListener("KILL", killChar);
+			charWindow.x = Constants.STAGE_WIDTH >> 1;
+			charWindow.y = Constants.STAGE_HEIGHT >> 1; 
+		}  
+		  
+		private function killChar(e:Event):void {
+			addEventListener(MouseEvent.MOUSE_MOVE, moveramk);
+			addEventListener(MouseEvent.CLICK, clickedOnMap, true);
+			removeChild(charWindow);
+			scrolling = true;
+			menu.mouseEnabled = true; 
+			menu.mouseChildren = true;
 		}
 		
 		public function over_enemy(e:MouseEvent):void {
@@ -724,7 +769,7 @@
 			tar.addEventListener(Event.ENTER_FRAME, rotateTar);
 			e.target.addEventListener(MouseEvent.MOUSE_OUT, out_enemy);
 		}
-		  
+		   
 		public function rotateTar(e:Event):void {
 			tar.rotation-=4;
 		}

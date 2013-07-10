@@ -208,10 +208,12 @@ package  {
 				else if (viewYOffset > (worldHeight-viewHeight)-1) {
 					viewYOffset = (worldHeight-viewHeight)-1;
 					//trace("hit end of world height");
-				}
+				} 
 				_speedY *= .86;
 			} 	    
-			if (!ui.hitTestPoint(mouseX, mouseY, true) || !game._turn)  updMapPos();    
+			if (!ui.hitTestPoint(mouseX, mouseY, true) || !game._turn) {
+				if(Game.scrolling) updMapPos();     
+			}
 			game.unit_cont.x = -viewXOffset;  
 			game.unit_cont.y = -viewYOffset;  
 		}  

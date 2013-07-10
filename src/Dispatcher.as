@@ -10,11 +10,9 @@ package  {
 		private var commandList:Vector.<ICommand>;  
 		private var eventList:Vector.<String>; 
 		private var menu:Menu; 
-		private var game:Game;
 		
-		public function Dispatcher(tar:Menu, main:Game):void {
+		public function Dispatcher(tar:Menu):void {
 			menu = tar;
-			game = main; 
 			commandList = new Vector.<ICommand>();   
 			eventList = new Vector.<String>(); 
 		}
