@@ -38,7 +38,8 @@ package units {
 			hp = max_hp = 16;
 			att = 8;
 			def = 3;
-			agi = 2; 
+			agi = 2;
+			mp = max_mp = 20;
 		}
 //-----		
 	}

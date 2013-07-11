@@ -1,6 +1,8 @@
 package  {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.DisplayObject;
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -44,30 +46,74 @@ package  {
 		}
 		
 		private function init():void {
-			main.ico.addChildAt(unit.getIco(), 0);
+			main.ico.addChildAt(unit.getIco(), 0); 
 			main.level.text = String(unit.level); 
 			main.infoProgress.text = String(unit.exp);
 			main.progress.lod.width = unit.exp * 96 / 100;  
 			main.clas.text = unit.getClassName();  
-			main.nam.text = unit.getName(); 
-			main.hp.text = String(unit.hp + "/" + unit.max_hp); 
-			if (unit.type == "mage") main.mp.text = String(MageUnit(unit).mp + "/" + MageUnit(unit).max_mp);
+			main.nam.text = unit.getName();
+			refreshHpMp();
 		}
-		
+		 
+		private function refreshHpMp():void {  
+			var hpadd:int;
+			var mpadd:int;
+			var mas:Array = unit.getBonus();
+			var index:int; 
+			var reg:RegExp =/\D+/;
+			var ss:String;
+			for each (var s:String in mas) {
+				ss = reg.exec(s);
+				switch(ss) { 
+					case "HP":
+						hpadd =  int(s.substr(0, s.search(ss)));
+					break; 
+					case "MP":   
+						if (unit.type == "mage") mpadd = int(s.substr(0, s.search(ss)));
+					break;
+				}
+			}
+			main.hp.text = String((unit.hp+hpadd) + "/" + (unit.max_hp+hpadd)); 
+			if (unit.type == "mage") main.mp.text = String((MageUnit(unit).mp+mpadd) + "/" + (MageUnit(unit).max_mp+mpadd));
+		} 
+		 
 		private function atr_open(e:MouseEvent=null):void { 
 			main.attributes.removeEventListener(MouseEvent.CLICK, atr_open);
 			bg.gotoAndStop(1); 
 			bg.at.text = String(unit.att); 
 			bg.df.text = String(unit.def); 
-			bg.ag.text = String(unit.agi);  	 
+			bg.ag.text = String(unit.agi);  	   
 			bg.mv.text = String(unit.speed);
-			bg.info.text = unit.description;
+			var mas:Array = unit.getBonus();
+			var index:int; 
+			var reg:RegExp =/\D+/;
+			var ss:String;
+			for each (var s:String in mas) {
+				ss = reg.exec(s);
+				switch(ss) {
+					case "AT":
+						bg.at.text = String(int(bg.at.text) + int( s.substr(0, s.search(ss)) ));
+					break;
+					case "DF":
+						bg.df.text = String(int(bg.df.text) + int( s.substr(0, s.search(ss)) ));
+					break;
+					case "AG": 
+						bg.ag.text = String(int(bg.ag.text) + int( s.substr(0, s.search(ss)) ));
+					break;
+					case "MV":  
+						bg.mv.text = String(int(bg.mv.text) + int( s.substr(0, s.search(ss)) ));
+					break;
+				}
+			} 
+			bg.info.text = unit.description;  
+			bg.infoSpell.visible = false;  
 			main.inventory.addEventListener(MouseEvent.CLICK, inv_open);
 		}
 		
 		private function inv_open(e:MouseEvent=null):void { 
 			main.inventory.removeEventListener(MouseEvent.CLICK, inv_open);
 			bg.gotoAndStop(2);
+			bg.infoLoot.visible = false;  
 			bg.cont.scrollRect = new Rectangle(0, 0, 156, 210);   
 			bg.progress.visible = false;
 			var place:Loot; 
@@ -81,8 +127,7 @@ package  {
 				place.y = (i%4)*52; 
 				bg.cont.addChild(place);
 				botom = place.x + 52; 
-				place.who = lootMas[i][0]; 
-				place.par = lootMas[i][1];
+				place.mas = lootMas[i];  
 				Width = lootXml.SubTexture.(attribute('name') == lootMas[i][0]).@width;
 				Height = lootXml.SubTexture.(attribute('name') == lootMas[i][0]).@height;
 				bmpd = new BitmapData(Width, Height);  
@@ -104,6 +149,12 @@ package  {
 			bg.all.addEventListener(MouseEvent.CLICK, sort);
 			drawCurLoot();
 			main.attributes.addEventListener(MouseEvent.CLICK, atr_open);
+			 
+			bg.helm_slot.addEventListener(MouseEvent.CLICK, remove);
+			bg.weapon_slot.addEventListener(MouseEvent.CLICK, remove);
+			bg.shield_slot.addEventListener(MouseEvent.CLICK, remove);
+			bg.boots_slot.addEventListener(MouseEvent.CLICK, remove);
+			bg.chest_slot.addEventListener(MouseEvent.CLICK, remove);  
 		}
 		
 		private function drawCurLoot():void { 
@@ -115,12 +166,11 @@ package  {
 			var mas:Array = unit.itemMas;
 			for (var j:int; j < mas.length; j++) {
 				item = new Loot;
-				item.who = mas[j][0];   
-				item.par = mas[j][1]; 
+				item.mas = mas[j]; 
 				if (mas[j][0].search("weapon") != -1) bg.weapon_slot.addChild(item);
 				else if (mas[j][0].search("boots") != -1) bg.boots_slot.addChild(item); 
 				else if (mas[j][0].search("chest") != -1) bg.chest_slot.addChild(item);
-				else if (mas[j][0].search("helm") != -1) bg.head_slot.addChild(item); 
+				else if (mas[j][0].search("helm") != -1) bg.helm_slot.addChild(item); 
 				else bg.shield_slot.addChild(item);    
 			 
 				Width = lootXml.SubTexture.(attribute('name') == mas[j][0]).@width;
@@ -130,17 +180,124 @@ package  {
                        new Rectangle(lootXml.SubTexture.(attribute('name') == mas[j][0]).@x, lootXml.SubTexture.(attribute('name') == mas[j][0]).@y, Width, Height), 
                        new Point(0, 0)); 
 				bmp = new Bitmap(bmpd);   
-				item.addChild(bmp);    
+				item.addChild(bmp);      
 				item.addEventListener(MouseEvent.MOUSE_OVER, showStat);
 			}     
 		}
 		
 		private function showStat(e:MouseEvent):void {
-			trace(e.currentTarget.par);  
+			var item:Loot = Loot(e.currentTarget);
+			item.removeEventListener(MouseEvent.MOUSE_OVER, showStat);
+			bg.infoLoot.visible = true;
+			var p:Point;
+			var bol:Boolean = bg.cont.contains(item);
+			var slot:Place = Place(bg.getChildByName(item.slot + "_slot"));
+			var back:Loot; 
+			if (slot.numChildren > 1) back = Loot(slot.getChildAt(1)); 
+			if (bol) {   
+				p = bg.cont.localToGlobal(new Point(item.x, item.y));
+				p = bg.globalToLocal(p); 
+			}
+			else {  
+				p = item.parent.localToGlobal(new Point(item.x, item.y));
+				p = bg.globalToLocal(p);
+			}
+			bg.infoLoot.x = p.x;   
+			bg.infoLoot.y = p.y;
+			
+			for (var i:int=1; i < bg.infoLoot.numChildren; i++) {
+				bg.infoLoot.getChildAt(i).visible = false;  
+			} 
+			bg.infoLoot.at_stat.y = -12;
+			bg.infoLoot.df_stat.y = bg.infoLoot.at_stat.y + 24; 
+			bg.infoLoot.ag_stat.y = bg.infoLoot.df_stat.y + 24;
+			bg.infoLoot.hp_stat.y = bg.infoLoot.ag_stat.y + 24; 
+			bg.infoLoot.mp_stat.y = bg.infoLoot.hp_stat.y + 24;
+			bg.infoLoot.complect.y = bg.infoLoot.mp_stat.y + 24;
+			bg.infoLoot.bg.height = 190;
+				 
+			var per:int;  
+			var iter:int = 24; 
+			if (item.att > 0) {   
+				bg.infoLoot.at_stat.visible = true;
+				bg.infoLoot.at_stat._add.text = "";   
+				bg.infoLoot.at_stat.num.text = String(item.att);
+				if (bol && back != null) infoLine(bg.infoLoot.at_stat, item.att, back.att);
+			}
+			else per += iter;
+			if (item.def > 0) {
+				bg.infoLoot.df_stat.y -= per; 
+				bg.infoLoot.df_stat.visible = true; 
+				bg.infoLoot.df_stat._add.text = "";   
+				bg.infoLoot.df_stat.num.text = String(item.def);   
+				if (bol && back != null) if (bol && back != null) infoLine(bg.infoLoot.df_stat, item.def, back.def);
+			}
+			else per += iter;
+			if (item.agi > 0) {
+				bg.infoLoot.ag_stat.y -= per; 
+				bg.infoLoot.ag_stat.visible = true; 
+				bg.infoLoot.ag_stat._add.text = "";   
+				bg.infoLoot.ag_stat.num.text = String(item.agi);   
+				if (bol && back != null) if (bol && back != null) infoLine(bg.infoLoot.ag_stat, item.agi, back.agi);
+			}
+			else per += iter;
+			if (item.hp > 0) {
+				bg.infoLoot.hp_stat.y -= per; 
+				bg.infoLoot.hp_stat.visible = true; 
+				bg.infoLoot.hp_stat._add.text = "";   
+				bg.infoLoot.hp_stat.num.text = String(item.hp);   
+				if (bol && back != null) if (bol && back != null) infoLine(bg.infoLoot.hp_stat, item.hp, back.hp);
+			}
+			else per += iter;
+			if (item.mp > 0) {
+				bg.infoLoot.mp_stat.y -= per; 
+				bg.infoLoot.mp_stat.visible = true; 
+				bg.infoLoot.mp_stat._add.text = "";   
+				bg.infoLoot.mp_stat.num.text = String(item.mp);   
+				if (bol && back != null) if (bol && back != null) infoLine(bg.infoLoot.mp_stat, item.mp, back.mp);
+			}
+			else per += iter; 
+			  
+			if (item.sett != null) {
+				var s:String = item.sett;
+				bg.infoLoot.complect.visible = true;
+				bg.infoLoot.complect.y -= per;    
+				bg.infoLoot.complect.num.text = s;
+				bg.infoLoot.complect.b1.text = Game.setsMas[s][0];
+				bg.infoLoot.complect.b2.text = Game.setsMas[s][1];
+				bg.infoLoot.complect.b1.textColor = bg.infoLoot.complect.b2.textColor = 0xff0000;
+				var k:int;
+				var mas:Array = unit.itemMas;
+				for (var j:int; j < mas.length; j++) {
+					if (mas[j][6]==s) k++;
+				}
+				if (k > 1) bg.infoLoot.complect.b1.textColor = 0x00ff00;
+				if (k > 3) bg.infoLoot.complect.b2.textColor = 0x00ff00; 
+			}
+			else per += bg.infoLoot.complect.height;  
+			bg.infoLoot.bg.height -= per; 
+			e.currentTarget.addEventListener(MouseEvent.MOUSE_OUT, hideStat);
+		}
+		 
+		private function infoLine(obg:MovieClip, now:int, prew:int):void {
+			if (Math.abs(now - prew) == 0) {
+				obg._add.text = "";
+				return;
+			} 
+			obg._add.text = "("+String(now - prew)+")";   
+			if (prew < now) obg._add.textColor = "0x00ff00";
+			else obg._add.textColor = "0xff0000"; 
+		}
+		
+		private function hideStat(e:MouseEvent):void {
+			e.currentTarget.removeEventListener(MouseEvent.MOUSE_OUT, hideStat);
+			bg.infoLoot.visible = false;  
+			e.currentTarget.addEventListener(MouseEvent.MOUSE_OVER, showStat); 
 		}
 		
 		private function equip(e:MouseEvent):void {
-			var loot:Loot = Loot(e.currentTarget); 
+			var loot:Loot = Loot(e.currentTarget);
+			e.currentTarget.removeEventListener(MouseEvent.CLICK, equip); 
 			if (e.shiftKey) {
 				for (var i:int; i < bg.cont.numChildren; i++) {
 					if (bg.cont.getChildAt(i) == loot) { 
@@ -150,72 +307,63 @@ package  {
 					}
 				}
 			}
-			else {
+			else { 
 				if (sortState=="only") equipCurItem(loot);  
 				else if( loot.who.search(unit._sname) != -1 ) equipCurItem(loot);    
   			}
+			refreshHpMp(); 
 		} 
 		
+		private function remove(e:MouseEvent):void {
+			if (e.currentTarget.numChildren > 1) { 
+				var item:Loot = e.currentTarget.getChildAt(1);
+				e.currentTarget.removeChild(item); 
+				bg.cont.addChild(item);
+				item.addEventListener(MouseEvent.CLICK, equip);   
+				lootMas.push(item.mas);
+				var mas:Array = unit.itemMas;
+					for (var j:int; j < mas.length; j++) {
+						if (mas[j][0]==item.who) {
+							mas.splice(j, 1);  
+						}
+					}     
+			}
+			sorting(sortState);
+			refreshHpMp(); 
+		}  
+		 
 		private function equipCurItem(item:Loot):void {
 			for (var i:int; i < bg.cont.numChildren; i++) {
-				if (bg.cont.getChildAt(i) == item) {   
-					bg.cont.removeChild(item);  
+				if (bg.cont.getChildAt(i) == item) {    
+					bg.cont.removeChild(item); 
+					item.removeEventListener(MouseEvent.CLICK, equip); 
+					lootMas.splice(i, 1); 
 				}   
 			}
-			var bol:Boolean; 
-			var lot:Loot;  
-			if (item.who.search("weapon") != -1) {
-				if (bg.weapon_slot.numChildren > 1) {
-					lot = Loot(bg.weapon_slot.getChildAt(1));
-					bg.weapon_slot.removeChild(lot);
-					bol = true; 
-				}
-				bg.weapon_slot.addChild(item); 
-			}
-			else if (item.who.search("boots") != -1) {
-				if (bg.boots_slot.numChildren > 1) {
-					lot = Loot(bg.boots_slot.getChildAt(1));
-					bg.boots_slot.removeChild(lot);
-					bol = true;
-				}
-				bg.boots_slot.addChild(item); 
-			}
-			else if (item.who.search("chest") != -1) {
-				if (bg.chest_slot.numChildren > 1) {
-					lot = Loot(bg.chest_slot.getChildAt(1));
-					bg.chest_slot.removeChild(lot);
-					bol = true;
-				}
-				bg.chest_slot.addChild(item);
-			}
-			else if (item.who.search("helm") != -1) {
-				if (bg.head_slot.numChildren > 1) {
-					lot = Loot(bg.head_slot.getChildAt(1));
-					bg.head_slot.removeChild(lot);
-					bol = true; 
-				}
-				bg.head_slot.addChild(item); 
-			}
-			else {
-				if (bg.shield_slot.numChildren > 1) {
-					lot = Loot(bg.shield_slot.getChildAt(1));
-					bg.shield_slot.removeChild(lot);
+			var bol:Boolean;  
+			var lot:Loot;
+			var place:Place = Place(bg.getChildByName(item.slot + "_slot"));
+			if (place.numChildren > 1) {
+					lot = Loot(place.getChildAt(1));
+					place.removeChild(lot);
 					bol = true;  
 				}
-				bg.shield_slot.addChild(item);    
-			}
-			item.x = item.y = 0;
+			place.addChild(item);  
+			item.x = item.y = 0;  
+			 
 			var mas:Array = unit.itemMas;
-			if (bol) {
+			if (bol) { 
 				bg.cont.addChild(lot);
+				lootMas.push(lot.mas);  
+				lot.addEventListener(MouseEvent.CLICK, equip); 
 				for (var j:int; j < mas.length; j++) {
-					if (mas[j][0]==lot.who && mas[j][1]==lot.par) {
+					if (mas[j][0]==lot.who) {
 						mas.splice(j, 1); 
 					}
-				}     
-			}
+				}      
+			}   
 			item.addEventListener(MouseEvent.MOUSE_OVER, showStat); 
-			mas.push([item.who, item.par]);
+			mas.push(item.mas);
 			sorting(sortState);  
 		} 
 			

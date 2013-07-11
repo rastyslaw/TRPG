@@ -138,6 +138,29 @@ package units {
 			addChild(tween);
 			tween.x = tween.y = 40;
 		}
+		 
+		public function correctLoot(num:int):int { 
+			var bonus:int;
+			for (var i:int; i < itemMas.length; i++) {
+				bonus += itemMas[i][num];
+			}  
+			return bonus;   
+		}
+		 
+		public function getBonus():Array { 
+			var s:String = "";
+			var mas:Array = [];
+			var rex:Array = [];  
+			for (var i:int; i < itemMas.length; i++) { 
+				s = itemMas[i][6]; 
+				if (s != null && Search.lookLine(mas, s)==0) {   
+					if (Search.look(itemMas, s, 6) > 1) rex.push(Game.setsMas[s][0]);  
+					if (Search.look(itemMas, s, 6) > 3) rex.push(Game.setsMas[s][1]);  
+					mas.push(s) 
+				} 
+			}  
+			return rex;   
+		}
 		
 		public function get speed():int { return _speed; }
 		public function set speed(value:int):void { _speed = value;  }
@@ -154,22 +177,33 @@ package units {
 		public function get prev():Point {	return _prev; } 
 		public function set prev(value:Point):void { _prev = value; }
 		
-		public function get hp():int { return _hp; } 
+		public function get hp():int {
+			return _hp+correctLoot(4);
+		}  
 		public function set hp(value:int):void {
 			_hp = value;
-			hpBar.tt.text = String(value); 
+			hpBar.tt.text = String(value);  
+		}
+		 
+		public function get max_hp():int {
+			return _max_hp+correctLoot(4); 
 		}
 		
-		public function get max_hp():int { return _max_hp; }
 		public function set max_hp(value:int):void { _max_hp = value; }
 				
-		public function get att():uint { return _att; }
+		public function get att():uint {
+			return _att+correctLoot(1); 
+		}
 		public function set att(value:uint):void { _att = value; }
 				
-		public function get def():uint { return _def; }  
+		public function get def():uint {
+			return _def+correctLoot(2);
+		}  
 		public function set def(value:uint):void { _def = value; }
 				
-		public function get agi():uint {	return _agi; }
+		public function get agi():uint {
+			return _agi+correctLoot(3);
+		}
 		public function set agi(value:uint):void { _agi = value; }
 		
 		public function get direction():Array { return _direction; }

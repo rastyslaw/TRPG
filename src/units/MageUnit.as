@@ -1,4 +1,6 @@
 package units {
+	import spell.Fireball;
+	import spell.ISpell; 
 	/**
 	 * ...
 	 * @author waltasar
@@ -7,9 +9,9 @@ package units {
 		
 		private var _mp:int;
 		private var _max_mp:int;   
-		private var spellMas:Array; 
-		 
-		override internal function setType():void { 
+		private var _spellMas:Vector.<ISpell> = Vector.<ISpell>([new Fireball]);    
+		  
+		override internal function setType():void {   
 			type = "mage"; 
 		}
 		
@@ -19,12 +21,19 @@ package units {
 						   [-1,-1], [1, 1], [-1, 1], [1,-1] ]; 
 		}
 		
-		public function get mp():int { return _mp; }
+		public function get mp():int {  
+			return _mp+correctLoot(5); 
+		}
 		public function set mp(value:int):void { _mp = value; }
 		
-		public function get max_mp():int { return _max_mp; }
+		public function get max_mp():int {
+			return _max_mp+correctLoot(5); 
+		}
 		public function set max_mp(value:int):void { _max_mp = value; }
 		
+		public function get spellMas():Vector.<ISpell> {
+			return _spellMas;  
+		}
 //-----		
 	}
 }

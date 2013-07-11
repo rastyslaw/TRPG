@@ -1,16 +1,30 @@
 package  {
 	import events.MenuEvent;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
+	import flash.geom.Rectangle;
+	import spell.ISpell;
+	import units.MageUnit;
 	import units.Unit;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
 	public class Menu extends Sprite { 
-		  
+		
+		[Embed(source = "../assets/spell.xml", mimeType = "application/octet-stream")]
+		public static const TextureXMLData:Class;
+  
+		[Embed(source = "../assets/spell.png")]   
+		public static const TextureData:Class;
+		
+		private var spellXml:XML;
+		private var texture:Bitmap;
 		private var mas:Vector.<Object>; 
 		private var elements:Array; 
 		private var obg:Unit;  
@@ -18,23 +32,26 @@ package  {
 		private var enemyMas:Vector.<Point> = new Vector.<Point>(); 
 		private var target:Point;
 		private var radius:int = 60; 
-		private var cont:Sprite;
+		private var cont:Sprite;  
+		private var spellcont:Sprite; 
 		private var _cons:Boolean; 
 		private var _first:Boolean;
 		
 		public function Menu(mas:Vector.<Object>) {
-			this.mas = mas;   
+			this.mas = mas; 
+			texture = Bitmap(new TextureData());  
+			spellXml = XML(new TextureXMLData());     
 		}  
 		
 		public function init(numX:int, numY:int, first:Boolean):void {
 			_first = first;
-			elements = [Cbtn, Mbtn, Abtn, Sbtn, Bbtn, Obtn];
+			elements = [Cbtn, Mbtn, Abtn, Sbtn, Bbtn, Obtn]; 
 			enemyMas.splice(0, enemyMas.length);
 			obg = mas[numY][numX].unit;
 			type = obg.type;  
 			target = new Point(numX, numY);    
 			if (first) { 
-				elements.splice(4);     
+				elements.splice(4);      
 				if (!scanMas()) elements.splice(2); 
 				else if (type != "mage") elements.pop();    
 			}  
@@ -50,14 +67,14 @@ package  {
 		}
 		
 		private function drawMenu():void {
-			cont = new Sprite; 
+			cont = new Sprite;  
 			var len:int = elements.length; 
 			var angle:int = 360 / len;
 			var c:DisplayObject;
 			var curAngle:int;  
 			var rad:Number;
 			for (var i:int; i < len; i++) {
-				rad = curAngle * Math.PI / 180;
+				rad = curAngle * Math.PI / 180;  
 				c = new elements[i];
 				c.y = radius * Math.sin(rad);  
 				c.x = radius * Math.cos(rad);
@@ -66,8 +83,8 @@ package  {
 			}
 			addChild(cont); 
 			cont.x = Map.grid_size >> 1; 
-			cont.y = Map.grid_size >> 1;
-			addEventListener(MouseEvent.CLICK, sendNote); 
+			cont.y = Map.grid_size >> 1; 
+			cont.addEventListener(MouseEvent.CLICK, sendNote); 
 		}
 		
 		private function sendNote(e:MouseEvent):void {
@@ -91,14 +108,86 @@ package  {
 				case "C":  
 					eventName = MenuEvent.CHAR;  
 				break;
-			} 
-			dispatchEvent(new MenuEvent(eventName, obg)); 
+			}   
+			if (s != "S") dispatchEvent(new MenuEvent(eventName, obg));
+			else {
+				spellClicked();
+				return; 
+			}
 			if(s!="C") killer(); 
 		}
 		
-		public function killer():void { 
+		private function spellClicked():void {
+			cont.visible = false;
+			if (spellcont!=null) {
+				spellcont.visible = true;
+				return; 
+			}
+			var mas:Vector.<ISpell> = MageUnit(obg).spellMas; 
+			var len:int = mas.length; 
+			var angle:int = 360 / (len+1);
+			var c:MenuElm;   
+			var curAngle:int;   
+			var rad:Number; 
+			spellcont = new Sprite; 
+			var ex:ZBtn = new ZBtn;  
+			rad = curAngle * Math.PI / 180;
+			ex.y = radius * Math.sin(rad);  
+			ex.x = radius * Math.cos(rad);
+			spellcont.addChild(ex);
+			curAngle += angle;
+			
+			var bmpd:BitmapData;
+			var bmp:Bitmap; 
+			var Width:Number;
+			var Height:Number;
+			var sname:String; 
+			for (var i:int; i < len; i++) { 
+				rad = curAngle * Math.PI / 180;  
+				c = new MenuElm;  
+				c.y = radius * Math.sin(rad);  
+				c.x = radius * Math.cos(rad); 
+				spellcont.addChild(c);
+				sname = mas[i].ico;   
+				Width = spellXml.SubTexture.(attribute('name') == sname).@width;
+				Height = spellXml.SubTexture.(attribute('name') == sname).@height; 
+				bmpd = new BitmapData(Width, Height);  
+				bmpd.copyPixels(texture.bitmapData,        
+                       new Rectangle(spellXml.SubTexture.(attribute('name') == sname).@x, spellXml.SubTexture.(attribute('name') == sname).@y, Width, Height), 
+                       new Point(0, 0));  
+				bmp = new Bitmap(bmpd);
+				bmp.scaleX = bmp.scaleY = 0.7;   
+				bmp.x -= bmp.width >> 1;
+				bmp.y -= bmp.height >> 1;
+				c.addChild(bmp);   
+				curAngle += angle;
+			}  
+			addChild(spellcont); 
+			spellcont.x = Map.grid_size >> 1;   
+			spellcont.y = Map.grid_size >> 1;  
+			spellcont.addEventListener(MouseEvent.CLICK, clickOnSpell); 
+		}
+		 
+		private function clickOnSpell(e:MouseEvent):void {
+			if (e.target is ZBtn) {
+				spellcont.visible = false;
+				cont.visible = true; 
+			}
+			else {
+				
+			}
+		}
+		
+		public function killer():void {
 			removeEventListener(MouseEvent.CLICK, sendNote);
-			if(this.contains(cont)) removeChild(cont);  
+			if (cont!=null) { 
+				removeChild(cont); 
+				cont = null;   
+			}  
+			if (spellcont!=null) { 
+				removeChild(spellcont);
+				spellcont = null; 
+			}
 			cons = false; 
 		}
 		

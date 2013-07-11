@@ -16,7 +16,13 @@
 	import com.greensock.*; 
 	import com.greensock.easing.*;
 
-	public class Game extends Sprite implements IReceiver { 
+	public class Game extends Sprite implements IReceiver {
+		public static const RAMKA_SIMPLE:uint     = 0;  
+		public static const RAMKA_CROSS:uint      = 1;
+		public static const RAMKA_SQUARE:uint	  = 2; 
+		public static const RAMKA_LINE:uint       = 3;   
+		public static const RAMKA_GRANDCROSS:uint = 4;
+		 
 		public static var distance:int = 400;
 		public static var scrolling:Boolean = true;  
 		private var map1:Array = [  [1,2,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5], 
@@ -35,12 +41,13 @@
 									[1,0,0,0,1,0,0,0,0,0,0,0,0,1,5,0,0,0,4,4],
 									[1,0,3,2,0,0,5,0,0,0,3,0,0,0,0,1,0,4,4,4],
 									[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,4,4,4]];  
-			    
-		private var lootMas:Array = [["boots1_gnom", 2], ["chest1_gnom", 5], ["helm1_gnom", 4], ["shield1_gnom", 6], ["shield2_gnom", 12], ["weapon1_gnom", 4],
-									 ["weapon1_archer", 5], ["chest1_archer", 1], ["helm2_archer", 2], ["boots1_archer", 5], ["helm1_archer", 5],
-									 ["helm1_mage", 5], ["book1_mage", 1], ["book2_mage", 2], ["weapon1_mage", 2], ["chest2_mage", 2], ["chest1_mage", 2]];   
-		private var ramka:Ramka;     
-		public var unit_cont:Sprite = new Sprite;
+			     
+		private var lootMas:Array = [["boots1_gnom",0,2,0,0,0], ["chest1_gnom",0,5,2,0,0,"gnomset1"], ["helm1_gnom", 0,4,0,10,0,"gnomset1"], ["shield1_gnom", 0,6,0,0,0,"gnomset1"], ["shield2_gnom", 0,12,0,20,0], ["weapon1_gnom", 4,0,0,0,0],
+									 ["weapon1_archer", 5,0,0,0,0,"archerset1"], ["chest1_archer", 0,1,0,0,0], ["helm2_archer", 0,1,0,0,0,"archerset1"], ["boots1_archer", 0,1,0,0,0,"archerset1"], ["helm1_archer", 0,1,0,0,0], 
+									 ["helm1_mage",0,4,0,0,0,"mageset1"], ["book1_mage", 0,0,0,0,10,"mageset1"], ["book2_mage", 0,0,0,0,20], ["weapon1_mage", 12,0,0,0,0,"mageset1"], ["chest2_mage", 0,4,0,0,0,"mageset1"], ["chest1_mage", 0,4,0,0,0]];    
+		public static var setsMas:Object = {"archerset1":["2AT","4AG"], "gnomset1":["2DF","20HP"], "mageset1":["10HP","20MP"]};    
+		private var ramka:Ramka;       
+		public var unit_cont:Sprite = new Sprite; 
 		private var sqCont:Sprite = new Sprite; 
 		public var masGoodUnit:Vector.<Unit> = new Vector.<Unit>;
 		public var masBadUnit:Vector.<Unit> = new Vector.<Unit>;
@@ -69,7 +76,7 @@
 		private var infoLand:InfoLand;
 		private var charWindow:CharacterInfo; 
 		
-		public function Game() {
+		public function Game() { 
 			ui = new UI(this);
 			map = new Map(map1, this);
 			addChild(map);
@@ -83,7 +90,7 @@
 			ramka.width = ramka.height = grid_size;  
 			addEventListener(MouseEvent.MOUSE_MOVE, moveramk);
 			addEventListener(MouseEvent.CLICK, clickedOnMap, true);
-			  
+			   
 			var goodFactory:CreatorUnits = new HeroCreator;
 			var badFactory:CreatorUnits = new EnemyCreator;
 			 
@@ -118,15 +125,15 @@
 			infoLand = new InfoLand;
 			addChild(infoLand);  
 			var tween:TurnTweener = new TurnTweener("YOU TURN");
-			addChild(tween);
+			addChild(tween); 
 			turn = true; 
 		}  
 		 
 		private function clickedOnMap(e:MouseEvent):void { 
 			if (!turn || menu.hitTestPoint(mouseX, mouseY, true)) return;
 			if (menu.cons && !menu.hitTestPoint(mouseX, mouseY, true) && menu.first) { 
-				menu.killer(); 
-				return;     
+				menu.killer();  
+				return;      
 			}  
 			var numX:int = (mouseX + map.corX) / grid_size;
 		 	var numY:int = (mouseY + map.corY) / grid_size;
@@ -509,9 +516,9 @@
 			map.border = 80;
 			//ramka.visible = true;  
 		}
-		*/ 
-		private function killUnit(unit:Unit):void {
-			var s:String;
+		*/  
+		public function killUnit(unit:Unit):void { 
+			var s:String; 
 			unit_cont.removeChild(unit);
 			if(unit.enemy){
 				for (s in masBadUnit) {  
@@ -522,7 +529,7 @@
 				for (s in masGoodUnit) {  
 					if (masGoodUnit[s] == unit) masGoodUnit.splice(int(s), 1);
 				}
-			}
+			} 
 			var p:Point = gerCoord(unit.x, unit.y);  
 			mas[p.y][p.x].unit = undefined; 
 			unit.removeEventListener(MouseEvent.MOUSE_OUT, out_enemy);
@@ -705,14 +712,14 @@
 			}
 			return p; 
 		}
-		 
+		   
 		public static function gerCoord(x:Number, y:Number):Point {
 			var p:Point = new Point();
 			p.x = int((x+(Map.grid_size>>1)) / Map.grid_size);   
 			p.y = int((y+(Map.grid_size>>1)) / Map.grid_size);  
 			return p;
 		}
-		
+		  
 		public function attack(tar:Unit):void {
 			var dirX:int; 
 			var dirY:int;  
