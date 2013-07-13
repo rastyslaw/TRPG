@@ -5,6 +5,7 @@ package units {
 	 */
 	public interface IState {
 		function createAndPlay(type:Unit):void;
+		function get index():String; 
 	} 
 //-----	
 }

@@ -78,6 +78,8 @@ package  {
 				for(var j:int=0; j<worldCols; j++){ 
 					 c = aWorld[i][j];
 					 obj = new Object;
+					 obj.i = i;
+					 obj.j = j; 
 					 switch(c) {
 						case 1:
 						case 2:

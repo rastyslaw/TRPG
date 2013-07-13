@@ -27,7 +27,7 @@ package units {
 		}
 		
 		override internal function setSname():void {
-			sname = "gnom";   
+			sname = "gnom";    
 		}
 		 
 		override internal function setSpd():void { 

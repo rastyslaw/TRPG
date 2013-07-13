@@ -10,10 +10,12 @@ package {
 		
 		private var obg:DamageBar;
 		private var _value:String;
-		  
+		private var _color:uint = 0xDDE901; 
+		
 		public function init():void {
 			obg = new DamageBar;
-			obg.tt.text = _value;   
+			obg.tt.text = _value;
+			obg.tt.textColor = _color;   
 			addChild(obg);   
 			TweenLite.to(obg, 0.3, { y:-20, ease:Quint.easeOut, onComplete:onFinishTween}); 
 		}
@@ -27,6 +29,10 @@ package {
 		}
 		
 		public function set value(value:String):void { _value = value; }
+		 
+		public function set color(value:uint):void {
+			_color = value;
+		}
 //-----		
 	}
 }

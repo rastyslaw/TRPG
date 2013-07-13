@@ -5,12 +5,14 @@ package units {
 	import flash.display.Sprite; 
 	import flash.events.Event;
 	import flash.geom.Point;
+	import spell.effect.Grave;
+	import spell.effect.IEffect;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
 	//Abstract class 
-	public class Unit extends Sprite { 
+	public class Unit extends Sprite implements IObserver { 
 		
 		private var _speed:int;  
 		private var _type:String;
@@ -22,22 +24,25 @@ package units {
 		private var moveState:MoveState;
 		private var attackState:AttackState;   
 		public var hero:Animation;  
-		internal var sname:String;   
+		private var _sname:String;    
 		
 		private var _hp:int;
 		private var _max_hp:int;  
 		private var _att:uint;
 		private var _def:uint;  
 		private var _agi:uint;   
-		private var hpBar:HpBar;
+		public var hpBar:HpBar;
 		 
 		internal var _direction:Array; 
 		public var target:Unit; 
 		private var _agro:Unit;
 		private var _level:uint = 1;
-		private var _exp:uint = 10;
+		private var _exp:uint = 10; 
 		protected var _description:String;
-		protected var _itemMas:Array= []; 
+		protected var _itemMas:Array = [];
+		
+		protected var _effects:Vector.<IEffect> = new Vector.<IEffect>;  
+		protected var _timeEffects:Vector.<int> = new Vector.<int>; 
 		
 		//Abstract method    
 		internal function setSname():void {  
@@ -122,13 +127,31 @@ package units {
 		public function attack(value:String):void {
 			state = attackState;   
 			attackState.side = value;
-			state.createAndPlay(this);   
-		} 
+			state.createAndPlay(this);    
+		}
 		 
-		public function getDamage(value:int, crit:Boolean=false, dodge:Boolean=false):void {
-			var tween:TweenBar = new TweenBar();
+		public function cast(value:String):void {
+			state = attackState;   
+			attackState.side = value;
+			attackState.index = "cast"; 
+			state.createAndPlay(this);    
+		}
+		
+		public function grave():void {
+			var grave:Grave = new Grave(this); 
+			_effects.push(grave);
+			_timeEffects.push(grave.timer);
+			grave.apply();   
+		} 
+		
+		public function getDamage(value:int, crit:Boolean=false, dodge:Boolean=false, color:uint=0):void {
+			var tween:TweenBar = new TweenBar(); 
+			if (color != 0) tween.color = color; 
 			if (dodge) tween.value = "dodge"; 
-			else if (crit) tween.value = "crit";
+			else if (crit) {
+				tween.value = "crit";
+				exp = value;  
+			}
 			else {
 				tween.value = String(value);  
 				hp -= value; 
@@ -160,6 +183,19 @@ package units {
 				} 
 			}  
 			return rex;   
+		}
+		
+		public function update():void {
+			for (var i:int; i < _timeEffects.length; i++ ) {
+				if (_timeEffects[i] <= 1) {
+					trace("gfhfg");
+					IEffect(_effects[i]).cancel();
+					_timeEffects.splice(i, 1);
+					_effects.splice(i, 1);
+					break;  
+				}  
+				else _timeEffects[i]--; 
+			}
 		}
 		
 		public function get speed():int { return _speed; }
@@ -215,13 +251,31 @@ package units {
 		public function set level(value:uint):void { _level = value;}
 		 
 		public function get exp():uint { return _exp; }
-		public function set exp(value:uint):void { _exp = value; } 
+		public function set exp(value:uint):void { 
+			_exp += value;
+			if (_exp >= 100) {
+				_exp = 0;
+				level++; 
+			}
+		} 
 		
 		public function get description():String { return _description; }
-		public function get _sname():String { return sname; }
+		
+		public function get sname():String {
+			if (level < 10) return _sname;
+			else return _sname+"_dual";  
+		} 
+		public function set sname(value:String):void { _sname = value; }
 		
 		public function get itemMas():Array { return _itemMas; }       
 		public function set itemMas(value:Array):void { _itemMas = value; }   
+		
+		public function setEffects(value:IEffect):void {
+			_effects.push(value); 
+			_timeEffects.push(value.timer);
+			value.apply(); 
+		}
+		
 //-----		 
 	}
 }

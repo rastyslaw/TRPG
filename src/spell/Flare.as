@@ -1,24 +1,23 @@
 package spell {
 	import flash.display.Sprite;
-	import flash.geom.Point;
+	import flash.geom.Point; 
 	import units.Unit;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
-	public class Fireball implements ISpell {
-		
-		private var spdam:Number = 2;  
+	public class Flare implements ISpell {
+		 
+		private var spdam:Number = 6.5;   
 		private var unit:Unit;
-		private var direction:Array = [[ -1, 0], [1, 0], [0, -1], [0, 1]];
 		 
 		public function get ico():String { 
-			return "spell9";  
+			return "spell8";  
 		}
 		
-		public function get ramka():int { 
-			return Game.RAMKA_CROSS;    
-		}
+		public function get ramka():int {  
+			return Game.RAMKA_SIMPLE;    
+		} 
 		
 		public function get summon():Boolean {
 			return false;     
@@ -37,8 +36,7 @@ package spell {
 			var dirX:int; 
 			var dirY:int; 
 			var cof:Number = 1;
-			var damage:int;
-			var exp:uint;  
+			var damage:int; 
 			var base_damage:int = unit.att * spdam; 
 			if (Math.random() * 100 < unit.agi) { 
 				base_damage *= 2;   
@@ -50,31 +48,12 @@ package spell {
 				if (hero.enemy) { 
 					if (mas[dirY][dirX].coff < 5) cof = 1 - mas[dirY][dirX].coff * .1; 
 					damage = (base_damage - hero.def) * cof;   
-					if (damage <= 0) damage = 1;
-					exp += damage;  
+					if (damage <= 0) damage = 1; 
 					hero.getDamage(damage, false, false, 0xff6600);    
 					if(hero.hp <= 0) game.killUnit(hero); 
 				}
 			}   
-			 
-			for (var i:int = 0; i < direction.length; i++) {   
-				dirX = numX + direction[i][0];     
-				dirY = numY + direction[i][1]; 
-				if (Game.getIndex(dirX, dirY)) {  
-					if (mas[dirY][dirX].unit != undefined) { 
-						hero = mas[dirY][dirX].unit; 
-						if (hero.enemy) {     
-							if (mas[dirY][dirX].coff < 5) cof = 1 - mas[dirY][dirX].coff * .1;
-							damage = (base_damage-hero.def) * cof;
-							if (damage <= 0) damage = 1;
-							exp += damage;  
-							hero.getDamage(damage, false, false, 0xff6600);    
-							if(hero.hp <= 0) game.killUnit(hero);   
-						} 
-					}   
-				}  
-			}
-			unit.exp = uint(exp * 0.8); 
+			unit.exp = damage;   
 			var s:String;
 			var p:Point = Game.gerCoord(unit.x, unit.y); 
 			if (p.y == numY) { 
@@ -90,7 +69,6 @@ package spell {
 			game.endTurn(unit);   
 			unit.prev = null; 
 		}
-		
-//-----		 
+//-----		
 	}
 }

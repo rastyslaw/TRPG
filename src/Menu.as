@@ -122,12 +122,12 @@ package  {
 			if (spellcont!=null) {
 				spellcont.visible = true;
 				return; 
-			}
+			} 
 			var mas:Vector.<ISpell> = MageUnit(obg).spellMas; 
 			var len:int = mas.length; 
 			var angle:int = 360 / (len+1);
 			var c:MenuElm;   
-			var curAngle:int;   
+			var curAngle:int;     
 			var rad:Number; 
 			spellcont = new Sprite; 
 			var ex:ZBtn = new ZBtn;  
@@ -172,10 +172,15 @@ package  {
 			if (e.target is ZBtn) {
 				spellcont.visible = false;
 				cont.visible = true; 
-			}
-			else {
-				
-			}
+			} 
+			else { 
+				var mas:Vector.<ISpell> = MageUnit(obg).spellMas;
+				var i:int = spellcont.getChildIndex(DisplayObject(e.target));
+				Game.curcast = mas[i - 1];
+				Game.curcast.tar = obg; 
+				dispatchEvent(new MenuEvent(MenuEvent.CAST, obg));
+				killer(); 
+			} 
 		}
 		
 		public function killer():void {

@@ -13,6 +13,7 @@ package events {
 		public static const FINISH:String 	= 'finish'; 
 		public static const DEAD:String 	= 'dead'; 
 		public static const CHAR:String 	= 'char'; 
+		public static const CAST:String 	= 'cast'; 
 		
 		public var tar:Unit;  
 		

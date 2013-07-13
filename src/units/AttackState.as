@@ -10,7 +10,7 @@ package units {
 		
 		private var _index:String = "attack";  
 		private var _side:String; 
-		private var unit:Unit;
+		private var unit:Unit; 
 		 
 		public function createAndPlay(type:Unit):void {
 			unit = type; 
@@ -23,7 +23,6 @@ package units {
 			hero.scaleX = hero.scaleY = 0.8; 
 			hero.addEventListener("FINISH", goStay); 
 			type.hero = hero; 
-			
 		}  
 		
 		private function goStay(e:Event):void { 
@@ -34,8 +33,12 @@ package units {
 		public function set side(value:String):void {
 			_side = value; 
 		}
-		
+		 
 		public function get index():String { return _index; }
+		
+		public function set index(value:String):void {
+			_index = value; 
+		}
 //-----		
 	}
 }

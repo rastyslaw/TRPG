@@ -1,5 +1,5 @@
 package units {
-	import spell.Fireball;
+	import flash.errors.IllegalOperationError;
 	import spell.ISpell; 
 	/**
 	 * ...
@@ -9,10 +9,18 @@ package units {
 		
 		private var _mp:int;
 		private var _max_mp:int;   
-		private var _spellMas:Vector.<ISpell> = Vector.<ISpell>([new Fireball]);    
-		  
+		protected var _spellMas:Vector.<ISpell>;   
+		    
+		public function MageUnit() {
+			setSpellMas(); 
+		}
+		 
 		override internal function setType():void {   
 			type = "mage"; 
+		}
+		 
+		protected function setSpellMas():void {      
+			throw new IllegalOperationError("Abstract method must be overridden in a subclass");
 		}
 		
 		override internal function initDirection():void {

@@ -1,35 +1,35 @@
 package spell {
-	import flash.display.Sprite;
 	import flash.geom.Point;
 	import units.Unit;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
-	public class Fireball implements ISpell {
-		
-		private var spdam:Number = 2;  
+	public class RainOfFire implements ISpell {
+		 
+		private var spdam:Number = 1.5;     
 		private var unit:Unit;
-		private var direction:Array = [[ -1, 0], [1, 0], [0, -1], [0, 1]];
+		private var direction:Array = [[ -1, 0], [1, 0], [0, -1], [0, 1], 
+									   [ -1, -1], [1, -1], [1, -1], [-1, 1]];
 		 
 		public function get ico():String { 
-			return "spell9";  
+			return "spell10";    
 		}
 		
-		public function get ramka():int { 
-			return Game.RAMKA_CROSS;    
-		}
+		public function get ramka():int {  
+			return Game.RAMKA_SQUARE;     
+		} 
 		
-		public function get summon():Boolean {
+		public function get summon():Boolean { 
 			return false;     
 		}
 		 
 		public function set tar(value:Unit):void {
 			unit = value;  
 		}
-		  
+		 
 		public function get baff():Boolean {
-			return false;      
+			return false;       
 		}
 		
 		public function cast(numX:int, numY:int, mas:Vector.<Object>, game:Game):void {
@@ -51,7 +51,7 @@ package spell {
 					if (mas[dirY][dirX].coff < 5) cof = 1 - mas[dirY][dirX].coff * .1; 
 					damage = (base_damage - hero.def) * cof;   
 					if (damage <= 0) damage = 1;
-					exp += damage;  
+					exp += damage; 
 					hero.getDamage(damage, false, false, 0xff6600);    
 					if(hero.hp <= 0) game.killUnit(hero); 
 				}
@@ -74,7 +74,7 @@ package spell {
 					}   
 				}  
 			}
-			unit.exp = uint(exp * 0.8); 
+			unit.exp = uint(exp * 0.6); 
 			var s:String;
 			var p:Point = Game.gerCoord(unit.x, unit.y); 
 			if (p.y == numY) { 
@@ -91,6 +91,6 @@ package spell {
 			unit.prev = null; 
 		}
 		
-//-----		 
+//-----		
 	}
 }

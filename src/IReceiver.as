@@ -9,7 +9,8 @@ package  {
 		function attack(tar:Unit):void; 
 		function finishMovement(tar:Unit):void; 
 		function backMovement(tar:Unit):void;
-		function showChar(tar:Unit):void; 
+		function showChar(tar:Unit):void;
+		function castNow(tar:Unit):void; 
 	}
 //-----	
 }

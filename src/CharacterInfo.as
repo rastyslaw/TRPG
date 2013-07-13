@@ -309,7 +309,7 @@ package  {
 			}
 			else { 
 				if (sortState=="only") equipCurItem(loot);  
-				else if( loot.who.search(unit._sname) != -1 ) equipCurItem(loot);    
+				else if( loot.who.search(unit.sname) != -1 ) equipCurItem(loot);    
   			}
 			refreshHpMp(); 
 		} 
@@ -388,7 +388,7 @@ package  {
 			for (i=0; i < bg.cont.numChildren; i++ ) {
 				loot = Loot(bg.cont.getChildAt(i)); 
 				if (s != "all") {
-					if (loot.who.search(unit._sname) == -1) {
+					if (loot.who.search(unit.sname) == -1) {
 							loot.visible = false;
 							j++;
 					}

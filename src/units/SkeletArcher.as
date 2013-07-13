@@ -22,7 +22,7 @@ package units {
 		}
 		
 		override internal function setAttributes():void {
-			hp = max_hp = 20;
+			hp = max_hp = 60;
 			att = 26;
 			def = 2;
 			agi = 19; 

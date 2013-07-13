@@ -21,7 +21,7 @@ package {
 			removeEventListener(Event.ADDED_TO_STAGE, init);  
 			animationManager = new AnimationManager();    
 			animationManager.addAnimation("Gnom_stay", "gnom_stay"); 
-			animationManager.addAnimation("Gnom_walk", "gnom_walk"); 
+			animationManager.addAnimation("Gnom_walk", "gnom_walk");  
 			animationManager.addAnimation("Gnom_attack_t", "gnom_attack_t"); 
 			animationManager.addAnimation("Gnom_attack_d", "gnom_attack_d");  
 			animationManager.addAnimation("Gnom_attack_l", "gnom_attack_l"); 
@@ -40,12 +40,17 @@ package {
 			animationManager.addAnimation("Mage_attack_d", "mage_attack_d");  
 			animationManager.addAnimation("Mage_attack_l", "mage_attack_l"); 
 			animationManager.addAnimation("Mage_attack_r", "mage_attack_r");
+			animationManager.addAnimation("Mage_cast_t", "mage_cast_t"); 
+			animationManager.addAnimation("Mage_cast_d", "mage_cast_d");  
+			animationManager.addAnimation("Mage_cast_l", "mage_cast_l");  
+			animationManager.addAnimation("Mage_cast_r", "mage_cast_r");
 			
+			//enemy
 			animationManager.addAnimation("Troll_stay", "troll_stay");
 			animationManager.addAnimation("Troll_walk", "troll_walk");  
 			animationManager.addAnimation("Troll_attack_t", "troll_attack_t"); 
 			animationManager.addAnimation("Troll_attack_d", "troll_attack_d");  
-			animationManager.addAnimation("Troll_attack_l", "troll_attack_l"); 
+			animationManager.addAnimation("Troll_attack_l", "troll_attack_l");  
 			animationManager.addAnimation("Troll_attack_r", "troll_attack_r");
 			 
 			animationManager.addAnimation("SkeletArcher_stay", "skeletarcher_stay");
