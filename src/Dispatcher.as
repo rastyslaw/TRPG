@@ -18,7 +18,7 @@ package  {
 		}
 		
 		public function setCommand(event:String, commandClassRef:Class, rec:IReceiver):void {
-			commandList.push(new commandClassRef(rec));   
+			commandList.push( new commandClassRef(rec) );   
 			eventList.push(event);  
 			menu.addEventListener(event, run);   
 		}
