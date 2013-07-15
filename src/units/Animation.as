@@ -35,12 +35,16 @@
 		private var moveSide:int;
 		
 		public function Animation():void {
+			Sheep_stay; Sheep_walk;
 			Archer_stay; Archer_walk; Archer_attack_d; Archer_attack_t; Archer_attack_l; Archer_attack_r;
-			Mage_stay; Mage_walk; Mage_attack_d; Mage_attack_t; Mage_attack_l; Mage_attack_r; Mage_cast_d; Mage_cast_t; Mage_cast_l; Mage_cast_r; 
+			Mage_stay; Mage_walk; Mage_attack_d; Mage_attack_t; Mage_attack_l; Mage_attack_r; Mage_cast_d; Mage_cast_t; Mage_cast_l; Mage_cast_r;
+			Priest_stay; Priest_walk; Priest_attack_d; Priest_attack_t; Priest_attack_l; Priest_attack_r; Priest_cast_d; Priest_cast_t; Priest_cast_l; Priest_cast_r;  
 			Troll_stay; Troll_walk; Troll_attack_d; Troll_attack_t; Troll_attack_l; Troll_attack_r;
 			SkeletArcher_stay; SkeletArcher_walk; SkeletArcher_attack_d; SkeletArcher_attack_t; SkeletArcher_attack_l; SkeletArcher_attack_r;
 			Death_stay; Death_walk; Death_attack_d; Death_attack_t; Death_attack_l; Death_attack_r;
 			Gnom_stay; Gnom_walk; Gnom_attack_d; Gnom_attack_t; Gnom_attack_l; Gnom_attack_r; 
+			Raise_stay; Raise_walk; Raise_attack_d; Raise_attack_t; Raise_attack_l; Raise_attack_r;
+			Spider_stay; Spider_walk; Spider_attack_d; Spider_attack_t; Spider_attack_l; Spider_attack_r; 
 		}
 		 
 		public function buildAnimation(identifier:String):void {

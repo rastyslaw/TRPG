@@ -28,14 +28,14 @@ package units {
 		
 		override internal function setSname():void {
 			sname = "archer";   
-		}
+		} 
 		 
 		override internal function setSpd():void { 
 			speed = 2; 
 		}
 		
 		override internal function setAttributes():void {
-			hp = max_hp = 70;
+			hp = max_hp = 20;
 			att = 12;
 			def = 8;
 			agi = 8; 

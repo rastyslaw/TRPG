@@ -7,42 +7,46 @@ package units {
 	import flash.geom.Point;
 	import spell.effect.Grave;
 	import spell.effect.IEffect;
+	import spell.skill.ISkill;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
 	//Abstract class 
-	public class Unit extends Sprite implements IObserver { 
+	public class Unit extends Sprite { 
 		
 		private var _speed:int;  
 		private var _type:String;
 		private var _enemy:Boolean; 
 		private var _turn:Boolean;
 		private var _prev:Point; 
-		public var state:IState;
 		private var stayState:StayState;
 		private var moveState:MoveState;
-		private var attackState:AttackState;   
-		public var hero:Animation;  
-		private var _sname:String;    
-		
+		private var attackState:AttackState;
+		private var _sname:String;   
 		private var _hp:int;
-		private var _max_hp:int;  
+		private var _max_hp:int;   
 		private var _att:uint;
 		private var _def:uint;  
-		private var _agi:uint;   
-		public var hpBar:HpBar;
-		 
-		internal var _direction:Array; 
-		public var target:Unit; 
+		private var _agi:uint;  
 		private var _agro:Unit;
 		private var _level:uint = 1;
 		private var _exp:uint = 10; 
+		private var graves:Grave; 
+		private var _issheep:Boolean;  
+		
 		protected var _description:String;
 		protected var _itemMas:Array = [];
-		
 		protected var _effects:Vector.<IEffect> = new Vector.<IEffect>;  
-		protected var _timeEffects:Vector.<int> = new Vector.<int>; 
+		protected var _skills:Vector.<ISkill>; 
+		 
+		internal var _direction:Array; 
+		
+		public var hero:Animation;  
+		public var state:IState;  
+		public var hpBar:HpBar;
+		public var target:Unit; 
+		public var mainMas:Vector.<Unit>;
 		
 		//Abstract method    
 		internal function setSname():void {  
@@ -82,11 +86,16 @@ package units {
 			createBar();
 			setAttributes();
 			initDirection();
-			setDescription(); 
+			setDescription();
+			setSkilMas(); 
 		}
 		
 		internal function initDirection():void {
 			_direction = [[ -1, 0], [1, 0], [0, -1], [0, 1]]; 
+		}
+		 
+		protected function setSkilMas():void {      
+			 _skills = new Vector.<ISkill>;   
 		}
 		
 		private function createBar():void {
@@ -107,7 +116,7 @@ package units {
 		} 
 		
 		internal function setType():void { 
-			_type = "soldier";    
+			_type = "soldier";     
 		}
 		 
 		internal function setEnemy():void {
@@ -138,30 +147,66 @@ package units {
 		}
 		
 		public function grave():void {
-			var grave:Grave = new Grave(this); 
-			_effects.push(grave);
-			_timeEffects.push(grave.timer);
-			grave.apply();   
+			graves = new Grave(this); 
+			_effects.push(graves);  
+			graves.apply();
+			Game.effects.subscribeObserver(graves);   
 		} 
+		
+		public function raincar():void { 
+			stay(); 
+			hp = max_hp * 0.2;   
+			mainMas.push(this);
+			for (var e:int; e < _effects.length; e++ ) {
+				if (_effects[e] == graves) _effects.splice(e, 1);
+			}
+			graves.back();  
+			Game.effects.unsubscribeObserver(IObserver(graves));
+			graves = null;
+			turn = true;
+		}
+		
+		public function purdg():void {
+			var effect:IEffect;
+			for (var e:int; e < _effects.length; e++ ) {
+				effect = _effects[e];
+				if(effect.insalubrity()){ 
+					effect.cancel();  
+					Game.effects.unsubscribeObserver(IObserver(effect));
+					_effects.splice(e, 1);
+				}
+			} 
+		}
 		
 		public function getDamage(value:int, crit:Boolean=false, dodge:Boolean=false, color:uint=0):void {
 			var tween:TweenBar = new TweenBar(); 
 			if (color != 0) tween.color = color; 
 			if (dodge) tween.value = "dodge"; 
-			else if (crit) {
-				tween.value = "crit";
-				exp = value;  
-			}
-			else {
+			else if (crit) tween.value = "crit";
+ 			else {
 				tween.value = String(value);  
 				hp -= value; 
-				if (hp <= 0) dispatchEvent(new MenuEvent("DEAD", this));  
+				//if (hp <= 0) dispatchEvent(new MenuEvent("DEAD", this));  
 			}
 			tween.init();
 			addChild(tween);
 			tween.x = tween.y = 40;
 		}
 		 
+		public function healing(value:int, crit:Boolean=false):void { 
+			var tween:TweenBar = new TweenBar(); 
+			if (crit) tween.value = "crit";  
+			else {
+				tween.color = 0x00ff00;   
+				tween.value = String(value);  
+				hp += value; 
+				if (hp >= max_hp) hp = max_hp;  
+			}
+			tween.init();
+			addChild(tween);
+			tween.x = tween.y = 40;
+		}
+		
 		public function correctLoot(num:int):int { 
 			var bonus:int;
 			for (var i:int; i < itemMas.length; i++) {
@@ -185,19 +230,6 @@ package units {
 			return rex;   
 		}
 		
-		public function update():void {
-			for (var i:int; i < _timeEffects.length; i++ ) {
-				if (_timeEffects[i] <= 1) {
-					trace("gfhfg");
-					IEffect(_effects[i]).cancel();
-					_timeEffects.splice(i, 1);
-					_effects.splice(i, 1);
-					break;  
-				}  
-				else _timeEffects[i]--; 
-			}
-		}
-		
 		public function get speed():int { return _speed; }
 		public function set speed(value:int):void { _speed = value;  }
 		
@@ -214,21 +246,28 @@ package units {
 		public function set prev(value:Point):void { _prev = value; }
 		
 		public function get hp():int {
-			return _hp+correctLoot(4);
+			return _hp+correctLoot(4); 
 		}  
 		public function set hp(value:int):void {
 			_hp = value;
 			hpBar.tt.text = String(value);  
-		}
+		} 
 		 
 		public function get max_hp():int {
 			return _max_hp+correctLoot(4); 
+		}
+		 
+		public function kill():void { 
+			for each (var e:IEffect in _effects) {
+				Game.effects.unsubscribeObserver(IObserver(e));
+			} 
+			dispatchEvent(new MenuEvent(MenuEvent.DEAD, this));  
 		}
 		
 		public function set max_hp(value:int):void { _max_hp = value; }
 				
 		public function get att():uint {
-			return _att+correctLoot(1); 
+			return _att + correctLoot(1);
 		}
 		public function set att(value:uint):void { _att = value; }
 				
@@ -270,10 +309,25 @@ package units {
 		public function get itemMas():Array { return _itemMas; }       
 		public function set itemMas(value:Array):void { _itemMas = value; }   
 		
-		public function setEffects(value:IEffect):void {
-			_effects.push(value); 
-			_timeEffects.push(value.timer);
-			value.apply(); 
+		public function get skills():Vector.<ISkill> { return _skills; }  
+		 
+		public function get issheep():Boolean { return _issheep;} 
+		public function set issheep(value:Boolean):void { _issheep = value; }
+		
+		public function setEffects(value:IEffect, del:Boolean=false):void {
+			if (!del) { 
+				_effects.push(value);
+				value.apply();
+				Game.effects.subscribeObserver(IObserver(value));  
+			}
+			 else {
+				for (var e:int; e < _effects.length; e++ ) {
+					if (_effects[e] == value) _effects.splice(e, 1);
+				}
+				value.cancel();  
+				Game.effects.unsubscribeObserver(IObserver(value));
+				value = null; 
+			 }
 		}
 		
 //-----		 

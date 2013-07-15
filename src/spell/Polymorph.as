@@ -1,17 +1,17 @@
 package spell {
 	import flash.geom.Point;
-	import spell.effect.Inner;
+	import spell.effect.Sheep;
 	import units.Unit;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
-	public class InnerFire implements ISpell { 
+	public class Polymorph implements ISpell { 
 		 
-		private var unit:Unit;
+		private var unit:Unit; 
 		 
 		public function get ico():String { 
-			return "spell11";   
+			return "spell12";   
 		}
 		
 		public function get ramka():int { 
@@ -23,7 +23,7 @@ package spell {
 		}
 		
 		public function get baff():String {
-			return "good";      
+			return "bad";       
 		}
 		
 		public function set tar(value:Unit):void {
@@ -31,19 +31,21 @@ package spell {
 		}
 		
 		public function get ress():String {
-			return null ;
+			return null  ;
 		}
 		
 		public function cast(numX:int, numY:int, mas:Vector.<Object>, game:Game):void {
 			var hero:Unit; 
-					 
+			var dirX:int;  
+			var dirY:int; 
+					  
 			hero = mas[numY][numX].unit;  
 			if (hero == null) return;
-			hero.setEffects(new Inner(unit));
+			hero.setEffects(new Sheep(hero)); 
 			
-			var s:String; 
+			var s:String;  
 			var p:Point = Game.gerCoord(unit.x, unit.y); 
-			if (p.y == numY) { 
+			if (p.y == numY) {  
 				if (p.x > numX) s = "l";
 				else s = "r";
 			}   
@@ -55,7 +57,6 @@ package spell {
 			game.endTurn(unit);   
 			unit.prev = null; 
 		}
-		
 //-----		
 	}
 }

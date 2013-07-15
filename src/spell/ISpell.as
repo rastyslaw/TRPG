@@ -11,7 +11,8 @@ package spell {
 		function get summon():Boolean;
 		function cast(numX:int, numY:int, map:Vector.<Object>, game:Game):void;
 		function set tar(value:Unit):void; 
-		function get baff():Boolean;
+		function get baff():String; 
+		function get ress():String;   
 	}
 //-----	
 }

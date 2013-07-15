@@ -77,7 +77,7 @@ package  {
 			if (unit.type == "mage") main.mp.text = String((MageUnit(unit).mp+mpadd) + "/" + (MageUnit(unit).max_mp+mpadd));
 		} 
 		 
-		private function atr_open(e:MouseEvent=null):void { 
+		private function atr_open(e:MouseEvent = null):void {
 			main.attributes.removeEventListener(MouseEvent.CLICK, atr_open);
 			bg.gotoAndStop(1); 
 			bg.at.text = String(unit.att); 

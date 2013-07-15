@@ -4,7 +4,9 @@ package units {
 	import spell.Flare;
 	import spell.InnerFire;
 	import spell.ISpell;
+	import spell.Polymorph;
 	import spell.RainOfFire;
+	import spell.Reincarnation;
 	/**
 	 * ...
 	 * @author waltasar
@@ -19,9 +21,9 @@ package units {
 		}
 		
 		override protected function setSpellMas():void {      
-			_spellMas = Vector.<ISpell>([new Flare, new Fireball, new RainOfFire, new InnerFire]);  
+			_spellMas = Vector.<ISpell>([new Flare, new Fireball, new RainOfFire, new InnerFire, new Polymorph]);  
 		}
-		 
+		  
 		override public function getName():String {   
 			return "Slayer";
 		}  

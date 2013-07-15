@@ -10,7 +10,8 @@ package units {
 		public function createAndPlay(type:Unit):void {
 			var hero:Animation;   
 			type.hero.kill(); 
-			hero = Main.animationManager.getAnimation(type.sname+"_"+_index); 
+			if (!type.issheep) hero = Main.animationManager.getAnimation(type.sname + "_" + _index);
+			else hero = Main.animationManager.getAnimation("sheep_walk");  
 			hero.movieLen = 8;  
 			hero.delay = .05;  
 			type.addChildAt(hero, 0);          

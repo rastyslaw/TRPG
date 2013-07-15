@@ -46,24 +46,32 @@ package  {
 		public function init(numX:int, numY:int, first:Boolean):void {
 			_first = first;
 			elements = [Cbtn, Mbtn, Abtn, Sbtn, Bbtn, Obtn]; 
-			enemyMas.splice(0, enemyMas.length);
+			enemyMas.splice(0, enemyMas.length); 
 			obg = mas[numY][numX].unit;
 			type = obg.type;  
 			target = new Point(numX, numY);    
 			if (first) { 
 				elements.splice(4);      
-				if (!scanMas()) elements.splice(2); 
-				else if (type != "mage") elements.pop();    
+				if (!scanMas()) killElement(Abtn);   
+				if (type != "mage") killElement(Sbtn);  
 			}  
 			else {
-				elements.splice(0, 2);   
-				if (!scanMas()) elements.splice(0, 2); 
-				else if (type != "mage") elements.splice(1, 1);  
+				elements.splice(0, 2);      
+				if (!scanMas()) killElement(Abtn);  
+				if (type != "mage") killElement(Sbtn); 
 			}
 			this.x = numX * Map.grid_size;
 			this.y = numY * Map.grid_size;
 			drawMenu();
 			cons = true; 
+		}
+		
+		private function killElement(obg:*):void {
+			for (var i:int; i < elements.length; i++ ) { 
+				if (elements[i] == obg) {
+					elements.splice(i, 1); 
+				}
+			}
 		}
 		
 		private function drawMenu():void {
@@ -120,7 +128,7 @@ package  {
 		private function spellClicked():void {
 			cont.visible = false;
 			if (spellcont!=null) {
-				spellcont.visible = true;
+				spellcont.visible = true; 
 				return; 
 			} 
 			var mas:Vector.<ISpell> = MageUnit(obg).spellMas; 

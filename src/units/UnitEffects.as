@@ -26,10 +26,10 @@ package units {
 				} 
 			} 
 		} 
-		
-		public function notifyObserver(type:Boolean):void {
+		 
+		public function notifyObserver():void {
 			for each(var o:IObserver in observers) {
-				if(Unit(o).enemy != type) o.update();      
+				o.update();       
 			}
 		}
 //-----		

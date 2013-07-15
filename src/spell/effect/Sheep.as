@@ -5,26 +5,27 @@ package spell.effect {
 	 * ...
 	 * @author waltasar
 	 */
-	public class Inner implements IEffect, IObserver { 
+	public class Sheep implements IEffect, IObserver { 
 		 
-		private var timer:int = 4;
-		private var cof:Number = 1.3;
-		private var unit:Unit;
-		
-		public function Inner(tar:Unit) {
+		private var timer:int = 4; 
+		private var unit:Unit;  
+		 
+		public function Sheep(tar:Unit) {
 			unit = tar;   
-		}
+		}  
 		
 		public function apply():void {
-			unit.att = unit.att * cof;   
+			unit.issheep = true;
+			unit.stay();  
 		} 
 		
 		public function cancel():void {
-			unit.att = unit.att / cof;  
+			unit.issheep = false;
+			unit.stay();  
 		}
 		
 		public function update():void {
-			timer--;   
+			timer--;    
 			if (timer < 1) unit.setEffects(this, true);
 		}
 		 

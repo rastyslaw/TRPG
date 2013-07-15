@@ -1,17 +1,16 @@
 package spell {
 	import flash.geom.Point;
-	import spell.effect.Inner;
 	import units.Unit;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
-	public class InnerFire implements ISpell { 
+	public class Dispel implements ISpell { 
 		 
 		private var unit:Unit;
 		 
 		public function get ico():String { 
-			return "spell11";   
+			return "spell2";    
 		}
 		
 		public function get ramka():int { 
@@ -31,16 +30,16 @@ package spell {
 		}
 		
 		public function get ress():String {
-			return null ;
+			return null; 
 		}
 		
 		public function cast(numX:int, numY:int, mas:Vector.<Object>, game:Game):void {
 			var hero:Unit; 
-					 
+					
 			hero = mas[numY][numX].unit;  
 			if (hero == null) return;
-			hero.setEffects(new Inner(unit));
-			
+			hero.purdg();
+				 
 			var s:String; 
 			var p:Point = Game.gerCoord(unit.x, unit.y); 
 			if (p.y == numY) { 
@@ -55,7 +54,6 @@ package spell {
 			game.endTurn(unit);   
 			unit.prev = null; 
 		}
-		
 //-----		
 	}
 }

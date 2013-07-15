@@ -19,7 +19,10 @@ package {
 
 		private function init(e:Event = null):void { 
 			removeEventListener(Event.ADDED_TO_STAGE, init);  
-			animationManager = new AnimationManager();    
+			animationManager = new AnimationManager();
+			animationManager.addAnimation("Sheep_stay", "sheep_stay");
+			animationManager.addAnimation("Sheep_walk", "sheep_walk");
+			 
 			animationManager.addAnimation("Gnom_stay", "gnom_stay"); 
 			animationManager.addAnimation("Gnom_walk", "gnom_walk");  
 			animationManager.addAnimation("Gnom_attack_t", "gnom_attack_t"); 
@@ -34,6 +37,20 @@ package {
 			animationManager.addAnimation("Archer_attack_l", "archer_attack_l"); 
 			animationManager.addAnimation("Archer_attack_r", "archer_attack_r");
 			
+			animationManager.addAnimation("Raise_stay", "raise_stay");
+			animationManager.addAnimation("Raise_walk", "raise_walk");  
+			animationManager.addAnimation("Raise_attack_t", "raise_attack_t"); 
+			animationManager.addAnimation("Raise_attack_d", "raise_attack_d");  
+			animationManager.addAnimation("Raise_attack_l", "raise_attack_l"); 
+			animationManager.addAnimation("Raise_attack_r", "raise_attack_r");
+			
+			animationManager.addAnimation("Spider_stay", "spider_stay");
+			animationManager.addAnimation("Spider_walk", "spider_walk");   
+			animationManager.addAnimation("Spider_attack_t", "spider_attack_t"); 
+			animationManager.addAnimation("Spider_attack_d", "spider_attack_d");  
+			animationManager.addAnimation("Spider_attack_l", "spider_attack_l"); 
+			animationManager.addAnimation("Spider_attack_r", "spider_attack_r");
+			
 			animationManager.addAnimation("Mage_stay", "mage_stay");
 			animationManager.addAnimation("Mage_walk", "mage_walk");  
 			animationManager.addAnimation("Mage_attack_t", "mage_attack_t"); 
@@ -44,6 +61,17 @@ package {
 			animationManager.addAnimation("Mage_cast_d", "mage_cast_d");  
 			animationManager.addAnimation("Mage_cast_l", "mage_cast_l");  
 			animationManager.addAnimation("Mage_cast_r", "mage_cast_r");
+			
+			animationManager.addAnimation("Priest_stay", "priest_stay"); 
+			animationManager.addAnimation("Priest_walk", "priest_walk");  
+			animationManager.addAnimation("Priest_attack_t", "priest_attack_t"); 
+			animationManager.addAnimation("Priest_attack_d", "priest_attack_d");  
+			animationManager.addAnimation("Priest_attack_l", "priest_attack_l"); 
+			animationManager.addAnimation("Priest_attack_r", "priest_attack_r");
+			animationManager.addAnimation("Priest_cast_t", "priest_cast_t"); 
+			animationManager.addAnimation("Priest_cast_d", "priest_cast_d");  
+			animationManager.addAnimation("Priest_cast_l", "priest_cast_l");  
+			animationManager.addAnimation("Priest_cast_r", "priest_cast_r");
 			
 			//enemy
 			animationManager.addAnimation("Troll_stay", "troll_stay");

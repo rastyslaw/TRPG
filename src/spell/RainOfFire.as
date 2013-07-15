@@ -10,7 +10,7 @@ package spell {
 		private var spdam:Number = 1.5;     
 		private var unit:Unit;
 		private var direction:Array = [[ -1, 0], [1, 0], [0, -1], [0, 1], 
-									   [ -1, -1], [1, -1], [1, -1], [-1, 1]];
+									   [ -1, -1], [1, 1], [1, -1], [-1, 1]]; 
 		 
 		public function get ico():String { 
 			return "spell10";    
@@ -28,10 +28,14 @@ package spell {
 			unit = value;  
 		}
 		 
-		public function get baff():Boolean {
-			return false;       
+		public function get baff():String {
+			return null;        
 		}
 		
+		public function get ress():String {
+			return null ;
+		}
+		 
 		public function cast(numX:int, numY:int, mas:Vector.<Object>, game:Game):void {
 			var hero:Unit; 
 			var dirX:int; 
@@ -47,8 +51,8 @@ package spell {
 				
 			if (mas[numY][numX].unit != undefined ) {    
 				hero = mas[numY][numX].unit; 
-				if (hero.enemy) { 
-					if (mas[dirY][dirX].coff < 5) cof = 1 - mas[dirY][dirX].coff * .1; 
+				if (hero.enemy) {  
+					if (mas[numY][numX].coff < 5) cof = 1 - mas[numY][numX].coff * .1; 
 					damage = (base_damage - hero.def) * cof;   
 					if (damage <= 0) damage = 1;
 					exp += damage; 

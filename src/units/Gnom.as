@@ -1,5 +1,8 @@
 package units { 
 	import flash.display.Bitmap;
+	import spell.skill.ISkill;
+	import spell.skill.Revenge;
+	import spell.skill.Splash;
 	/**
 	 * ...
 	 * @author waltasar 
@@ -16,6 +19,10 @@ package units {
 		override public function getName():String {   
 			return "Gimli";
 		} 
+		
+		override protected function setSkilMas():void {      
+			_skills = Vector.<ISkill>([new Splash, new Revenge]);      
+		}
 		
 		override public function getClassName():String {     
 			if (level <= 10) return "[Warrior]";
@@ -36,7 +43,7 @@ package units {
 		
 		override internal function setAttributes():void {
 			hp = max_hp = 100;
-			att = 22;
+			att = 19;
 			def = 11;
 			agi = 6; 
 		}

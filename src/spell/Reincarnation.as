@@ -1,48 +1,50 @@
 package spell {
 	import flash.geom.Point;
-	import spell.effect.Inner;
 	import units.Unit;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
-	public class InnerFire implements ISpell { 
-		 
+	public class Reincarnation implements ISpell {
+		
 		private var unit:Unit;
-		 
+		
 		public function get ico():String { 
-			return "spell11";   
+			return "spell4";   
 		}
 		
-		public function get ramka():int { 
-			return Game.RAMKA_SIMPLE;      
+		public function get ramka():int {  
+			return Game.RAMKA_SIMPLE;    
 		} 
 		
 		public function get summon():Boolean {
-			return false;     
+			return true;     
 		}
-		
-		public function get baff():String {
-			return "good";      
-		}
-		
+		 
 		public function set tar(value:Unit):void {
 			unit = value;  
 		}
+		  
+		public function get baff():String {
+			return "";        
+		}
 		
 		public function get ress():String {
-			return null ;
+			return "good";       
 		}
 		
 		public function cast(numX:int, numY:int, mas:Vector.<Object>, game:Game):void {
 			var hero:Unit; 
-					 
-			hero = mas[numY][numX].unit;  
-			if (hero == null) return;
-			hero.setEffects(new Inner(unit));
+			var dirX:int;  
+			var dirY:int;   
+			var p:Point = Game.gerCoord(unit.x, unit.y);
+			 
+			hero = mas[numY][numX].grave;
+			mas[numY][numX].grave = undefined;
+			mas[numY][numX].unit = hero;  
+			hero.raincar();        
 			
 			var s:String; 
-			var p:Point = Game.gerCoord(unit.x, unit.y); 
 			if (p.y == numY) { 
 				if (p.x > numX) s = "l";
 				else s = "r";
@@ -55,7 +57,6 @@ package spell {
 			game.endTurn(unit);   
 			unit.prev = null; 
 		}
-		
 //-----		
 	}
 }

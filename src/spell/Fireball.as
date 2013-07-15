@@ -28,14 +28,18 @@ package spell {
 			unit = value;  
 		}
 		  
-		public function get baff():Boolean {
-			return false;      
+		public function get baff():String { 
+			return null;      
+		}
+		
+		public function get ress():String {
+			return null      
 		}
 		
 		public function cast(numX:int, numY:int, mas:Vector.<Object>, game:Game):void {
 			var hero:Unit; 
 			var dirX:int; 
-			var dirY:int; 
+			var dirY:int;  
 			var cof:Number = 1;
 			var damage:int;
 			var exp:uint;  
@@ -48,13 +52,13 @@ package spell {
 			if (mas[numY][numX].unit != undefined ) {    
 				hero = mas[numY][numX].unit; 
 				if (hero.enemy) { 
-					if (mas[dirY][dirX].coff < 5) cof = 1 - mas[dirY][dirX].coff * .1; 
+					if (mas[numY][numX].coff < 5) cof = 1 - mas[numY][numX].coff * .1; 
 					damage = (base_damage - hero.def) * cof;   
 					if (damage <= 0) damage = 1;
-					exp += damage;  
+					exp += damage;   
 					hero.getDamage(damage, false, false, 0xff6600);    
-					if(hero.hp <= 0) game.killUnit(hero); 
-				}
+					if(hero.hp <= 0) game.killUnit(hero);  
+				}	
 			}   
 			 
 			for (var i:int = 0; i < direction.length; i++) {   

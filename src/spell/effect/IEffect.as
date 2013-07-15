@@ -6,7 +6,7 @@ package spell.effect {
 	public interface IEffect {
 		function apply():void;
 		function cancel():void;
-		function get timer():int; 
+		function insalubrity():Boolean;  
 	}
 //-----	
 }

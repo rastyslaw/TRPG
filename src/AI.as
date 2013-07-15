@@ -34,13 +34,16 @@ package  {
 			unit = tar; 
 			container = cont; 
 		}
-		
+		 
 		public function init():Array {
 			getPath(unit.speed); 
-			attMas = new Vector.<Array>(masSq.length, true);
-			lookTargets();
-			if (empty) calkAgro();   
-			else calkAttack();
+			if(!unit.issheep) { 
+				attMas = new Vector.<Array>(masSq.length, true);
+				lookTargets();
+				if (empty) calkAgro();   
+				else calkAttack();
+			}
+			else calkAgro();   
 			if (resaltTarget == null && resaltPoint == null) return null; 
 			else return [resaltTarget, resaltPoint];  
 		}
@@ -185,8 +188,8 @@ package  {
 		private function lookTargets():void {
 			var dirX:int; 
 			var dirY:int;  
-			var direction:Array = unit.enemyDirection(unit.type);
-			var goodUnit:Unit;
+			var direction:Array = unit.direction; 
+			var goodUnit:Unit;  
 			
 			for (var j:int; j < masSq.length; j++ ) {
 				for (var i:int = 0; i < direction.length; i++) {  

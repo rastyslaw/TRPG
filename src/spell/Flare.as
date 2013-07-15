@@ -1,4 +1,5 @@
 package spell {
+	import events.MenuEvent;
 	import flash.display.Sprite;
 	import flash.geom.Point; 
 	import units.Unit;
@@ -8,7 +9,7 @@ package spell {
 	 */
 	public class Flare implements ISpell {
 		 
-		private var spdam:Number = 6.5;   
+		private var spdam:Number = 2.5;    
 		private var unit:Unit;
 		 
 		public function get ico():String { 
@@ -27,8 +28,12 @@ package spell {
 			unit = value;  
 		}
 		  
-		public function get baff():Boolean {
-			return false;      
+		public function get baff():String {
+			return null;       
+		}
+		
+		public function get ress():String {
+			return null      
 		}
 		
 		public function cast(numX:int, numY:int, mas:Vector.<Object>, game:Game):void {
@@ -49,7 +54,7 @@ package spell {
 					if (mas[dirY][dirX].coff < 5) cof = 1 - mas[dirY][dirX].coff * .1; 
 					damage = (base_damage - hero.def) * cof;   
 					if (damage <= 0) damage = 1; 
-					hero.getDamage(damage, false, false, 0xff6600);    
+					hero.getDamage(damage, false, false, 0xff6600);
 					if(hero.hp <= 0) game.killUnit(hero); 
 				}
 			}   

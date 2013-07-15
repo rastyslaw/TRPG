@@ -6,7 +6,7 @@ package units {
 	public interface ISubject { 
 		function subscribeObserver(o:IObserver):void; 
 		function unsubscribeObserver(o:IObserver):void; 
-		function notifyObserver(s:Boolean):void;   
+		function notifyObserver():void;   
 	}
 //-----	
 } 

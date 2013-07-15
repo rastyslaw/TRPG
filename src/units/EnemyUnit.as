@@ -26,21 +26,19 @@ package units {
 			dispatchEvent(new Event("FINISH"));  
 		}
 		
-		override protected function setDescription():void {   }
-		
-		public function enemyDirection(s:String=null):Array {
-			switch(s) {
-				case "archer":
-					_direction = [ [-2, 0], [2, 0], [0, -2], [0, 2],
-								[-1,-1], [1, 1], [-1, 1], [1,-1] ]; 
-				break;
-				case "mage": 
-					_direction = [ [-1, 0], [1, 0], [0, -1], [0, 1], 
-								[-2, 0], [2, 0], [0, -2], [0, 2],
-								[-1,-1], [1, 1], [-1, 1], [1,-1] ]; 
-				break;
+		override protected function setDescription():void {  }
+	
+		override public function get direction():Array {  
+			if (type=="archer") {
+				_direction = [ [-2, 0], [2, 0], [0, -2], [0, 2],
+							[-1,-1], [1, 1], [-1, 1], [1,-1] ]; 
+			} 
+			else if(type=="mage") {  
+				_direction = [ [-1, 0], [1, 0], [0, -1], [0, 1], 
+							[-2, 0], [2, 0], [0, -2], [0, 2],
+							[-1,-1], [1, 1], [-1, 1], [1,-1] ]; 
 			}
-			return _direction; 
+			return _direction;  
 		}
 		 
 //-----		

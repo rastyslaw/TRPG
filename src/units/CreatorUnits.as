@@ -11,12 +11,10 @@ package units {
 		
 		private var cont:DisplayObjectContainer;
 		private var unitmas:Vector.<Unit>;
-		private var effect:UnitEffects;
 		 
-		public function init(obg:DisplayObjectContainer, mas:Vector.<Unit>, ef:UnitEffects):void {  
+		public function init(obg:DisplayObjectContainer, mas:Vector.<Unit>):void {  
 			cont = obg; 
 			unitmas = mas; 
-			effect = ef; 
 		}
 		
 		public function creating(unit:uint, oj:Object):void {  
@@ -25,7 +23,7 @@ package units {
 			oj.unit = obg;  
 			cont.addChild(obg);
 			unitmas.push(obg);
-			effect.subscribeObserver(obg); 
+			obg.mainMas = unitmas;
 			obg.x = oj.j * Map.grid_size - 8;
 			obg.y = oj.i * Map.grid_size - 8; 
 		}
