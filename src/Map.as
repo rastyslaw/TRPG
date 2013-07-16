@@ -89,7 +89,7 @@ package  {
 							obj.coff = 3;   
 						break;
 						case 4:
-							obj.coff = 5;    
+							obj.coff = 4;     
 						break;
 						case 5: 
 							obj.coff = 9;    

@@ -1,14 +1,19 @@
 package spell.skill {
 	import flash.geom.Point;
+	import spell.IIcon;
 	import units.Unit;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
-	public class Revenge implements ISkill {
+	public class Revenge implements ISkill, IIcon {    
 		 
 		private var _percent:Number = 0.9; 
-		  
+		
+		public function get ico():String { 
+			return "skill6";  
+		}
+		
 		public function calk(tar1:Unit, tar2:Unit, mas:Vector.<Object>, damage:int, func:Function):void {
 			var unit:Unit;
 			var cof:Number = 1; 
@@ -40,13 +45,21 @@ package spell.skill {
 					tar1.getDamage(damage);  
 					tar2.exp = damage; 
 					for each(var ss:ISkill in tar2.skills) {      
-						if(!(ss is Revenge)) ss.calk(tar2, tar1, mas, damage, func);    
+						if(!ss.defence()) ss.calk(tar2, tar1, mas, damage, func);     
 					}
 				} 
 				if(tar1.hp <= 0) func(tar1);    
 			}
 		}
-
+		
+		public function correct():Number {
+			return 0; 
+		}
+		
+		public function defence():Boolean {
+			return true;  
+		}
+		
 		public function set percent(value:int):void {
 			_percent = value/100; 
 		}

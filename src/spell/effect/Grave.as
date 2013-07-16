@@ -1,15 +1,20 @@
 package spell.effect {
+	import spell.IIcon;
 	import units.IObserver;
 	import units.Unit;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
-	public class Grave implements IEffect, IObserver { 
+	public class Grave implements IEffect, IObserver, IIcon {  
 		
 		private var timer:int = 4;  
 		private var unit:Unit;
 		private var grave:GraveGr;
+		
+		public function get ico():String { 
+			return "";     
+		}
 		
 		public function Grave(tar:Unit) {
 			unit = tar;  
@@ -31,6 +36,10 @@ package spell.effect {
 			unit.kill();
 		}
 		
+		public function get cof():Number {
+			return 0;  
+		}
+		
 		public function back():void { 
 			unit.removeChild(grave); 
 		}
@@ -42,6 +51,10 @@ package spell.effect {
 		 
 		public function insalubrity():Boolean {
 			return false; 
+		}
+		
+		public function get _unit():Unit {
+			return unit;  
 		}
 //-----		
 	}

@@ -7,7 +7,7 @@ package spell {
 	 * ...
 	 * @author waltasar
 	 */
-	public class Flare implements ISpell {
+	public class Flare implements ISpell, IIcon { 
 		 
 		private var spdam:Number = 2.5;    
 		private var unit:Unit;

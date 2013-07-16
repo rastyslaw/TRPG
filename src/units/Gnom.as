@@ -1,6 +1,8 @@
 package units { 
 	import flash.display.Bitmap;
+	import spell.skill.Block;
 	import spell.skill.ISkill;
+	import spell.skill.Prot;
 	import spell.skill.Revenge;
 	import spell.skill.Splash;
 	/**
@@ -21,7 +23,7 @@ package units {
 		} 
 		
 		override protected function setSkilMas():void {      
-			_skills = Vector.<ISkill>([new Splash, new Revenge]);      
+			_skills = Vector.<ISkill>([new Prot, new Block]);      
 		}
 		
 		override public function getClassName():String {     

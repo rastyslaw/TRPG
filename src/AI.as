@@ -39,7 +39,7 @@ package  {
 			getPath(unit.speed); 
 			if(!unit.issheep) { 
 				attMas = new Vector.<Array>(masSq.length, true);
-				lookTargets();
+				lookTargets(); 
 				if (empty) calkAgro();   
 				else calkAttack();
 			}
@@ -207,7 +207,7 @@ package  {
 						}
 					}
 				}
-			} 
+			}
 		}
 		
 		private function calkAttack():void {
@@ -226,11 +226,12 @@ package  {
 						p = Game.gerCoord(goodgay.x, goodgay.y);   
 						if(mas[p.y][p.x].coff < 5) cof = 1 - mas[p.y][p.x].coff * .1;   
 						damage = (unit.att - goodgay.def) * cof; 
+						if (damage <= 0) damage = 1; 
 						if (damage >= goodgay.hp) {               			  
 							resaltTarget = goodgay;		
 							resaltPoint = masSq[i+(masSq.length-attMas.length)];    
 							return; 						
-						} 
+						}  
 						damage *= (1 - goodgay.agi * .01);
 						damage = parseFloat(damage.toFixed(2));
 						damageMas.push(damage);
@@ -269,8 +270,9 @@ package  {
 			damageMas = sortMas[0]; 
 			
 			resaltPoint = masSq[masSq.length-1];
-			resaltTarget = arrackTransform[arrackTransform.length-1];
-			for (var m:int=placeMas.length-1; m >= 0; m--) { 
+			resaltTarget = arrackTransform[arrackTransform.length - 1];
+ 
+			for (var m:int=placeMas.length-1; m > 0; m--) { 
 				if (placeMas[m] >= placeMas[m - 1]) {
 					if (m == placeMas.length - 1) {
 						resaltTarget = arrackTransform[m];

@@ -6,7 +6,7 @@ package spell {
 	 * ...
 	 * @author waltasar
 	 */
-	public class Fireball implements ISpell {
+	public class Fireball implements ISpell, IIcon { 
 		
 		private var spdam:Number = 2;  
 		private var unit:Unit;

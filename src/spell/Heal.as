@@ -5,7 +5,7 @@ package spell {
 	 * ...
 	 * @author waltasar
 	 */
-	public class Heal implements ISpell {
+	public class Heal implements ISpell, IIcon { 
 		 
 		private var spdam:Number = 2.5;    
 		private var unit:Unit;

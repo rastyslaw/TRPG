@@ -6,7 +6,7 @@ package spell {
 	 * ...
 	 * @author waltasar
 	 */
-	public class InnerFire implements ISpell { 
+	public class InnerFire implements ISpell, IIcon { 
 		 
 		private var unit:Unit;
 		 
@@ -39,7 +39,7 @@ package spell {
 					 
 			hero = mas[numY][numX].unit;  
 			if (hero == null) return;
-			hero.setEffects(new Inner(unit));
+			hero.setEffects(new Inner(hero, ico)); 
 			
 			var s:String; 
 			var p:Point = Game.gerCoord(unit.x, unit.y); 

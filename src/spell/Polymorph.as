@@ -6,7 +6,7 @@ package spell {
 	 * ...
 	 * @author waltasar
 	 */
-	public class Polymorph implements ISpell { 
+	public class Polymorph implements ISpell, IIcon { 
 		 
 		private var unit:Unit; 
 		 
@@ -41,7 +41,7 @@ package spell {
 					  
 			hero = mas[numY][numX].unit;  
 			if (hero == null) return;
-			hero.setEffects(new Sheep(hero)); 
+			hero.setEffects(new Sheep(hero, ico));  
 			
 			var s:String;  
 			var p:Point = Game.gerCoord(unit.x, unit.y); 

@@ -5,6 +5,8 @@ package units {
 	import flash.display.Sprite; 
 	import flash.events.Event;
 	import flash.geom.Point;
+	import flash.utils.getQualifiedClassName;
+	import spell.effect.Adsorb;
 	import spell.effect.Grave;
 	import spell.effect.IEffect;
 	import spell.skill.ISkill;
@@ -34,6 +36,7 @@ package units {
 		private var _exp:uint = 10; 
 		private var graves:Grave; 
 		private var _issheep:Boolean;  
+		private var _adsorber:int;   
 		
 		protected var _description:String;
 		protected var _itemMas:Array = [];
@@ -181,11 +184,24 @@ package units {
 		public function getDamage(value:int, crit:Boolean=false, dodge:Boolean=false, color:uint=0):void {
 			var tween:TweenBar = new TweenBar(); 
 			if (color != 0) tween.color = color; 
-			if (dodge) tween.value = "dodge"; 
-			else if (crit) tween.value = "crit";
+			if (dodge) tween.value = "dodge";  
+			else if (crit) tween.value = "crit"; 
  			else {
-				tween.value = String(value);  
-				hp -= value; 
+				var m:int = Search.lookClass(effects, Adsorb);   
+				if (m >= 0) {
+					adsorber -= value; 
+					if (adsorber < 0) {  
+						setEffects(effects[m], true); 
+						hp -= adsorber;  
+						tween.value = String(adsorber); 
+						adsorber = 0; 
+					} 
+					else tween.value = String("adsorb"); 
+				} 
+				else {
+					tween.value = String(value);
+					hp -= value;   
+				}
 				//if (hp <= 0) dispatchEvent(new MenuEvent("DEAD", this));  
 			}
 			tween.init();
@@ -314,14 +330,26 @@ package units {
 		public function get issheep():Boolean { return _issheep;} 
 		public function set issheep(value:Boolean):void { _issheep = value; }
 		
+		public function get effects():Vector.<IEffect> { return _effects; } 
+		
+		public function get adsorber():int { return _adsorber; } 
+		public function set adsorber(value:int):void { _adsorber = value;}
+		
 		public function setEffects(value:IEffect, del:Boolean=false):void {
-			if (!del) { 
-				_effects.push(value);
-				value.apply();
-				Game.effects.subscribeObserver(IObserver(value));  
+			var e:int;
+			var per:Boolean; 
+			if (!del) {
+				for (e=0; e < _effects.length; e++ ) {
+					if (getQualifiedClassName(_effects[e]) == getQualifiedClassName(value)) per = true;
+				}  
+				if (!per) {  
+					_effects.push(value); 
+					value.apply(); 
+					Game.effects.subscribeObserver(IObserver(value));
+				} 
 			}
-			 else {
-				for (var e:int; e < _effects.length; e++ ) {
+			 else { 
+				for (e=0; e < _effects.length; e++ ) {
 					if (_effects[e] == value) _effects.splice(e, 1);
 				}
 				value.cancel();  

@@ -10,9 +10,13 @@
 	import flash.geom.Point;
 	import flash.utils.setTimeout;
 	import flash.utils.Timer;
+	import spell.effect.Protect;
+	import spell.effect.IEffect;
 	import spell.ISpell;
+	import spell.skill.Block;
+	import spell.skill.Cutting;
 	import spell.skill.ISkill;
-	import spell.skill.Revenge;
+	import spell.skill.Prot;
 	import units.*;  
 	import command.*;
 	
@@ -81,7 +85,9 @@
 		public static var curcast:ISpell;  
 		public static var goodFactory:CreatorUnits;
 		public static var badFactory:CreatorUnits; 
-			
+		 
+		public static var selectHero:uint;
+		
 		public function Game() { 
 			ui = new UI(this);
 			map = new Map(map1, this);
@@ -98,26 +104,29 @@
 			addEventListener(MouseEvent.CLICK, clickedOnMap, true);
 			   
 			goodFactory = new HeroCreator;  
-			badFactory = new EnemyCreator;
+			badFactory = new EnemyCreator; 
 			 
 			addChild(unit_cont);
 			unit_cont.addChild(sqCont);  
 			lines = new DrawPath;   
 			unit_cont.addChild(lines); 
-			
+			 
 			effects = new UnitEffects;  
 			goodFactory.init(unit_cont, masGoodUnit);
-			badFactory.init(unit_cont, masBadUnit); 
+			badFactory.init(unit_cont, masBadUnit);  
 			
-			badFactory.creating(EnemyCreator.DEATH, mas[0][2]); 
-			badFactory.creating(EnemyCreator.DEATH, mas[1][3]);
-			goodFactory.creating(HeroCreator.GNOM, mas[0][3]); 
-			goodFactory.creating(HeroCreator.ARCHER, mas[4][3]);
-			goodFactory.creating(HeroCreator.MAGE, mas[2][5]);
-			goodFactory.creating(HeroCreator.PRIEST, mas[3][5]); 
-			badFactory.creating(EnemyCreator.TROLL, mas[1][4]);
-			badFactory.creating(EnemyCreator.SKELARCHER, mas[2][4]);
-	
+			goodFactory.creating(selectHero, mas[10][12]);
+			 
+			goodFactory.creating(HeroCreator.GNOM, mas[8][6]); 
+			goodFactory.creating(HeroCreator.ARCHER, mas[9][12]);  
+			goodFactory.creating(HeroCreator.MAGE, mas[7][8]);
+			goodFactory.creating(HeroCreator.PRIEST, mas[8][5]); 
+			 
+			badFactory.creating(EnemyCreator.TROLL, mas[14][16]);
+			badFactory.creating(EnemyCreator.DEATH, mas[13][17]);
+			badFactory.creating(EnemyCreator.TROLL, mas[14][15]);
+			badFactory.creating(EnemyCreator.DEATH, mas[13][15]);
+			
 			menu = new Menu(mas); 
 			unit_cont.addChild(menu);   
 			dispatcher = new Dispatcher(menu); 
@@ -127,7 +136,7 @@
 			dispatcher.setCommand(MenuEvent.BACK, BackCommand, this);   
 			dispatcher.setCommand(MenuEvent.CHAR, CharCommand, this);
 			dispatcher.setCommand(MenuEvent.CAST, CastCommand, this); 
-			
+			 
 			unit_cont.x = -map.corX;  
 			unit_cont.y = -map.corY;
 			ui.addEventListener("END_TURN", livesTurn); 
@@ -179,7 +188,8 @@
 							curcast.cast(numX, numY, mas, this);
 							if (mas[curhero.y][curhero.x].grave != undefined) {  
 								Unit(mas[curhero.y][curhero.x].grave).kill();  
-							}
+							} 
+							lookProtect(mas[curhero.y][curhero.x].unit);   
 						}
 					}
 					else backMovement(mas[curhero.y][curhero.x].unit);   
@@ -226,24 +236,28 @@
 					else if (curhero.y > enemyMas[i].y) {   
 						 s = "t"; 
 					} 
-					else s = "d";
+					else s = "d"; 
 					hero.attack(s); 
-					//  
-					if (Math.random() * 100 < enemy.agi) {
+					//   
+					if (Math.random() * 100 < enemy.agi) { 
 						enemy.getDamage(0, false, true);
-					}
-					else {   
+					} 
+					else {     
 						if(mas[enemyMas[i].y][enemyMas[i].x].coff < 5) cof = 1 - mas[enemyMas[i].y][enemyMas[i].x].coff * .1;
-						damage = (hero.att - enemy.def) * cof;
+						var n:Number = 1;  
+						var m:int = Search.lookClass(hero.skills, Cutting);   
+						if (m >= 0) n = hero.skills[m].correct();    
+						damage = (hero.att - enemy.def*n) * cof; 
 						if (Math.random() * 100 < hero.agi) {
 							damage *= 2; 
 							hero.getDamage(0, true);   
-						}   
-						if (damage <= 0) damage = 1; 
+						}
+						
+						if (damage <= 0) damage = 1;
 						enemy.getDamage(damage); 
 						hero.exp = damage;
 						calkSkills(hero, enemy, damage);  
-					} 
+					}    
 					if(enemy.hp <= 0) killUnit(enemy); 
 					endTurn(hero); 
 					hero.prev = null;   
@@ -254,11 +268,11 @@
 			attack_mode = false;
 		} 
 		
-		private function calkSkills(tar1:Unit, tar2:Unit, damage:int):void {
-			for each(var s:ISkill in tar1.skills) { 
-				if(!(s is Revenge)) s.calk(tar1, tar2, mas, damage, killUnit);   
+		private function calkSkills(tar1:Unit, tar2:Unit, damage:int):void {  
+			for each(var s:ISkill in tar1.skills) {  
+				if(!s.defence()) s.calk(tar1, tar2, mas, damage, killUnit);       
 			}   
-		}
+		} 
 		
 		public function endTurn(obg:Unit):void {
 			obg.turn = false;  
@@ -381,12 +395,12 @@
 				if (tar == unit) return; 
 			}
 			enemyTutnMas.push(tar); 
-		}
-		 
+		} 
+		  
 		private function moveRamka2(e:Event):void {
 			if (enemyTutnMas[cutTurnEnemy].visible) { 
 				removeEventListener(Event.ENTER_FRAME, moveRamka2)
-				var timer:Timer = new Timer(1500, 1);
+				var timer:Timer = new Timer(2000, 1);
 				timer.addEventListener(TimerEvent.TIMER_COMPLETE, ShowRamka);
 				timer.start();
 			} 
@@ -496,14 +510,29 @@
 				if (Math.random() * 100 < obg.agi) {  
 					damage *= 2; 
 					obg.getDamage(0, true);   
-				} 
+				}
 				if (damage <= 0) damage = 1; 
-				tar.getDamage(damage);
+				else {
+					var n:Number = 0;
+					var m:int = Search.lookClass(tar.effects, Protect);   
+					if (m >= 0) {
+						var rev:Unit = tar.effects[m]._unit;
+						n = tar.effects[m].cof;
+						var damagePie:int = damage * n; 
+						rev.getDamage(damagePie);   
+					} 
+					m = Search.lookClass(tar.skills, Block);   
+					if (m >= 0) { 
+						damage = tar.skills[m].correct();  
+					}
+					damage = int(damage * (1 - n)); 	
+				}
+				tar.getDamage(damage);    
 				obg.exp = damage;   
 			} 
-			var m:int = Search.lookClass(tar.skills, Revenge);
-			if (m >= 0) tar.skills[m].calk(obg, tar, mas, damage, killUnit);
-			
+			for each(var ss:ISkill in tar.skills) {     
+				if(ss.defence()) ss.calk(obg, tar, mas, damage, killUnit);    
+			}   
 			if (tar.hp <= 0) killUnit(tar);
 			nextEnemy(); 
 			//addEventListener(MenuEvent.DEAD, killUnit); 
@@ -613,7 +642,58 @@
 			if (mas[curhero.y][curhero.x].grave != undefined) {
 				Unit(mas[curhero.y][curhero.x].grave).kill(); 
 			}
+			var m:int = Search.lookClass(tar.skills, Prot);     
+			if (m >= 0) applyProt(tar);   
+			else lookProtect(tar);   
 		} 
+		  
+		public function lookProtect(unit:Unit):void {   
+			for each(var ss:IEffect in unit.effects) {       
+				if (ss is Protect) {  
+					unit.setEffects(ss, true);        
+					break;   
+				}   
+			}       
+			var direction:Array = [[ -1, 0], [1, 0], [0, -1], [0, 1]]; 
+			var dirX:int;   
+			var dirY:int;   
+			var tar:Unit;  
+			var p2:Point = Game.gerCoord(unit.x, unit.y); 
+				for (var i:int; i < direction.length; i++) {    
+					dirX = p2.x + direction[i][0];      
+					dirY = p2.y + direction[i][1];   
+					if (getIndex(dirX, dirY)) {  
+						tar = mas[dirY][dirX].unit;  
+						if(tar!=null) { 
+							var m:int = Search.lookClass(tar.skills, Prot);     
+							if (m >= 0) unit.setEffects(new Protect(tar, "skill3")); 
+						}
+					} 
+				} 
+		}   
+		   
+		public function applyProt(unit:Unit):void {
+			var m:int;
+			for each(var ss:Unit in masGoodUnit) {       
+				m = Search.lookClass(ss.effects, Protect);      
+				if (m >= 0) ss.setEffects(ss.effects[m], true);  
+			}  
+			var direction:Array = [[ -1, 0], [1, 0], [0, -1], [0, 1]]; 
+			var dirX:int;    
+			var dirY:int;  
+			var tar:Unit;  
+			var p2:Point = Game.gerCoord(unit.x, unit.y); 
+				for (var i:int; i < direction.length; i++) {    
+					dirX = p2.x + direction[i][0];     
+					dirY = p2.y + direction[i][1];   
+					if (getIndex(dirX, dirY)) {    
+						tar = mas[dirY][dirX].unit;   
+						if(tar!=null) {    
+							if(!tar.enemy) tar.setEffects(new Protect(unit, "skill3")); 
+						}
+					} 
+				} 
+		}
 		
 		public function backMovement(tar:Unit):void {
 			var p:Point = tar.prev;

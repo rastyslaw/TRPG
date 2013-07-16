@@ -1,5 +1,8 @@
 package units {
 	import flash.display.Bitmap;
+	import spell.skill.Binding;
+	import spell.skill.ISkill;
+	import spell.skill.Pierce;
 	/**
 	 * ...
 	 * @author waltasar
@@ -16,6 +19,10 @@ package units {
 		override public function getName():String {   
 			return "Gess";
 		} 
+		
+		override protected function setSkilMas():void {      
+			_skills = Vector.<ISkill>([new Binding, new Pierce]);        
+		}
 		
 		override public function getClassName():String {     
 			if (level <= 10) return "[Archer]";
@@ -35,10 +42,10 @@ package units {
 		}
 		
 		override internal function setAttributes():void {
-			hp = max_hp = 20;
+			hp = max_hp = 120;
 			att = 12;
 			def = 8;
-			agi = 8; 
+			agi = 18; 
 		}
 //-----		
 	}

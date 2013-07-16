@@ -6,7 +6,7 @@ package spell {
 	 * ...
 	 * @author waltasar
 	 */
-	public class Raise implements ISpell {
+	public class Raise implements ISpell, IIcon { 
 		
 		private var unit:Unit;
 		

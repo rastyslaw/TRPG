@@ -1,7 +1,9 @@
 package {
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import units.AnimationManager;
+	import units.HeroCreator;
 	/**
 	 * ...
 	 * @author waltasar
@@ -11,6 +13,7 @@ package {
 	public class Main extends Sprite {
 		
 		public static var animationManager:AnimationManager;
+		private var selectPanel:SelectPanel;
 		
 		public function Main():void { 
 			if (stage) init(); 
@@ -22,7 +25,34 @@ package {
 			animationManager = new AnimationManager();
 			animationManager.addAnimation("Sheep_stay", "sheep_stay");
 			animationManager.addAnimation("Sheep_walk", "sheep_walk");
-			 
+			
+			//hero
+			animationManager.addAnimation("Hero_warr_stay", "hero_warr_stay");  
+			animationManager.addAnimation("Hero_warr_walk", "hero_warr_walk");  
+			animationManager.addAnimation("Hero_warr_attack_t", "hero_warr_attack_t"); 
+			animationManager.addAnimation("Hero_warr_attack_d", "hero_warr_attack_d");  
+			animationManager.addAnimation("Hero_warr_attack_l", "hero_warr_attack_l"); 
+			animationManager.addAnimation("Hero_warr_attack_r", "hero_warr_attack_r");
+			
+			animationManager.addAnimation("Hero_archer_stay", "hero_archer_stay");  
+			animationManager.addAnimation("Hero_archer_walk", "hero_archer_walk");  
+			animationManager.addAnimation("Hero_archer_attack_t", "hero_archer_attack_t"); 
+			animationManager.addAnimation("Hero_archer_attack_d", "hero_archer_attack_d");  
+			animationManager.addAnimation("Hero_archer_attack_l", "hero_archer_attack_l"); 
+			animationManager.addAnimation("Hero_archer_attack_r", "hero_archer_attack_r");
+			
+			animationManager.addAnimation("Hero_mage_stay", "hero_mage_stay");  
+			animationManager.addAnimation("Hero_mage_walk", "hero_mage_walk");  
+			animationManager.addAnimation("Hero_mage_attack_t", "hero_mage_attack_t"); 
+			animationManager.addAnimation("Hero_mage_attack_d", "hero_mage_attack_d");  
+			animationManager.addAnimation("Hero_mage_attack_l", "hero_mage_attack_l"); 
+			animationManager.addAnimation("Hero_mage_attack_r", "hero_mage_attack_r");  
+			animationManager.addAnimation("Hero_mage_cast_t", "hero_mage_cast_t"); 
+			animationManager.addAnimation("Hero_mage_cast_d", "hero_mage_cast_d");  
+			animationManager.addAnimation("Hero_mage_cast_l", "hero_mage_cast_l"); 
+			animationManager.addAnimation("Hero_mage_cast_r", "hero_mage_cast_r");  
+			
+			//units
 			animationManager.addAnimation("Gnom_stay", "gnom_stay"); 
 			animationManager.addAnimation("Gnom_walk", "gnom_walk");  
 			animationManager.addAnimation("Gnom_attack_t", "gnom_attack_t"); 
@@ -95,8 +125,28 @@ package {
 			animationManager.addAnimation("Death_attack_l", "death_attack_l"); 
 			animationManager.addAnimation("Death_attack_r", "death_attack_r");
 			
-			stage.addChild(new Game); 
+			selectPanel = new SelectPanel;
+			selectPanel.x = Constants.STAGE_WIDTH >> 1;
+			selectPanel.y = Constants.STAGE_HEIGHT >> 1;
+			addChild(selectPanel);
+			selectPanel.addEventListener(MouseEvent.CLICK, select);
 		} 
+		  
+		private function select(e:MouseEvent):void {
+			selectPanel.removeEventListener(MouseEvent.CLICK, select);
+			var i:uint;
+			if (e.target.name == "b1") {
+				i = HeroCreator.HERO_WARR; 
+			}
+			else if (e.target.name == "b2") {
+				i = HeroCreator.HERO_ARCHER; 
+			}
+			else i = HeroCreator.HERO_MAGE;
+			removeChild(selectPanel);
+			Game.selectHero = i; 
+			stage.addChild(new Game);
+		}
+		
 //-----
 	}
 }

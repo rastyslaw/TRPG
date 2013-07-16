@@ -8,6 +8,7 @@ package  {
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import spell.IIcon;
 	import spell.ISpell;
 	import units.MageUnit;
 	import units.Unit;
@@ -156,7 +157,7 @@ package  {
 				c.y = radius * Math.sin(rad);  
 				c.x = radius * Math.cos(rad); 
 				spellcont.addChild(c);
-				sname = mas[i].ico;   
+				sname = IIcon(mas[i]).ico;    
 				Width = spellXml.SubTexture.(attribute('name') == sname).@width;
 				Height = spellXml.SubTexture.(attribute('name') == sname).@height; 
 				bmpd = new BitmapData(Width, Height);  
