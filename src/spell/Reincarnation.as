@@ -57,6 +57,10 @@ package spell {
 			game.endTurn(unit);   
 			unit.prev = null; 
 		}
+		
+		public function get description():String { 
+			return "back target to life";     
+		}
 //-----		
 	}
 }

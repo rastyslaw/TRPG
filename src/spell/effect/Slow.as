@@ -35,7 +35,7 @@ package spell.effect {
 		}
 		 
 		public function insalubrity():Boolean {
-			return false; 
+			return true; 
 		}
 		
 		public function get _unit():Unit {
@@ -44,6 +44,10 @@ package spell.effect {
 		  
 		public function get cof():Number {
 			return 0; 
+		}
+		
+		public function get description():String {
+			return "reduced speed";
 		}
 //-----		
 	}

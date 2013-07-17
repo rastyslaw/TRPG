@@ -1,8 +1,11 @@
 package units {
 	import flash.display.Bitmap;
+	import spell.Channel;
 	import spell.ISpell;
 	import spell.Shield;
+	import spell.Storm;
 	import spell.Summon;
+	import spell.Telepotr;
 	/**
 	 * ...
 	 * @author waltasar
@@ -13,11 +16,11 @@ package units {
 		private var ico:Class;  
 		 
 		override public function getIco():Bitmap {   
-			return new ico();  
+			return new ico();   
 		}
 		 
-		override protected function setSpellMas():void {        
-			_spellMas = Vector.<ISpell>([new Summon, new Shield]);              
+		override protected function setSpellMas():void {          
+			_spellMas = Vector.<ISpell>([new Summon, new Shield, new Channel, new Storm, new Telepotr]);               
 		}
 		  
 		override public function getName():String {   

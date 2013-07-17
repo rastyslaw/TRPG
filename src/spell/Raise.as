@@ -43,6 +43,8 @@ package spell {
 			mas[numY][numX].grave = undefined;  
 			Game.goodFactory.creating(HeroCreator.ZOMBIE, mas[numY][numX]); 
 			game.unit_cont.setChildIndex(game.menu, game.unit_cont.numChildren-1); 
+			Unit(mas[numY][numX].unit).summon = true; 
+			
 			var s:String; 
 			if (p.y == numY) { 
 				if (p.x > numX) s = "l";
@@ -55,6 +57,10 @@ package spell {
 			unit.cast(s);
 			game.endTurn(unit);   
 			unit.prev = null; 
+		}
+		
+		public function get description():String { 
+			return "raise zombie from near corple";     
 		}
 //-----		
 	}

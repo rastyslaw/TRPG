@@ -8,8 +8,9 @@ package spell {
 	 */
 	public class Shield implements ISpell, IIcon { 
 		 
-		private var unit:Unit;
-		 
+		private var unit:Unit; 
+		private var _cof:int = 40; 
+		
 		public function get ico():String { 
 			return "spell6";     
 		} 
@@ -39,7 +40,10 @@ package spell {
 					 
 			hero = mas[numY][numX].unit;  
 			if (hero == null) return;
-			hero.setEffects(new Adsorb(hero, ico));  
+			var adsorb:Adsorb = new Adsorb(hero, ico);
+			adsorb.mas = mas;
+			adsorb.game = game;   
+			hero.setEffects(adsorb);  
 			
 			var s:String; 
 			var p:Point = Game.gerCoord(unit.x, unit.y); 
@@ -56,6 +60,9 @@ package spell {
 			unit.prev = null; 
 		}
 		
+		public function get description():String {  
+			return "creates a shield around the target that absorbs "+String(_cof)+" damage and explodes after 2 turns on wearing all around on "+String(_cof>>1)+" damage"; 
+		}
 //-----		
 	}
 }

@@ -76,6 +76,11 @@ package spell {
 			game.endTurn(unit);   
 			unit.prev = null; 
 		}
+		
+		public function get description():String { 
+			return "heal all targets in direction on [num] hp";     
+		}
+
 //-----		
 	}
 }

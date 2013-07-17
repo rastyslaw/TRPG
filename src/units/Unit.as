@@ -4,6 +4,7 @@ package units {
 	import flash.errors.IllegalOperationError; 
 	import flash.display.Sprite; 
 	import flash.events.Event;
+	import flash.geom.ColorTransform;
 	import flash.geom.Point;
 	import flash.utils.getQualifiedClassName;
 	import spell.effect.Adsorb;
@@ -36,7 +37,9 @@ package units {
 		private var _exp:uint = 10; 
 		private var graves:Grave; 
 		private var _issheep:Boolean;  
-		private var _adsorber:int;   
+		private var _adsorber:int;
+		private var goodArr:Arr;   
+		private var badArr:Arr;
 		
 		protected var _description:String;
 		protected var _itemMas:Array = [];
@@ -50,6 +53,7 @@ package units {
 		public var hpBar:HpBar;
 		public var target:Unit; 
 		public var mainMas:Vector.<Unit>;
+		public var summon:Boolean;  
 		
 		//Abstract method    
 		internal function setSname():void {  
@@ -79,18 +83,36 @@ package units {
 		internal function init():void {  
 			moveState = new MoveState;
 			stayState = new StayState;
-			attackState = new AttackState;  
+			attackState = new AttackState;
+			
 			setSname(); 
 			stay();  
 			setSpd();
-			setType(); 
+			setType();   
 			setEnemy(); 
 			_turn = true;
 			createBar();
 			setAttributes();
 			initDirection();
-			setDescription();
-			setSkilMas(); 
+			setDescription(); 
+			setSkilMas();
+			
+			createArr();
+		}
+		
+		private function createArr():void {
+			goodArr = new Arr;
+			badArr = new Arr;
+			var color:ColorTransform = new ColorTransform;
+			color.color = 0xff0000;
+			badArr.transform.colorTransform = color; 
+			goodArr.scaleY = -1; 
+			addChild(goodArr);
+			addChild(badArr);
+			goodArr.y = badArr.y = 20; 
+			goodArr.x = this.width - 34;
+			badArr.x = this.width - 22;
+			badArr.visible = goodArr.visible = false; 
 		}
 		
 		internal function initDirection():void {
@@ -343,19 +365,26 @@ package units {
 					if (getQualifiedClassName(_effects[e]) == getQualifiedClassName(value)) per = true;
 				}  
 				if (!per) {  
-					_effects.push(value); 
+					_effects.push(value);
 					value.apply(); 
 					Game.effects.subscribeObserver(IObserver(value));
 				} 
 			}
-			 else { 
+			else { 
 				for (e=0; e < _effects.length; e++ ) {
 					if (_effects[e] == value) _effects.splice(e, 1);
 				}
 				value.cancel();  
 				Game.effects.unsubscribeObserver(IObserver(value));
 				value = null; 
-			 }
+			}
+			// 
+			badArr.visible = goodArr.visible = false; 
+			for each(var effect:IEffect in _effects) {
+				if (effect is Grave) break;
+				if (effect.insalubrity()) badArr.visible = true; 
+				else goodArr.visible = true;    
+			}
 		}
 		
 //-----		 

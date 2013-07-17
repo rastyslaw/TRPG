@@ -39,6 +39,10 @@ package spell.skill {
 		public function get percent():int {
 			return int(_percent*100); 
 		}
+		
+		public function get description():String {
+			return String(percent)+"% to block half damage";   
+		}
 //-----		
 	}
 }

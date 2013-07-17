@@ -56,6 +56,10 @@ package spell.effect {
 		public function get _unit():Unit {
 			return unit;  
 		}
+		
+		public function get description():String {
+			return "corpse";
+		}
 //-----		
 	}
 }

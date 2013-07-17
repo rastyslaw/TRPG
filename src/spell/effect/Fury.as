@@ -6,14 +6,14 @@ package spell.effect {
 	 * ...
 	 * @author waltasar
 	 */
-	public class Inner implements IEffect, IObserver, IIcon {  
+	public class Fury implements IEffect, IObserver, IIcon {  
 		 
 		private var timer:int = 4;
-		private var _cof:Number = 1.3;
+		private var _cof:Number = 1.5; 
 		private var unit:Unit;
 		private var _ico:String;
-		
-		public function Inner(tar:Unit, ico:String) { 
+		 
+		public function Fury(tar:Unit, ico:String) { 
 			unit = tar;
 			_ico = ico; 
 		}
@@ -23,20 +23,20 @@ package spell.effect {
 		}
 		
 		public function apply():void {
-			unit.att = unit.att * cof;   
+			unit.agi = unit.agi * cof;   
 		} 
 		
 		public function cancel():void {
-			unit.att = unit.att / cof;  
+			unit.agi = unit.agi / cof;  
 		}
-		
+		 
 		public function update():void {
 			timer--;   
 			if (timer < 1) unit.setEffects(this, true);
 		}
 		 
 		public function insalubrity():Boolean {
-			return false;  
+			return false; 
 		}
 		
 		public function get _unit():Unit {
@@ -48,7 +48,7 @@ package spell.effect {
 		}
 		
 		public function get description():String {
-			return "attack up";
+			return "battle rage";
 		}
 //-----		
 	}

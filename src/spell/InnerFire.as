@@ -9,6 +9,7 @@ package spell {
 	public class InnerFire implements ISpell, IIcon { 
 		 
 		private var unit:Unit;
+		private var _cof:Number = 1.3;
 		 
 		public function get ico():String { 
 			return "spell11";   
@@ -56,6 +57,9 @@ package spell {
 			unit.prev = null; 
 		}
 		
+		public function get description():String {
+			return "targets attack increase on "+ String(_cof)+" %";     
+		}
 //-----		
 	}
 }

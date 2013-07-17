@@ -1,20 +1,18 @@
 package spell {
-	import events.MenuEvent;
-	import flash.display.Sprite;
-	import flash.geom.Point; 
+	import flash.geom.Point;
 	import units.Unit;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
-	public class Flare implements ISpell, IIcon { 
+	public class Channel implements ISpell, IIcon { 
 		 
 		private var spdam:Number = 2.5;    
-		private var unit:Unit;
+		private var unit:Unit; 
 		 
 		public function get ico():String { 
-			return "spell8";  
-		}
+			return "spell13";   
+		} 
 		
 		public function get ramka():int {  
 			return Game.RAMKA_SIMPLE;    
@@ -33,7 +31,7 @@ package spell {
 		}
 		
 		public function get ress():String {
-			return null      
+			return null; 
 		}
 		
 		public function cast(numX:int, numY:int, mas:Vector.<Object>, game:Game):void {
@@ -45,16 +43,17 @@ package spell {
 			var base_damage:int = unit.att * spdam; 
 			if (Math.random() * 100 < unit.agi) { 
 				base_damage *= 2;   
-				unit.getDamage(0, true, false, 0xff6600);     
+				unit.getDamage(0, true, false);      
 			} 
-				
+				 
 			if (mas[numY][numX].unit != undefined ) {    
-				hero = mas[numY][numX].unit; 
+				hero = mas[numY][numX].unit;   
 				if (hero.enemy) { 
 					if (mas[dirY][dirX].coff < 5) cof = 1 - mas[dirY][dirX].coff * .1; 
 					damage = (base_damage - hero.def) * cof;   
 					if (damage <= 0) damage = 1; 
-					hero.getDamage(damage, false, false, 0xff6600);
+					hero.getDamage(damage, false, false, 0x011D65);
+					unit.healing(int(damage/2));  
 					if(hero.hp <= 0) game.killUnit(hero); 
 				}
 			}   
@@ -76,7 +75,7 @@ package spell {
 		}
 		
 		public function get description():String {
-			return "hit the target on [num] damage";     
+			return "hit the target on [num] damage and heals himself for 50% of the damage done";     
 		}
 //-----		
 	}

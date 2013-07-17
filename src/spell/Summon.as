@@ -40,7 +40,8 @@ package spell {
 			Game.goodFactory.creating(HeroCreator.SPIDER, mas[numY][numX]); 
 			game.unit_cont.setChildIndex(game.menu, game.unit_cont.numChildren - 1);
 				
-			if (mas[numY][numX].grave != undefined) Unit(mas[numY][numX].grave).kill();  
+			if (mas[numY][numX].grave != undefined) Unit(mas[numY][numX].grave).kill();   
+			Unit(mas[numY][numX].unit).summon = true;  
 			 
 			var s:String; 
 			if (p.y == numY) { 
@@ -54,6 +55,10 @@ package spell {
 			unit.cast(s);
 			game.endTurn(unit);   
 			unit.prev = null; 
+		}
+		
+		public function get description():String { 
+			return "summon)";     
 		}
 //-----		
 	}

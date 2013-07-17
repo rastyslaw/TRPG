@@ -5,7 +5,7 @@ package spell {
 	 * ...
 	 * @author waltasar
 	 */
-	public class RainOfFire implements ISpell, IIcon { 
+	public class Storm implements ISpell, IIcon { 
 		 
 		private var spdam:Number = 1.5;     
 		private var unit:Unit;
@@ -13,8 +13,8 @@ package spell {
 									   [ -1, -1], [1, 1], [1, -1], [-1, 1]]; 
 		 
 		public function get ico():String { 
-			return "spell10";    
-		}
+			return "spell14";     
+		} 
 		
 		public function get ramka():int {  
 			return Game.RAMKA_SQUARE;     
@@ -41,7 +41,7 @@ package spell {
 			var dirX:int; 
 			var dirY:int; 
 			var cof:Number = 1;
-			var damage:int;
+			var damage:int; 
 			var exp:uint;  
 			var base_damage:int = unit.att * spdam; 
 			if (Math.random() * 100 < unit.agi) { 
@@ -55,8 +55,8 @@ package spell {
 					if (mas[numY][numX].coff < 5) cof = 1 - mas[numY][numX].coff * .1; 
 					damage = (base_damage - hero.def) * cof;   
 					if (damage <= 0) damage = 1;
-					exp += damage; 
-					hero.getDamage(damage, false, false, 0xff6600);    
+					exp += damage;  
+					hero.getDamage(damage, false, false, 0x011D65);    
 					if(hero.hp <= 0) game.killUnit(hero); 
 				}
 			}   
@@ -72,7 +72,7 @@ package spell {
 							damage = (base_damage-hero.def) * cof;
 							if (damage <= 0) damage = 1;
 							exp += damage;  
-							hero.getDamage(damage, false, false, 0xff6600);    
+							hero.getDamage(damage, false, false, 0x011D65);    
 							if(hero.hp <= 0) game.killUnit(hero);   
 						} 
 					}   

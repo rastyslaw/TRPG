@@ -1,25 +1,24 @@
 package spell.skill {
-	import flash.geom.Point;
-	import spell.effect.Slow;
+	import spell.effect.Stun;
 	import spell.IIcon;
 	import units.Unit;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
-	public class Binding implements ISkill, IIcon {   
+	public class Stuner implements ISkill, IIcon {   
 		
-		private var _percent:Number = .9;  
+		private var _percent:Number = .9;   
 		
-		public function get ico():String { 
-			return "skill8";    
+		public function get ico():String {  
+			return "skill9";      
 		} 
 		
 		public function calk(tar1:Unit, tar2:Unit, mas:Vector.<Object>, damage:int, func:Function):void {
-			if (Math.random() < _percent) { 
-				tar2.setEffects(new Slow(tar2, ico));  
+			if (Math.random() < _percent) {    
+				tar2.setEffects(new Stun(tar2, ico));
 			}
-		} 
+		}  
 		
 		public function correct():Number {
 			return 0; 
@@ -38,7 +37,7 @@ package spell.skill {
 		}
 		
 		public function get description():String {
-			return String(percent)+"% to reduced target speed on 2";  
+			return String(percent)+"% to stun the target for 1 round";  
 		}
 //-----		
 	}

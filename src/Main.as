@@ -81,6 +81,13 @@ package {
 			animationManager.addAnimation("Spider_attack_l", "spider_attack_l"); 
 			animationManager.addAnimation("Spider_attack_r", "spider_attack_r");
 			
+			animationManager.addAnimation("Barbar_stay", "barbar_stay");
+			animationManager.addAnimation("Barbar_walk", "barbar_walk");    
+			animationManager.addAnimation("Barbar_attack_t", "barbar_attack_t"); 
+			animationManager.addAnimation("Barbar_attack_d", "barbar_attack_d");  
+			animationManager.addAnimation("Barbar_attack_l", "barbar_attack_l"); 
+			animationManager.addAnimation("Barbar_attack_r", "barbar_attack_r");
+			
 			animationManager.addAnimation("Mage_stay", "mage_stay");
 			animationManager.addAnimation("Mage_walk", "mage_walk");  
 			animationManager.addAnimation("Mage_attack_t", "mage_attack_t"); 

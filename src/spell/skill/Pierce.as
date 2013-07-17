@@ -40,8 +40,10 @@ package spell.skill {
 				if (Game.getIndex(dirX, dirY)) {
 					unit = mas[dirY][dirX].unit; 
 					if (unit != null) {  
-						if (unit.enemy) { 
-							unit.getDamage(int(damage * cof));
+						if (unit.enemy) {
+							damage = int(damage * cof);
+							if (damage <= 0) damage = 1;
+							unit.getDamage(damage); 
 							if(unit.hp <= 0) func(unit); 
 						}
 					}  
@@ -64,6 +66,10 @@ package spell.skill {
 		
 		public function get percent():int {
 			return int(_percent*100); 
+		}
+		
+		public function get description():String {
+			return String(percent)+"% to damage enemy behind current target";   
 		}
 //-----		
 	}

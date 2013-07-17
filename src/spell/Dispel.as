@@ -54,6 +54,10 @@ package spell {
 			game.endTurn(unit);   
 			unit.prev = null; 
 		}
+		
+		public function get description():String { 
+			return "remove all negative effect from target";     
+		}
 //-----		
 	}
 }

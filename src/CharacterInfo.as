@@ -8,6 +8,10 @@ package  {
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.utils.getQualifiedClassName;
+	import spell.effect.IEffect;
+	import spell.IIcon;
+	import spell.skill.ISkill;
 	import units.MageUnit;
 	import units.Unit;
 	/**
@@ -21,28 +25,144 @@ package  {
  
 		[Embed(source = "../assets/loot.png")]  
 		public static const TextureData:Class;
+		 
+		[Embed(source = "../assets/spell.xml", mimeType = "application/octet-stream")]
+		public static const ImgXMLData:Class;
+ 
+		[Embed(source = "../assets/spell.png")]  
+		public static const ImgData:Class;
 		
 		private var main:CharWindow;
 		private var unit:Unit;
 		private var bg:CharBg;
 		private var _state:String;
-		private var lootXml:XML; 
-		private var lootMas:Array;
+		private var lootXml:XML;
+		private var spellXml:XML;  
+		private var lootMas:Array; 
 		private var botom:int;
-		private var texture:Bitmap;
+		private var texture:Bitmap; 
+		private var spellgr:Bitmap;
 		private var _sortState:String = "all";
+		private var cont:Sprite;
+		private var contEffect:Sprite;
 		
 		public function CharacterInfo(tar:Unit, mas:Array) {
 			lootMas = mas;
 			texture = Bitmap(new TextureData()); 
-			lootXml = XML(new TextureXMLData());  
-			unit = tar; 
+			lootXml = XML(new TextureXMLData());
+			spellgr = Bitmap(new ImgData()); 
+			spellXml = XML(new ImgXMLData());  
+			unit = tar;  
 			main = new CharWindow();   
-			addChild(main);
+			addChild(main); 
 			bg = main.bg;
-			init();
+			init(); 
+			createPanels(); 
 			main.close.addEventListener(MouseEvent.CLICK, closed);
 			state = "atr";  
+		}
+		
+		private function createPanels():void {  
+			cont = new Sprite; 
+			var bmpd:BitmapData;
+			var bmp:Bitmap;
+			var Width:Number;
+			var Height:Number;
+			var skilmas:*;
+			var i:int;
+			var ico:String;
+			var spe:Sprite;
+			var nam:String; 
+			if (unit.type != "mage") skilmas = unit.skills;
+			else skilmas = MageUnit(unit).spellMas;
+			for (i=0; i < skilmas.length; i++) {
+				ico = IIcon(skilmas[i]).ico;
+			    bmp = new Bitmap;  
+				Width = spellXml.SubTexture.(attribute('name') == ico).@width;
+				Height = spellXml.SubTexture.(attribute('name') == ico).@height;
+				bmpd = new BitmapData(Width, Height);  
+				bmpd.copyPixels(spellgr.bitmapData,      
+                       new Rectangle(spellXml.SubTexture.(attribute('name') == ico).@x, spellXml.SubTexture.(attribute('name') == ico).@y, Width, Height), 
+                       new Point(0, 0)); 
+				bmp.bitmapData = bmpd;
+				nam = getQualifiedClassName(skilmas[i]);
+				nam = nam.replace("spell.skill::", "");
+				nam = nam.replace("spell::", "");
+				bmp.name = nam;
+				spe = new Sprite;
+				spe.addChild(bmp); 
+				cont.addChild(spe);
+				spe.name = IIcon(skilmas[i]).description; 
+				spe.x = i*65;     
+				spe.scaleX = spe.scaleY = .8;  
+			}
+			cont.y = 56; 
+			cont.x = -10 - cont.width >> 1;
+			//
+			contEffect = new Sprite; 
+			var goodEffect:Sprite = new Sprite;
+			var badEffect:Sprite = new Sprite;
+			var effectMas:Vector.<IEffect> = unit.effects; 
+			for (i=0; i < effectMas.length; i++) {
+				ico = IIcon(effectMas[i]).ico; 
+			    bmp = new Bitmap;  
+				Width = spellXml.SubTexture.(attribute('name') == ico).@width;
+				Height = spellXml.SubTexture.(attribute('name') == ico).@height;
+				bmpd = new BitmapData(Width, Height);  
+				bmpd.copyPixels(spellgr.bitmapData,      
+                       new Rectangle(spellXml.SubTexture.(attribute('name') == ico).@x, spellXml.SubTexture.(attribute('name') == ico).@y, Width, Height), 
+                       new Point(0, 0)); 
+				bmp.bitmapData = bmpd;
+				nam = getQualifiedClassName(effectMas[i]);
+				nam = nam.replace("spell.skill::", "");
+				nam = nam.replace("spell::", "");  
+				bmp.name = nam;
+				spe = new Sprite;
+				spe.addChild(bmp); 
+				if (effectMas[i].insalubrity()) badEffect.addChild(spe);
+				else goodEffect.addChild(spe);
+				spe.name = IIcon(effectMas[i]).description; 
+				spe.x = i*30;      
+				spe.scaleX = spe.scaleY = .3;  
+			} 
+			contEffect.addChild(badEffect);
+			badEffect.x = 370 - badEffect.width;  
+			contEffect.addChild(goodEffect);
+			contEffect.y = 120;   
+			contEffect.x = -185;
+			cont.addEventListener(MouseEvent.MOUSE_OVER, show_spellinfo);
+			cont.addEventListener(MouseEvent.MOUSE_OUT, hide_spellinfo); 
+			contEffect.addEventListener(MouseEvent.MOUSE_OVER, show_effectinfo);
+			contEffect.addEventListener(MouseEvent.MOUSE_OUT, hide_effectinfo); 
+		}
+		
+		private function show_spellinfo(e:MouseEvent):void {
+			var obg:Sprite = e.currentTarget as Sprite;
+			bg.infoSpell.visible = true;
+			var p:Point = obg.localToGlobal(new Point(e.target.x, e.target.y));
+			p = bg.globalToLocal(p); 
+			bg.infoSpell.x = p.x;    
+			bg.infoSpell.y = p.y;  
+			bg.infoSpell.info.text = e.target.name;
+			bg.infoSpell.nam.text = Sprite(e.target).getChildAt(0).name;
+		}
+		
+		private function hide_spellinfo(e:MouseEvent):void {
+			bg.infoSpell.visible = false; 
+		}  
+		 
+		private function show_effectinfo(e:MouseEvent):void {
+			var obg:Sprite = e.currentTarget as Sprite;
+			bg.infoEffect.visible = true;
+			var p:Point = obg.localToGlobal(new Point(e.target.x, e.target.y));
+			p = bg.globalToLocal(p); 
+			bg.infoEffect.x = p.x;    
+			bg.infoEffect.y = p.y;  
+			bg.infoEffect.info.text = e.target.name;
+		}
+		
+		private function hide_effectinfo(e:MouseEvent):void {
+			bg.infoEffect.visible = false; 
 		}
 		
 		private function init():void {
@@ -83,7 +203,7 @@ package  {
 			bg.at.text = String(unit.att); 
 			bg.df.text = String(unit.def); 
 			bg.ag.text = String(unit.agi);  	   
-			bg.mv.text = String(unit.speed);
+			bg.mv.text = String(unit.speed); 
 			var mas:Array = unit.getBonus();
 			var index:int; 
 			var reg:RegExp =/\D+/;
@@ -103,15 +223,21 @@ package  {
 					case "MV":  
 						bg.mv.text = String(int(bg.mv.text) + int( s.substr(0, s.search(ss)) ));
 					break;
-				}
-			} 
+				} 
+			}     
 			bg.info.text = unit.description;  
-			bg.infoSpell.visible = false;  
-			main.inventory.addEventListener(MouseEvent.CLICK, inv_open);
+			bg.infoSpell.visible = bg.infoSpell.mouseEnable = false;
+			bg.infoEffect.visible = bg.infoEffect.mouseEnable = false; 
+			bg.addChild(cont);  
+			bg.addChild(contEffect);
+			if (!unit.summon) main.inventory.addEventListener(MouseEvent.CLICK, inv_open); 
+			else main.inventory.visible = false; 
 		}
 		
 		private function inv_open(e:MouseEvent=null):void { 
 			main.inventory.removeEventListener(MouseEvent.CLICK, inv_open);
+			bg.removeChild(cont); 
+			bg.removeChild(contEffect);
 			bg.gotoAndStop(2);
 			bg.infoLoot.visible = false;  
 			bg.cont.scrollRect = new Rectangle(0, 0, 156, 210);   

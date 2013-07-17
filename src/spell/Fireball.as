@@ -46,7 +46,7 @@ package spell {
 			var base_damage:int = unit.att * spdam; 
 			if (Math.random() * 100 < unit.agi) { 
 				base_damage *= 2;   
-				unit.getDamage(0, true, false, 0xff6600);     
+				unit.getDamage(0, true, false);     
 			} 
 				
 			if (mas[numY][numX].unit != undefined ) {    
@@ -95,6 +95,9 @@ package spell {
 			unit.prev = null; 
 		}
 		
+		public function get description():String {
+			return "hit the target and all around on [num] damage";     
+		}
 //-----		 
 	}
 }

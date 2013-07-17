@@ -16,6 +16,8 @@ package units {
 		public static const HERO_ARCHER:uint = 7; 
 		public static const HERO_WARR:uint   = 8; 
 		
+		public static const BARBAR:uint 	 = 9;
+		
 		override protected function createUnit(unit:uint):Unit {
 			switch(unit) {
 				case ARCHER:
@@ -44,6 +46,9 @@ package units {
 				break;
 				case HERO_WARR: 
 					return new HeroWarr();   
+				break;
+				case BARBAR:   
+					return new Barbar();   
 				break;
 			default:
 				throw new Error("Invalid unit"); 

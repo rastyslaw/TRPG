@@ -1,25 +1,24 @@
 package spell {
 	import flash.geom.Point;
-	import spell.effect.Sheep;
 	import units.Unit;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
-	public class Polymorph implements ISpell, IIcon { 
+	public class Telepotr implements ISpell, IIcon { 
 		 
-		private var unit:Unit; 
+		private var unit:Unit;
 		 
 		public function get ico():String { 
-			return "spell12";   
-		}
+			return "spell15";    
+		} 
 		
 		public function get ramka():int { 
 			return Game.RAMKA_SIMPLE;      
 		} 
 		
 		public function get summon():Boolean {
-			return false;     
+			return true;      
 		}
 		
 		public function get baff():String {
@@ -31,21 +30,18 @@ package spell {
 		}
 		
 		public function get ress():String {
-			return null  ;
+			return null ;
 		}
 		
 		public function cast(numX:int, numY:int, mas:Vector.<Object>, game:Game):void {
-			var hero:Unit; 
-			var dirX:int;  
-			var dirY:int; 
-					  
-			hero = mas[numY][numX].unit;  
-			if (hero == null) return;
-			hero.setEffects(new Sheep(hero, ico));  
-			
-			var s:String;  
 			var p:Point = Game.gerCoord(unit.x, unit.y); 
-			if (p.y == numY) {  
+			mas[numY][numX].unit = unit;  
+			mas[p.y][p.x].unit = undefined; 
+			unit.x = numX * Map.grid_size - 8;
+			unit.y = numY * Map.grid_size - 8;   
+
+			var s:String; 
+			if (p.y == numY) { 
 				if (p.x > numX) s = "l";
 				else s = "r";
 			}   
@@ -54,12 +50,12 @@ package spell {
 			} 
 			else s = "d"; 
 			unit.cast(s);
-			game.endTurn(unit);   
-			unit.prev = null; 
+			
+			game.finishMovement(unit);
 		}
 		
-		public function get description():String {
-			return "polimorph)";     
+		public function get description():String { 
+			return "teleport)";     
 		}
 //-----		
 	}

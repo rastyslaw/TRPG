@@ -17,6 +17,7 @@
 	import spell.skill.Cutting;
 	import spell.skill.ISkill;
 	import spell.skill.Prot;
+	import spell.Telepotr;
 	import units.*;  
 	import command.*;
 	
@@ -112,20 +113,24 @@
 			unit_cont.addChild(lines); 
 			 
 			effects = new UnitEffects;  
-			goodFactory.init(unit_cont, masGoodUnit);
+			goodFactory.init(unit_cont, masGoodUnit); 
 			badFactory.init(unit_cont, masBadUnit);  
 			
-			goodFactory.creating(selectHero, mas[10][12]);
+			goodFactory.creating(selectHero, mas[7][5]);
 			 
 			goodFactory.creating(HeroCreator.GNOM, mas[8][6]); 
-			goodFactory.creating(HeroCreator.ARCHER, mas[9][12]);  
-			goodFactory.creating(HeroCreator.MAGE, mas[7][8]);
+			goodFactory.creating(HeroCreator.ARCHER, mas[9][7]);  
+			goodFactory.creating(HeroCreator.MAGE, mas[7][8]); 
 			goodFactory.creating(HeroCreator.PRIEST, mas[8][5]); 
-			 
-			badFactory.creating(EnemyCreator.TROLL, mas[14][16]);
-			badFactory.creating(EnemyCreator.DEATH, mas[13][17]);
-			badFactory.creating(EnemyCreator.TROLL, mas[14][15]);
-			badFactory.creating(EnemyCreator.DEATH, mas[13][15]);
+			goodFactory.creating(HeroCreator.BARBAR, mas[7][9]); 
+			  
+			badFactory.creating(EnemyCreator.TROLL, mas[13][16]);
+			badFactory.creating(EnemyCreator.DEATH, mas[12][17]);
+			badFactory.creating(EnemyCreator.SKELARCHER, mas[13][15]);
+			
+			badFactory.creating(EnemyCreator.TROLL, mas[2][13]);
+			badFactory.creating(EnemyCreator.DEATH, mas[3][14]);
+			badFactory.creating(EnemyCreator.SKELARCHER, mas[1][12]);
 			
 			menu = new Menu(mas); 
 			unit_cont.addChild(menu);   
@@ -134,7 +139,7 @@
 			dispatcher.setCommand(MenuEvent.ATTACK, AttackCommand, this); 
 			dispatcher.setCommand(MenuEvent.FINISH, FinishCommand, this);
 			dispatcher.setCommand(MenuEvent.BACK, BackCommand, this);   
-			dispatcher.setCommand(MenuEvent.CHAR, CharCommand, this);
+			dispatcher.setCommand(MenuEvent.CHAR, CharCommand, this); 
 			dispatcher.setCommand(MenuEvent.CAST, CastCommand, this); 
 			 
 			unit_cont.x = -map.corX;  
@@ -178,21 +183,22 @@
 				else if (attack_mode) pressAttack(numX, numY);
 				else if (curcast != null) { 
 					for each (var p:Point in enemyMas) {  
-						var mob:Unit = mas[p.y][p.x].unit; 
+						var mob:Unit = mas[p.y][p.x].unit;  
 						if(mob==null) mob = mas[p.y][p.x].grave; 
 						mob.removeEventListener(MouseEvent.MOUSE_OUT, out_enemy);
 						mob.removeEventListener(MouseEvent.MOUSE_OVER, over_enemy);
-					}
+					}   
+					var unt:Unit = mas[curhero.y][curhero.x].unit; 
 					if (tarCast != null) { 
 						if (ramka.contains(tarCast) || unit_cont.contains(tarCast)) {
-							curcast.cast(numX, numY, mas, this);
+							curcast.cast(numX, numY, mas, this); 
 							if (mas[curhero.y][curhero.x].grave != undefined) {  
 								Unit(mas[curhero.y][curhero.x].grave).kill();  
-							} 
-							lookProtect(mas[curhero.y][curhero.x].unit);   
-						}
+							}  
+							if(unt!=null) lookProtect(unt);   
+						} 
 					}
-					else backMovement(mas[curhero.y][curhero.x].unit);   
+					else backMovement(unt);   
 					curcast = null;  
 				} 
 				clearSq();    
@@ -300,7 +306,7 @@
 			addChild(tween); 
 			for each (var unit:Unit in masBadUnit) {  
 				TweenMax.to(unit, 1.4, { colorMatrixFilter: { hue:0 }} );
-				unit.turn = true;
+				unit.turn = true; 
 				unit.agro = null; 
 				enemyTutnMas.splice(0, enemyTutnMas.length);
 			} 
@@ -328,7 +334,7 @@
 			} 
 			var tween:TurnTweener = new TurnTweener("ENEMY TURN");
 			addChild(tween);  
-			turn = false;
+			turn = false; 
 			cutTurnEnemy = 0; 
 			removeEventListener(MouseEvent.MOUSE_MOVE, moveramk); 
 			removeEventListener(MouseEvent.CLICK, clickedOnMap, true);
@@ -338,12 +344,12 @@
 			var dx:Number;     
 			var dy:Number;
 			var rast:Number;
-			for each (var badunit:Unit in masBadUnit) { 
+			for each (var badunit:Unit in masBadUnit) {
 				for each (var goodunit:Unit in masGoodUnit) {
 					dx = badunit.x - goodunit.x;
 					dy = badunit.y - goodunit.y;  
 					rast = Math.sqrt(dx * dx + dy * dy); 
-					if (rast < distance) {
+					if (rast < distance && badunit.turn) {
 						badunit.agro = goodunit;  
 						RastLowerDistance(badunit);  
 					}
@@ -352,7 +358,7 @@
 			addAgroUnits();
 			ramka.visible = false;  
 		}    
-		
+		 
 		private function addAgroUnits():void {
 			var p:Point;
 			var dirX:int;  
@@ -365,9 +371,9 @@
 					dirX = p.x + direction[i][0];
 					dirY = p.y + direction[i][1]; 
 					if (getIndex(dirX, dirY)) {   
-						unit = mas[dirY][dirX].unit;
+						unit = mas[dirY][dirX].unit; 
 						if (unit != null) {
-							if (unit.enemy) { 
+							if (unit.enemy && unit.turn) { 
 								unit.agro = enemyTutnMas[j].agro;    
 								RastLowerDistance(unit);
 							}
@@ -941,6 +947,7 @@
 				} 
 			} 
 			else { 
+				if(curcast is Telepotr) direction = tar.direction; 
 				for (i = 0; i < direction.length; i++) {       
 					dirX = target.x + direction[i][0];     
 					dirY = target.y + direction[i][1]; 
@@ -960,7 +967,7 @@
 										unit.addEventListener(MouseEvent.MOUSE_OVER, over_enemy);
 										enemyMas.push(new Point(dirX, dirY)); 
 										getSquare(dirY, dirX, 0xC28216); 
-								}  
+								}
 								else {  
 									if (!unit.enemy) {  
 										unit.addEventListener(MouseEvent.MOUSE_OVER, over_enemy);

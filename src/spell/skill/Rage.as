@@ -1,25 +1,24 @@
 package spell.skill {
-	import flash.geom.Point;
-	import spell.effect.Slow;
+	import spell.effect.Fury;
 	import spell.IIcon;
 	import units.Unit;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
-	public class Binding implements ISkill, IIcon {   
+	public class Rage implements ISkill, IIcon {   
 		
 		private var _percent:Number = .9;  
 		
-		public function get ico():String { 
-			return "skill8";    
+		public function get ico():String {  
+			return "skill10";      
 		} 
 		
 		public function calk(tar1:Unit, tar2:Unit, mas:Vector.<Object>, damage:int, func:Function):void {
-			if (Math.random() < _percent) { 
-				tar2.setEffects(new Slow(tar2, ico));  
+			if (Math.random() < _percent) {   
+				tar1.setEffects(new Fury(tar1, ico));   
 			}
-		} 
+		}  
 		
 		public function correct():Number {
 			return 0; 
@@ -36,9 +35,9 @@ package spell.skill {
 		public function get percent():int {
 			return int(_percent*100); 
 		}
-		
+		 
 		public function get description():String {
-			return String(percent)+"% to reduced target speed on 2";  
+			return String(percent)+"% enter into battle trans and increase agi by 50%";  
 		}
 //-----		
 	}
