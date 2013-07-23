@@ -53,7 +53,7 @@ package spell {
 					if (mas[dirY][dirX].unit != undefined) { 
 						hero = mas[dirY][dirX].unit; 
 						if (hero.enemy) {     
-							if (mas[dirY][dirX].coff < 5) cof = 1 - mas[dirY][dirX].coff * .1;
+							cof = 1 - mas[dirY][dirX].def * .1;
 							hero.getDamage(_dam);    
 							if(hero.hp <= 0) game.killUnit(hero);   
 						} 

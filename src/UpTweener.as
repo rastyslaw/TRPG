@@ -10,7 +10,7 @@ package {
 	public class UpTweener extends Sprite {
 		
 		public function UpTweener(obg:Sprite) { 
-			TweenLite.to(obg, 3, { y:-16, alpha:0.6, onComplete:onFinishTween}); 
+			TweenLite.to(obg, 1.5, { y:-6, alpha:0.6, onComplete:onFinishTween}); 
 		}
 		 
 		private function onFinishTween():void {  

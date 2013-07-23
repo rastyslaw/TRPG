@@ -52,6 +52,12 @@
 			Troll_stay; Troll_walk; Troll_attack_d; Troll_attack_t; Troll_attack_l; Troll_attack_r;
 			SkeletArcher_stay; SkeletArcher_walk; SkeletArcher_attack_d; SkeletArcher_attack_t; SkeletArcher_attack_l; SkeletArcher_attack_r;
 			Death_stay; Death_walk; Death_attack_d; Death_attack_t; Death_attack_l; Death_attack_r;
+			//npc
+			Npc_guard_stay; Npc_guard_talk; Npc_guard_walk; Npc_guard_look;
+			Npc_smith_stay; Npc_smith_talk; Npc_smith_work;
+			Npc_liza_stay; Npc_liza_talk; Npc_liza_walk;
+			Npc_farmer_talk; Npc_farmer_stay; Npc_farmer_look; Npc_farmer_walk; Npc_farmer_work;
+			Npc_fisher_stay; Npc_fisher_talk; Npc_fisher_work; 
 		}
 		 
 		public function buildAnimation(identifier:String):void {
@@ -142,7 +148,7 @@
 				}  
 				else { 
 					removeEventListener(Event.ENTER_FRAME, enterFrame); 
-					dispatchEvent(new Event("FINISH")); 
+					dispatchEvent(new Event("FINISH"));    
 					return;  
 				} 
 			} 

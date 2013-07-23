@@ -52,7 +52,7 @@ package spell {
 			if (mas[numY][numX].unit != undefined ) {    
 				hero = mas[numY][numX].unit; 
 				if (hero.enemy) { 
-					if (mas[numY][numX].coff < 5) cof = 1 - mas[numY][numX].coff * .1; 
+					cof = 1 - mas[numY][numX].def * .1; 
 					damage = (base_damage - hero.def) * cof;   
 					if (damage <= 0) damage = 1;
 					exp += damage;   

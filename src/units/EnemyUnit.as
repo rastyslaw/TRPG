@@ -1,5 +1,8 @@
 package units {
 	import flash.events.Event;
+	import flash.events.TimerEvent;
+	import flash.utils.setTimeout;
+	import flash.utils.Timer;
 	/**
 	 * ...
 	 * @author waltasar
@@ -15,12 +18,13 @@ package units {
 		public function skip():void {  
 			zzz = new Zzz;  
 			addChild(zzz);
-			zzz.y = 10;
-			var tween:UpTweener = new UpTweener(zzz); 
-			tween.addEventListener("FINISH", next); 
+			zzz.x = 36;
+			//var tween:UpTweener = new UpTweener(zzz); 
+			//tween.addEventListener("FINISH", next); 
+			setTimeout(next, 1200); 
 		}
 		 
-		private function next(e:Event):void {
+		private function next():void {
 			turn = false; 
 			removeChild(zzz); 
 			dispatchEvent(new Event("FINISH"));  

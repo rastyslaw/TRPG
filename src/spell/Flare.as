@@ -51,7 +51,7 @@ package spell {
 			if (mas[numY][numX].unit != undefined ) {    
 				hero = mas[numY][numX].unit; 
 				if (hero.enemy) { 
-					if (mas[dirY][dirX].coff < 5) cof = 1 - mas[dirY][dirX].coff * .1; 
+					cof = 1 - mas[dirY][dirX].def * .1; 
 					damage = (base_damage - hero.def) * cof;   
 					if (damage <= 0) damage = 1; 
 					hero.getDamage(damage, false, false, 0xff6600);

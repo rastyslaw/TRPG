@@ -1,4 +1,5 @@
 package {
+	import flash.display.Bitmap;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -12,8 +13,10 @@ package {
 	[SWF(stageWidth="800", stageHeight="480", frameRate="30")]
 	public class Main extends Sprite {
 		
+		public static var selectHero:uint;
 		public static var animationManager:AnimationManager;
 		private var selectPanel:SelectPanel;
+		private var level:int = 1;
 		
 		public function Main():void { 
 			if (stage) init(); 
@@ -22,7 +25,7 @@ package {
 
 		private function init(e:Event = null):void { 
 			removeEventListener(Event.ADDED_TO_STAGE, init);  
-			animationManager = new AnimationManager();
+			animationManager = new AnimationManager(); 
 			animationManager.addAnimation("Sheep_stay", "sheep_stay");
 			animationManager.addAnimation("Sheep_walk", "sheep_walk");
 			
@@ -132,6 +135,30 @@ package {
 			animationManager.addAnimation("Death_attack_l", "death_attack_l"); 
 			animationManager.addAnimation("Death_attack_r", "death_attack_r");
 			
+			//npc
+			animationManager.addAnimation("Npc_liza_stay", "npc_liza_stay");
+			animationManager.addAnimation("Npc_liza_walk", "npc_liza_walk");   
+			animationManager.addAnimation("Npc_liza_talk", "npc_liza_talk");    
+			
+			animationManager.addAnimation("Npc_smith_stay", "npc_smith_stay");
+			animationManager.addAnimation("Npc_smith_work", "npc_smith_work");    
+			animationManager.addAnimation("Npc_smith_talk", "npc_smith_talk");
+			
+			animationManager.addAnimation("Npc_guard_stay", "npc_guard_stay");
+			animationManager.addAnimation("Npc_guard_walk", "npc_guard_walk");   
+			animationManager.addAnimation("Npc_guard_talk", "npc_guard_talk");
+			animationManager.addAnimation("Npc_guard_look", "npc_guard_look"); 
+			
+			animationManager.addAnimation("Npc_fisher_stay", "npc_fisher_stay");
+			animationManager.addAnimation("Npc_fisher_work", "npc_fisher_work");   
+			animationManager.addAnimation("Npc_fisher_talk", "npc_fisher_talk");
+			
+			animationManager.addAnimation("Npc_farmer_stay", "npc_farmer_stay");
+			animationManager.addAnimation("Npc_farmer_walk", "npc_farmer_walk");    
+			animationManager.addAnimation("Npc_farmer_talk", "npc_farmer_talk");
+			animationManager.addAnimation("Npc_farmer_look", "npc_farmer_look");
+			animationManager.addAnimation("Npc_farmer_work", "npc_farmer_work");
+			
 			selectPanel = new SelectPanel;
 			selectPanel.x = Constants.STAGE_WIDTH >> 1;
 			selectPanel.y = Constants.STAGE_HEIGHT >> 1;
@@ -141,17 +168,29 @@ package {
 		  
 		private function select(e:MouseEvent):void {
 			selectPanel.removeEventListener(MouseEvent.CLICK, select);
-			var i:uint;
+			var i:uint; 
 			if (e.target.name == "b1") {
-				i = HeroCreator.HERO_WARR; 
+				i = HeroCreator.HERO_WARR;  
 			}
 			else if (e.target.name == "b2") {
 				i = HeroCreator.HERO_ARCHER; 
 			}
 			else i = HeroCreator.HERO_MAGE;
 			removeChild(selectPanel);
-			Game.selectHero = i; 
-			stage.addChild(new Game);
+			selectHero = i;  
+			  
+			var level:Levels = new Levels;
+			var mas:Array = level.getLevel(this.level, 6);  
+			//var mas:Array = level.getLevel(this.level, 13); 
+			var clas:Bitmap = level.getTileset(this.level);  
+			addChild(new Town(mas[0], mas[1], clas));
+			
+			/*
+			var game:Game = new Game;
+			game.setMap(mas[0], mas[1], clas);   
+			addChild(game);
+			game.init(); 
+			*/
 		}
 		
 //-----

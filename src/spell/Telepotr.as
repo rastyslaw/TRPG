@@ -34,7 +34,8 @@ package spell {
 		}
 		
 		public function cast(numX:int, numY:int, mas:Vector.<Object>, game:Game):void {
-			var p:Point = Game.gerCoord(unit.x, unit.y); 
+			var p:Point = Game.gerCoord(unit.x, unit.y);
+			if (mas[numY][numX].coff == 9) return;  
 			mas[numY][numX].unit = unit;  
 			mas[p.y][p.x].unit = undefined; 
 			unit.x = numX * Map.grid_size - 8;

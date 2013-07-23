@@ -62,13 +62,13 @@ package  {
 		private var game:Game;
 		private var ui:UI;
 		public var tracking:Unit; 
-		
-		public function Map(ar:Array, cont:Game) { 
+		 
+		public function Map(ar:Array, cofmas:Array, cont:Game, tiles:Bitmap) {   
 			aWorld = ar;
-			game = cont; 
+			game = cont;   
 			ui = game.ui;  
-			worldCols = 20;    
-			worldRows = 16; 
+			worldCols = ar[0].length;     
+			worldRows = ar.length;  
 			mas = new Vector.<Object>(worldRows, true); 
 			var obj:Object; 
 			var c:int;
@@ -80,22 +80,8 @@ package  {
 					 obj = new Object;
 					 obj.i = i;
 					 obj.j = j; 
-					 switch(c) {
-						case 1:
-						case 2:
-							obj.coff = 2;   
-						break;
-						case 3:
-							obj.coff = 3;   
-						break;
-						case 4:
-							obj.coff = 4;     
-						break;
-						case 5: 
-							obj.coff = 9;    
-						break;
-						default: obj.coff = 1;   
-					 }
+					 obj.coff = getCof(cofmas, c);
+					 obj.def = getDef(cofmas, c);  
 					 vector[j] = obj;  
 				}   
 				mas[i] = vector;      
@@ -114,19 +100,41 @@ package  {
 	   
 			canvasBD = new BitmapData(viewWidth,viewHeight,false,0x000000);
 			bufferBD = new BitmapData(viewWidth+2*grid_size,viewHeight+2*grid_size,false,0x000000);
-			bufferRect = new Rectangle(0,0,viewWidth,viewHeight);
+			bufferRect = new Rectangle(0,0,viewWidth,viewHeight); 
 			bufferPoint = new Point(0,0); 
 			canvasBitmap = new Bitmap(canvasBD); 
 			addChild(canvasBitmap);   
-			  
-			sprites_width=384;  
-			sprites_height=64;  
-			sprites64x64=new tileset(sprites_width,sprites_height);
-			sprites_perRow=sprites_width/grid_size;
+			sprites64x64 = tiles.bitmapData;   
+			sprites_width = sprites64x64.width; 
+			sprites_height=sprites64x64.height;  
+			sprites_perRow=sprites_width/grid_size; 
 			
 			gameTimer = new Timer(_period,1); 
 			gameTimer.addEventListener(TimerEvent.TIMER, runGame);
 			gameTimer.start();  
+		}
+		 
+		private function getCof(mas:Array, value:int):int {
+			var j:int; 
+			var n:int = 1;
+			if(value == 2 || value == 3) return 3;  
+			for (var i:int=1; i < mas.length; i++) {
+				j = mas[i];  
+				if (value < j) return n;
+				n++; 
+			}
+			return 9;
+		}
+		 
+		private function getDef(mas:Array, value:int):int {
+			var j:int; 
+			var n:int;
+			for (var i:int; i < mas.length; i++) {
+				j = mas[i];
+				if (value < j) return n; 
+				n++; 
+			}
+			return 9; 
 		}
 		
 		private function runGame(e:TimerEvent):void { 
@@ -211,10 +219,10 @@ package  {
 					viewYOffset = (worldHeight-viewHeight)-1;
 					//trace("hit end of world height");
 				} 
-				_speedY *= .86;
-			} 	    
+				_speedY *= .86; 
+			} 	     
 			if (!ui.hitTestPoint(mouseX, mouseY, true) || !game._turn) {
-				if(Game.scrolling) updMapPos();     
+				if(game.scrolling) updMapPos();      
 			}
 			game.unit_cont.x = -viewXOffset;  
 			game.unit_cont.y = -viewYOffset;  

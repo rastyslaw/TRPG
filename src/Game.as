@@ -24,31 +24,15 @@
 	import com.greensock.*; 
 	import com.greensock.easing.*;
 
-	public class Game extends Sprite implements IReceiver {
+	public class Game extends Sprite implements IReceiver { 
 		public static const RAMKA_SIMPLE:uint     = 1;  
-		public static const RAMKA_CROSS:uint      = 2;
+		public static const RAMKA_CROSS:uint      = 2;  
 		public static const RAMKA_SQUARE:uint	  = 3;  
 		
 		public static var effects:UnitEffects; 
 		public static var distance:int = 400;
-		public static var scrolling:Boolean = true;  
-		private var map1:Array = [  [1,2,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5], 
-									[2,0,1,0,0,2,4,2,0,1,3,3,3,0,1,0,0,0,0,5],
-									[0,3,3,3,0,2,4,2,0,1,3,0,0,0,1,0,0,0,0,5],
-									[0,3,3,3,3,0,1,2,0,1,2,2,0,0,1,0,0,0,0,5],
-									[3,0,1,3,1,2,2,2,0,1,0,0,0,0,1,0,5,5,5,5], 
-									[3,3,0,3,0,1,3,1,0,1,0,0,3,0,1,0,5,0,0,1],
-									[1,0,2,0,0,0,0,5,0,1,0,0,0,3,1,0,5,0,0,1], 
-									[1,0,0,0,0,0,0,0,0,2,4,4,0,0,0,0,0,0,0,1], 
-									[5,0,0,3,0,0,0,2,0,4,4,4,0,0,0,0,0,0,0,1],
-									[5,5,5,0,3,0,2,2,4,4,0,0,0,0,0,0,0,0,0,1],
-									[5,5,5,3,0,0,3,0,4,0,0,3,3,3,0,0,0,0,5,1],
-									[1,0,0,0,3,3,3,4,4,0,0,0,2,1,0,0,0,0,0,1],
-									[1,0,3,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
-									[1,0,0,0,1,0,0,0,0,0,0,0,0,1,5,0,0,0,4,4],
-									[1,0,3,2,0,0,5,0,0,0,3,0,0,0,0,1,0,4,4,4],
-									[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,4,4,4]];  
-			     
+		public var scrolling:Boolean = true;  
+		
 		private var lootMas:Array = [["boots1_gnom",0,2,0,0,0], ["chest1_gnom",0,5,2,0,0,"gnomset1"], ["helm1_gnom", 0,4,0,10,0,"gnomset1"], ["shield1_gnom", 0,6,0,0,0,"gnomset1"], ["shield2_gnom", 0,12,0,20,0], ["weapon1_gnom", 4,0,0,0,0],
 									 ["weapon1_archer", 5,0,0,0,0,"archerset1"], ["chest1_archer", 0,1,0,0,0], ["helm2_archer", 0,1,0,0,0,"archerset1"], ["boots1_archer", 0,1,0,0,0,"archerset1"], ["helm1_archer", 0,1,0,0,0], 
 									 ["helm1_mage",0,4,0,0,0,"mageset1"], ["book1_mage", 0,0,0,0,10,"mageset1"], ["book2_mage", 0,0,0,0,20], ["weapon1_mage", 12,0,0,0,0,"mageset1"], ["chest2_mage", 0,4,0,0,0,"mageset1"], ["chest1_mage", 0,4,0,0,0]];    
@@ -87,15 +71,20 @@
 		public static var goodFactory:CreatorUnits;
 		public static var badFactory:CreatorUnits; 
 		 
-		public static var selectHero:uint;
+		public function Game():void {
+			ui = new UI(this); 
+		}
 		
-		public function Game() { 
-			ui = new UI(this);
-			map = new Map(map1, this);
-			addChild(map);
-			mas = map._mas; 
+		public function setMap(mas:Array, cofMas:Array, tiles:Bitmap):void {
+			//if(map==null) {   
+				map = new Map(mas, cofMas, this, tiles);
+				addChild(map); 
+			//} 
+		}
+		
+		public function init():void {
+			mas = map._mas;  
 			grid_size = Map.grid_size;
-				
 			ramka = new Ramka; 
 			addChild(ramka);
 			ramka.mouseEnabled = false;   
@@ -116,7 +105,7 @@
 			goodFactory.init(unit_cont, masGoodUnit); 
 			badFactory.init(unit_cont, masBadUnit);  
 			
-			goodFactory.creating(selectHero, mas[7][5]);
+			goodFactory.creating(Main.selectHero, mas[7][5]); 
 			 
 			goodFactory.creating(HeroCreator.GNOM, mas[8][6]); 
 			goodFactory.creating(HeroCreator.ARCHER, mas[9][7]);  
@@ -151,8 +140,8 @@
 			var tween:TurnTweener = new TurnTweener("YOU TURN");
 			addChild(tween); 
 			turn = true; 
-		}  
-		 
+		}
+		
 		private function clickedOnMap(e:MouseEvent):void {
 			ramka.gotoAndStop(1);
 			if (!turn || menu.hitTestPoint(mouseX, mouseY, true)) return;
@@ -176,7 +165,9 @@
 						curhero = new Point(numX, numY);  
 						mas[numY][numX].unit = hero;   
 						hero.move(); 
-						var walker:Walke = new Walke(hero, masPoint, 5); 
+						var walker:Walke = new Walke(hero, masPoint, 5);
+						map.tracking = hero;      
+						map.border = 120; 
 						walker.addEventListener("LAST_POINT", comes);  
 					}  
 				}  
@@ -210,13 +201,14 @@
 			curcast = null;
 			if (mas[numY][numX].unit != undefined) { 
 				hero = mas[numY][numX].unit; 
-				if (hero.enemy || !hero.turn) return;
-				if (menu.cons) {
-					menu.killer(); 
-					if (!menu.first) backMovement(mas[curhero.y][curhero.x].unit);
-					return;
-				} 
-				curhero = new Point(numX, numY);
+				if (!hero.enemy || hero.turn) {
+					if (menu.cons) {
+						menu.killer(); 
+						if (!menu.first) backMovement(mas[curhero.y][curhero.x].unit);
+						return;
+					}  
+					curhero = new Point(numX, numY);
+				}
 				menu.init(numX, numY, true); 
 				//unit_cont.setChildIndex(menu, unit_cont.numChildren-1);  
 				ramka.visible = false;     
@@ -249,7 +241,7 @@
 						enemy.getDamage(0, false, true);
 					} 
 					else {     
-						if(mas[enemyMas[i].y][enemyMas[i].x].coff < 5) cof = 1 - mas[enemyMas[i].y][enemyMas[i].x].coff * .1;
+						cof = 1 - mas[enemyMas[i].y][enemyMas[i].x].def * .1;
 						var n:Number = 1;  
 						var m:int = Search.lookClass(hero.skills, Cutting);   
 						if (m >= 0) n = hero.skills[m].correct();    
@@ -406,16 +398,16 @@
 		private function moveRamka2(e:Event):void {
 			if (enemyTutnMas[cutTurnEnemy].visible) { 
 				removeEventListener(Event.ENTER_FRAME, moveRamka2)
-				var timer:Timer = new Timer(2000, 1);
+				var timer:Timer = new Timer(1000, 1);
 				timer.addEventListener(TimerEvent.TIMER_COMPLETE, ShowRamka);
 				timer.start();
-			} 
+			}  
 		} 
 		 
 		private function ShowRamka(e:TimerEvent):void {
 			e.target.removeEventListener(TimerEvent.TIMER_COMPLETE, ShowRamka);
-			e.target.stop(); 
-			map.border = 10;  
+			e.target.stop();  
+			map.border = 40;   
 			ramka.visible = true;  
 			var p:Point = unit_cont.localToGlobal(new Point(enemyPoint.x, enemyPoint.y));
 			ramka.x = p.x + 8; 
@@ -451,7 +443,9 @@
 						obj.unit = undefined; 
 						mas[retMas[1].y][retMas[1].x].unit = hero;
 						hero.move();
-						var walker:Walke = new Walke(hero, masPoint, 5); 
+						var walker:Walke = new Walke(hero, masPoint, 5);
+						map.tracking = hero;       
+						map.border = 120;     
 						walker.addEventListener("LAST_POINT", enemyComes);   
 					}
 				}
@@ -459,7 +453,7 @@
 					enemyTutnMas[cutTurnEnemy].target = retMas[0]; 
 					enemyComes(null); 
 				}
-				setTimeout(relocateRamka, 200, retMas[1]);
+				setTimeout(relocateRamka, 200, retMas[1]); 
 			}
 			else {  
 				p = gerCoord(enemyPoint.x, enemyPoint.y);   
@@ -480,6 +474,8 @@
 		
 		private function enemyComes(e:Event=null):void {   
 			if (e != null) e.target.removeEventListener("LAST_POINT", enemyComes);
+			map.tracking = null;       
+			map.border = 80; 
 			clearSq(); 
 			var obg:Unit = enemyTutnMas[cutTurnEnemy];
 			var tar:Unit = obg.target; 
@@ -511,7 +507,7 @@
 			}
 			else {
 				var p:Point = gerCoord(tar.x, tar.y); 
-				if(mas[p.y][p.x].coff < 5) cof = 1 - mas[p.y][p.x].coff * .1;  
+				cof = 1 - mas[p.y][p.x].def * .1;  
 				damage = (obg.att - tar.def) * cof; 
 				if (Math.random() * 100 < obg.agi) {  
 					damage *= 2; 
@@ -524,7 +520,7 @@
 					if (m >= 0) {
 						var rev:Unit = tar.effects[m]._unit;
 						n = tar.effects[m].cof;
-						var damagePie:int = damage * n; 
+						var damagePie:int = damage * n;
 						rev.getDamage(damagePie);   
 					} 
 					m = Search.lookClass(tar.skills, Block);   
@@ -555,7 +551,7 @@
 		private function nextStep():void {
 			if(cutTurnEnemy < enemyTutnMas.length) {   
 				enemyPoint = new Point(enemyTutnMas[cutTurnEnemy].x, enemyTutnMas[cutTurnEnemy].y);
-				map.tracking = enemyTutnMas[cutTurnEnemy];     
+				map.tracking = enemyTutnMas[cutTurnEnemy];      
 				map.border = 200;    
 				addEventListener(Event.ENTER_FRAME, moveRamka2);
 				ramka.visible = false;   
@@ -635,6 +631,8 @@
 		 
 		private function comes(e:Event):void {  
 			e.target.removeEventListener("LAST_POINT", comes);
+			map.tracking = null;      
+			map.border = 80; 
 			var obg:Unit = mas[curhero.y][curhero.x].unit;
 			obg.stay();
 			curhero = new Point(curhero.x, curhero.y);  
@@ -706,7 +704,7 @@
 			if (tar.prev == null) return; 
 			if(p.x == curhero.x && p.y == curhero.y) return; 
 			tar.x = p.x * grid_size - 8; 
-			tar.y = p.y * grid_size-8;
+			tar.y = p.y * grid_size - 8;
 			mas[p.y][p.x].unit = tar;
 			mas[curhero.y][curhero.x].unit = undefined;  
 			tar.prev = null;  
@@ -789,7 +787,7 @@
 					dirX = p.x + direction[i][0];
 					dirY = p.y + direction[i][1];    
 					if (getIndex(dirX, dirY)) {  
-						index = mas[dirY][dirX].coff;   
+						index = mas[dirY][dirX].coff;    
 						var op:Object = mas[dirY][dirX];
 						if (op.water == 0 || (op.water > index + curIndex)) { 
 							op.water = index + curIndex; 
@@ -822,11 +820,11 @@
 			var numX:int = (mouseX + map.corX % grid_size) / grid_size;
 			var numY:int = (mouseY + map.corY % grid_size) / grid_size;
 			var tarX:int = (mouseX + map.corX) / grid_size; 
-			var tarY:int = (mouseY + map.corY) / grid_size;
+			var tarY:int = (mouseY + map.corY) / grid_size; 
 			
 			if(!infoLand.visible) infoLand.visible = true;
 			infoLand.percent.text = "0";
-			if (mas[tarY][tarX].coff < 5) infoLand.percent.text = String(mas[tarY][tarX].coff * 10);
+			if(mas[tarY][tarX].def != 9) infoLand.percent.text = String(mas[tarY][tarX].def * 10);
 			
 			ramka.x = numX * grid_size - map.corX % grid_size;     
 			ramka.y = numY * grid_size - map.corY % grid_size;  
@@ -873,7 +871,7 @@
 				}  
 			}
 			return p; 
-		}
+		} 
 		   
 		public static function gerCoord(x:Number, y:Number):Point {
 			var p:Point = new Point();
@@ -1028,7 +1026,7 @@
 			e.currentTarget.addEventListener(MouseEvent.MOUSE_OVER, sqContOver);
 		}
 		
-		private function over_enemy(e:MouseEvent):void {
+		private function over_enemy(e:MouseEvent):void { 
 			e.target.removeEventListener(MouseEvent.MOUSE_OVER, over_enemy);
 			if(curcast==null) { 
 				tar = new Tar;
@@ -1041,16 +1039,17 @@
 			else { 
 				tarCast = new TarCast; 
 				tarCast.x = e.target.x + 40; 
-				tarCast.y = e.target.y + 40;  
+				tarCast.y = e.target.y + 40;   
 				tarCast.mouseEnabled = false;    
 				unit_cont.addChild(tarCast);  
 			}
 			e.target.addEventListener(MouseEvent.MOUSE_OUT, out_enemy);
 		}
-		   
+		    
 		public function rotateTar(e:Event):void { 
-			tar.rotation-=4;
-		}
+			if (tar!=null) tar.rotation -= 4;
+			else e.currentTarget.removeEventListener(Event.ENTER_FRAME, rotateTar);
+		} 
 		
 		public function out_enemy(e:MouseEvent):void {
 			e.target.removeEventListener(MouseEvent.MOUSE_OUT, out_enemy);

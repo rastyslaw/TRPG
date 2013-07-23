@@ -33,7 +33,7 @@ package  {
 		public static const ImgData:Class;
 		
 		private var main:CharWindow;
-		private var unit:Unit;
+		private var unit:Unit; 
 		private var bg:CharBg;
 		private var _state:String;
 		private var lootXml:XML;
@@ -57,7 +57,7 @@ package  {
 			addChild(main); 
 			bg = main.bg;
 			init(); 
-			createPanels(); 
+			if(!unit.enemy) createPanels();   
 			main.close.addEventListener(MouseEvent.CLICK, closed);
 			state = "atr";  
 		}
@@ -84,17 +84,17 @@ package  {
 				bmpd.copyPixels(spellgr.bitmapData,      
                        new Rectangle(spellXml.SubTexture.(attribute('name') == ico).@x, spellXml.SubTexture.(attribute('name') == ico).@y, Width, Height), 
                        new Point(0, 0)); 
-				bmp.bitmapData = bmpd;
+				bmp.bitmapData = bmpd; 
 				nam = getQualifiedClassName(skilmas[i]);
 				nam = nam.replace("spell.skill::", "");
 				nam = nam.replace("spell::", "");
 				bmp.name = nam;
-				spe = new Sprite;
+				spe = new Sprite; 
 				spe.addChild(bmp); 
-				cont.addChild(spe);
-				spe.name = IIcon(skilmas[i]).description; 
+				cont.addChild(spe); 
+				spe.name = IIcon(skilmas[i]).description;  
 				spe.x = i*65;     
-				spe.scaleX = spe.scaleY = .8;  
+				spe.scaleX = spe.scaleY = .8;   
 			}
 			cont.y = 56; 
 			cont.x = -10 - cont.width >> 1;
@@ -133,7 +133,7 @@ package  {
 			cont.addEventListener(MouseEvent.MOUSE_OVER, show_spellinfo);
 			cont.addEventListener(MouseEvent.MOUSE_OUT, hide_spellinfo); 
 			contEffect.addEventListener(MouseEvent.MOUSE_OVER, show_effectinfo);
-			contEffect.addEventListener(MouseEvent.MOUSE_OUT, hide_effectinfo); 
+			contEffect.addEventListener(MouseEvent.MOUSE_OUT, hide_effectinfo);
 		}
 		
 		private function show_spellinfo(e:MouseEvent):void {
@@ -142,9 +142,9 @@ package  {
 			var p:Point = obg.localToGlobal(new Point(e.target.x, e.target.y));
 			p = bg.globalToLocal(p); 
 			bg.infoSpell.x = p.x;    
-			bg.infoSpell.y = p.y;  
-			bg.infoSpell.info.text = e.target.name;
-			bg.infoSpell.nam.text = Sprite(e.target).getChildAt(0).name;
+			bg.infoSpell.y = p.y;   
+			bg.infoSpell.info.text = e.target.name; 
+			bg.infoSpell.nam.text = Sprite(e.target).getChildAt(0).name; 
 		}
 		
 		private function hide_spellinfo(e:MouseEvent):void {
@@ -157,21 +157,22 @@ package  {
 			var p:Point = obg.localToGlobal(new Point(e.target.x, e.target.y));
 			p = bg.globalToLocal(p); 
 			bg.infoEffect.x = p.x;    
-			bg.infoEffect.y = p.y;  
+			bg.infoEffect.y = p.y;   
 			bg.infoEffect.info.text = e.target.name;
 		}
 		
 		private function hide_effectinfo(e:MouseEvent):void {
 			bg.infoEffect.visible = false; 
-		}
+		} 
 		
 		private function init():void {
 			main.ico.addChildAt(unit.getIco(), 0); 
 			main.level.text = String(unit.level); 
 			main.infoProgress.text = String(unit.exp);
 			main.progress.lod.width = unit.exp * 96 / 100;  
-			main.clas.text = unit.getClassName();  
-			main.nam.text = unit.getName();
+			if (!unit.enemy) main.clas.text = unit.getClassName();
+			else main.clas.text = "";  
+			main.nam.text = unit.getName(); 
 			refreshHpMp();
 		}
 		 
@@ -195,15 +196,12 @@ package  {
 			}
 			main.hp.text = String((unit.hp+hpadd) + "/" + (unit.max_hp+hpadd)); 
 			if (unit.type == "mage") main.mp.text = String((MageUnit(unit).mp+mpadd) + "/" + (MageUnit(unit).max_mp+mpadd));
+			unit.hpBar.tt.text = String(unit.hp);  
 		} 
 		 
 		private function atr_open(e:MouseEvent = null):void {
 			main.attributes.removeEventListener(MouseEvent.CLICK, atr_open);
-			bg.gotoAndStop(1); 
-			bg.at.text = String(unit.att); 
-			bg.df.text = String(unit.def); 
-			bg.ag.text = String(unit.agi);  	   
-			bg.mv.text = String(unit.speed); 
+			bg.gotoAndStop(1);
 			var mas:Array = unit.getBonus();
 			var index:int; 
 			var reg:RegExp =/\D+/;
@@ -211,7 +209,7 @@ package  {
 			for each (var s:String in mas) {
 				ss = reg.exec(s);
 				switch(ss) {
-					case "AT":
+					case "AT": 
 						bg.at.text = String(int(bg.at.text) + int( s.substr(0, s.search(ss)) ));
 					break;
 					case "DF":
@@ -224,13 +222,21 @@ package  {
 						bg.mv.text = String(int(bg.mv.text) + int( s.substr(0, s.search(ss)) ));
 					break;
 				} 
-			}     
-			bg.info.text = unit.description;  
+			}
+			bg.df.text = String(unit.def);  
+			bg.ag.text = String(unit.agi);  	   
+			bg.mv.text = String(unit.speed);
+			bg.info.text = unit.description;
+			bg.at.text = String(unit.att); 
 			bg.infoSpell.visible = bg.infoSpell.mouseEnable = false;
 			bg.infoEffect.visible = bg.infoEffect.mouseEnable = false; 
-			bg.addChild(cont);  
-			bg.addChild(contEffect);
-			if (!unit.summon) main.inventory.addEventListener(MouseEvent.CLICK, inv_open); 
+			if(!unit.enemy) {
+				bg.addChild(cont); 
+				bg.addChild(contEffect);
+				bg.setChildIndex(bg.infoSpell, bg.numChildren-1); 
+				bg.setChildIndex(bg.infoEffect, bg.numChildren-1);  
+			} 
+			if (!unit.summon && !unit.enemy) main.inventory.addEventListener(MouseEvent.CLICK, inv_open); 
 			else main.inventory.visible = false; 
 		}
 		

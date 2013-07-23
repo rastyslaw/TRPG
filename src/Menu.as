@@ -49,18 +49,21 @@ package  {
 			elements = [Cbtn, Mbtn, Abtn, Sbtn, Bbtn, Obtn]; 
 			enemyMas.splice(0, enemyMas.length); 
 			obg = mas[numY][numX].unit;
-			type = obg.type;  
-			target = new Point(numX, numY);    
-			if (first) { 
-				elements.splice(4);      
-				if (!scanMas()) killElement(Abtn);   
-				if (type != "mage") killElement(Sbtn);  
-			}  
-			else {
-				elements.splice(0, 2);      
-				if (!scanMas()) killElement(Abtn);  
-				if (type != "mage") killElement(Sbtn); 
+			if(obg.turn && !obg.enemy) { 
+				type = obg.type;   
+				target = new Point(numX, numY);    
+				if (first) { 
+					elements.splice(4);      
+					if (!scanMas()) killElement(Abtn);   
+					if (type != "mage") killElement(Sbtn);  
+				}  
+				else {
+					elements.splice(0, 2);      
+					if (!scanMas()) killElement(Abtn);  
+					if (type != "mage") killElement(Sbtn); 
+				}
 			}
+			else elements.splice(1);
 			this.x = numX * Map.grid_size;
 			this.y = numY * Map.grid_size;
 			drawMenu();
@@ -80,7 +83,7 @@ package  {
 			var len:int = elements.length; 
 			var angle:int = 360 / len;
 			var c:DisplayObject;
-			var curAngle:int;  
+			var curAngle:int = -90;  
 			var rad:Number;
 			for (var i:int; i < len; i++) {
 				rad = curAngle * Math.PI / 180;  
@@ -136,7 +139,7 @@ package  {
 			var len:int = mas.length; 
 			var angle:int = 360 / (len+1);
 			var c:MenuElm;   
-			var curAngle:int;     
+			var curAngle:int = -90;     
 			var rad:Number; 
 			spellcont = new Sprite; 
 			var ex:ZBtn = new ZBtn;  

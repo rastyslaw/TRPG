@@ -62,7 +62,7 @@ package units {
 		
 		//Abstract method   
 		public function getIco():Bitmap {     
-			throw new IllegalOperationError("Abstract method must be overridden in a subclass");
+			throw new IllegalOperationError("Abstract method must be overridden in a subclass"); 
 		}
 		
 		//Abstract method  
@@ -214,7 +214,7 @@ package units {
 					adsorber -= value; 
 					if (adsorber < 0) {  
 						setEffects(effects[m], true); 
-						hp -= adsorber;  
+						hp = hp - adsorber;  
 						tween.value = String(adsorber); 
 						adsorber = 0; 
 					} 
@@ -222,7 +222,7 @@ package units {
 				} 
 				else {
 					tween.value = String(value);
-					hp -= value;   
+					hp = hp - value;   
 				}
 				//if (hp <= 0) dispatchEvent(new MenuEvent("DEAD", this));  
 			}
@@ -237,7 +237,7 @@ package units {
 			else {
 				tween.color = 0x00ff00;   
 				tween.value = String(value);  
-				hp += value; 
+				hp = hp + value; 
 				if (hp >= max_hp) hp = max_hp;  
 			}
 			tween.init();
@@ -248,7 +248,7 @@ package units {
 		public function correctLoot(num:int):int { 
 			var bonus:int;
 			for (var i:int; i < itemMas.length; i++) {
-				bonus += itemMas[i][num];
+				bonus += itemMas[i][num]; 
 			}  
 			return bonus;   
 		}
@@ -283,16 +283,17 @@ package units {
 		public function get prev():Point {	return _prev; } 
 		public function set prev(value:Point):void { _prev = value; }
 		
-		public function get hp():int {
+		public function get hp():int { 
 			return _hp+correctLoot(4); 
-		}  
+		} 
+		
 		public function set hp(value:int):void {
-			_hp = value;
+			_hp = value-correctLoot(4);  
 			hpBar.tt.text = String(value);  
 		} 
 		 
 		public function get max_hp():int {
-			return _max_hp+correctLoot(4); 
+			return _max_hp+correctLoot(4);  
 		}
 		 
 		public function kill():void { 
