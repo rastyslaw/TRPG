@@ -57,7 +57,11 @@
 			Npc_smith_stay; Npc_smith_talk; Npc_smith_work;
 			Npc_liza_stay; Npc_liza_talk; Npc_liza_walk;
 			Npc_farmer_talk; Npc_farmer_stay; Npc_farmer_look; Npc_farmer_walk; Npc_farmer_work;
-			Npc_fisher_stay; Npc_fisher_talk; Npc_fisher_work; 
+			Npc_prof_talk; Npc_prof_stay; Npc_prof_look; Npc_prof_walk; Npc_prof_work;
+			Npc_fisher_stay; Npc_fisher_talk; Npc_fisher_work;
+			Npc_cook_stay; Npc_cook_talk; Npc_cook_work;
+			Npc_monk_stay; Npc_monk_talk; Npc_monk_work;
+			Npc_pirat_stay;  
 		}
 		 
 		public function buildAnimation(identifier:String):void {

@@ -8,11 +8,11 @@ package  {
 	 */
 	public class Levels {
 		
-		[Embed(source = '../assets/maps/town1.png')]
+		[Embed(source = '../assets/maps/town.png')]
 		private const Tiles_Level1:Class;
 		
-		[Embed(source = '../assets/gfx/town1.oel', mimeType = "application/octet-stream")]
-		private const Level1:Class;
+		[Embed(source = '../assets/gfx/town.oel', mimeType = "application/octet-stream")]
+		private const Level1:Class; 
 		
 		[Embed(source = '../assets/maps/level.png')]
 		private const Tiles_Level2:Class;
@@ -72,7 +72,7 @@ package  {
 			var mas:Array;
 			switch(value) {
 				case 1:
-					mas = [29];  
+					mas = [210];  
 				break; 
 				case 2:
 					mas = [5, 50, 66, 72];

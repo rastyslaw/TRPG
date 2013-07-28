@@ -4,21 +4,30 @@ package  {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
+	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.text.TextField;
+	import flash.text.TextFormat;
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
 	import flash.utils.Timer;
+	import npc.Captain;
+	import npc.Cook;
+	import npc.ExitGuard;
 	import npc.Farmer;
 	import npc.Fisher;
 	import npc.Guard;
 	import npc.Liza;
+	import npc.Monk;
 	import npc.NPC;
+	import npc.Professor;
 	import npc.Smith;
+	import npc.WalkerGuard;
 	import units.Animation;
 	import units.Unit;
 	/**
@@ -39,7 +48,7 @@ package  {
 		private var backgroundBD:BitmapData;
 		private var backgroundRect:Rectangle;
 		private var backgroundPoint:Point; 
-		public var border:int = 80;   
+		public var border:int;   
 		private var aWorld:Array = []
 		private var mas:Vector.<Object>; 
 		
@@ -92,12 +101,13 @@ package  {
 		private var ui:Sprite; 
 		private var replic_tar:NPC;
 		private var replicTimer:Timer;
-		
+		private var face:Face; 
 		private var sqCont:Sprite = new Sprite;
 		private var dely:Boolean; 
+		private var autoScroll:Boolean;
 		
 		public function Town(ar:Array, cofMas:Array, tiles:Bitmap) {
-			grid_size = Map.grid_size;  
+			grid_size = border = Map.grid_size;  
 			aWorld = ar;
 			worldCols = ar[0].length;
 			worldRows = ar.length;  
@@ -111,7 +121,6 @@ package  {
 					 c = aWorld[i][j]; 
 					 obj = new Object; 
 					 if(c>cofMas[0]) obj.coff = 1;  
-					 else if(c==13||c==14||c==15||c==19||c==20||c==21||c==26) obj.coff = 2; 
 					 else obj.coff = 0;
 					 vector[j] = obj;  
 				}   
@@ -143,14 +152,15 @@ package  {
 			gameTimer = new Timer(_period,1); 
 			gameTimer.addEventListener(TimerEvent.TIMER, runGame);
 			gameTimer.start();
+			unit_cont.addChildAt(sqCont, 0);   
+			drawBox(); 
 			//
 			hero = new Hero; 
-			hero.x = hero.y = 2 * grid_size - 8;
+			hero.x = hero.y = 2 * grid_size - 8; 
 			unit_cont.addChild(hero);
 			mas[2][2].unit = hero; 
 			//
-
-			buildNPC(); 
+			buildNPC();  
 			ramka = new Sapog; 
 			addChild(ramka); 
 			ramka.mouseEnabled = false;    
@@ -159,66 +169,177 @@ package  {
 			addEventListener(MouseEvent.CLICK, clickedOnMap);
 			 
 			addChild(unit_cont);
-			unit_cont.addChild(sqCont);   
 			ui = new Sprite;
 			addChild(ui);
-			var roof1:Roof1 = new Roof1;
-			roof1.x = 13 * grid_size;
-			roof1.y = 1 * grid_size;
-			roofs.addChild(roof1); 
-			var roof2:Roof1 = new Roof1;
-			roof2.x = 3 * grid_size;
-			roof2.y = 8 * grid_size;
-			roofs.addChild(roof2); 
-			unit_cont.addChild(roofs); 
+			createRoof();
+			
+			face = new Face; 
+			ui.addChild(face);  
+			var bmp:Bitmap = hero.getHeroIcon();
+			bmp.scaleX = bmp.scaleY = 0.7; 
+			face.addChild(bmp);
+			bmp.x = bmp.y = 10;
+			face.addEventListener(MouseEvent.CLICK, face_clicked);
+			
 			addEventListener(Event.ENTER_FRAME, scanRoofs);
 			unit_cont.x = -viewXOffset;   
 			unit_cont.y = -viewYOffset; 
 		}
 		
+		private function face_clicked(e:MouseEvent):void {
+			tracking = hero;
+			autoScroll = true;
+			var timer:Timer = new Timer(100, 0);
+			timer.addEventListener(TimerEvent.TIMER, scan_camera_face);
+			timer.start();
+		}
+		 
+		private function scan_camera_face(e:TimerEvent):void {
+			if (_speedX == 0 && _speedY == 0 ) {
+				e.target.stop(); 
+				e.target.removeEventListener(TimerEvent.TIMER, scan_camera_face);
+				tracking = null;  
+				autoScroll = false;  
+			}
+		}
+		
+		private function drawBox():void { 
+			var box1:Box1 = new Box1; 
+			box1.x = 9 * grid_size;
+			box1.y = 7 * grid_size;
+			unit_cont.addChild(box1);
+			mas[7][9].coff = 0;
+			var box2:Box1 = new Box1; 
+			box2.x = 28 * grid_size;
+			box2.y = 22 * grid_size;
+			unit_cont.addChild(box2);
+			mas[22][28].coff = 0;
+			var box3:Box1_empty = new Box1_empty;  
+			box3.x = 0 * grid_size;
+			box3.y = 17 * grid_size;
+			unit_cont.addChild(box3);
+			mas[17][0].coff = 0;
+			var box4:Box2 = new Box2; 
+			box4.x = 27 * grid_size;
+			box4.y = 6 * grid_size;
+			unit_cont.addChild(box4); 
+			mas[6][27].coff = 0;
+			var box5:Box2= new Box2; 
+			box5.x = 17 * grid_size;
+			box5.y = 24 * grid_size;
+			unit_cont.addChild(box5); 
+			mas[24][17].coff = 0; 
+			var box6:Box2_empty = new Box2_empty;  
+			box6.x = 11 * grid_size;  
+			box6.y = 14 * grid_size;  
+			unit_cont.addChild(box6); 
+			mas[14][11].coff = 0; 
+		}
+		
+		private function createRoof():void {
+			var roof1:Roof_cook = new Roof_cook;
+			roof1.x = 10 * grid_size;
+			roof1.y = 2 * grid_size;
+			roofs.addChild(roof1); 
+			var roof2:Roof_alhim = new Roof_alhim;
+			roof2.x = 2 * grid_size;
+			roof2.y = 10 * grid_size; 
+			roofs.addChild(roof2);
+			var roof3:Roof_home = new Roof_home;
+			roof3.x = 22 * grid_size; 
+			roof3.y = 3 * grid_size; 
+			roofs.addChild(roof3);
+			var roof4:Roof_cherch = new Roof_cherch;
+			roof4.x = 12 * grid_size; 
+			roof4.y = 11 * grid_size; 
+			roofs.addChild(roof4);
+			var roof5:Roof_prison = new Roof_prison;
+			roof5.x = 22 * grid_size; 
+			roof5.y = 18 * grid_size;  
+			roofs.addChild(roof5); 
+			unit_cont.addChild(roofs); 
+		}
+		
 		private function buildNPC():void {
 			var liza:NPC = new Liza; 
-			liza.x = 6 * grid_size - 8;
-			liza.y = 2 * grid_size - 8; 
-			npc_cont.addChild(liza);
-			mas[2][6].unit = liza; 
+			liza.x = 2 * grid_size - 8;
+			liza.y = 15 * grid_size - 8; 
+			npc_cont.addChild(liza); 
+			mas[15][2].unit = liza;    
+ 
+			var guard1:NPC = new Guard; 
+			guard1.x = 25 * grid_size - 8;
+			guard1.y = 24 * grid_size - 8;  
+			npc_cont.addChild(guard1);
+			mas[24][25].unit = guard1; 
+			
+			var guard2:NPC = new ExitGuard; 
+			guard2.x = 3 * grid_size - 8;
+			guard2.y = 1 * grid_size - 8; 
+			npc_cont.addChild(guard2);
+			mas[1][3].unit = guard2;  
 			 
-			var smith:NPC = new Smith; 
-			smith.x = 4 * grid_size - 8;
-			smith.y = 3 * grid_size - 8; 
-			npc_cont.addChild(smith);
-			mas[3][4].unit = smith; 
-			 
-			var guard:NPC = new Guard; 
-			guard.x = 1 * grid_size - 8;
-			guard.y = 1 * grid_size - 8; 
-			npc_cont.addChild(guard);
-			mas[1][1].unit = guard;
+			var guard3:NPC = new WalkerGuard; 
+			guard3.x = 12 * grid_size - 8;
+			guard3.y = 8 * grid_size - 8; 
+			npc_cont.addChild(guard3);
+			mas[8][12].unit = guard3; 
 			
 			var fisher:NPC = new Fisher; 
-			fisher.x = 2 * grid_size - 8; 
-			fisher.y = 6 * grid_size - 8; 
+			fisher.x = 12 * grid_size - 8; 
+			fisher.y = 22 * grid_size - 8;  
 			npc_cont.addChild(fisher);
-			mas[6][2].unit = fisher;
-			  
-			var farmer:NPC = new Farmer;  
-			farmer.x = 7 * grid_size - 8;
-			farmer.y = 7 * grid_size - 8; 
-			npc_cont.addChild(farmer);
-			mas[7][7].unit = farmer; 
-			  
-			unit_cont.addChild(npc_cont); 
+			mas[22][12].unit = fisher;
+			
+			var captain:NPC = new Captain; 
+			captain.x = 4 * grid_size - 8; 
+			captain.y = 19 * grid_size - 8;  
+			npc_cont.addChild(captain); 
+			captain._busy = true;   
+			mas[19][4].unit = captain; 
+			
+			var cook:NPC = new Cook; 
+			cook.x = 12 * grid_size - 8; 
+			cook.y = 4 * grid_size - 8;  
+			npc_cont.addChild(cook);
+			mas[4][12].unit = cook; 
+			
+			var professor:NPC = new Professor; 
+			professor.x = 4 * grid_size - 8;  
+			professor.y = 12 * grid_size - 8;  
+			npc_cont.addChild(professor); 
+			mas[12][4].unit = professor;
+			
+			var monk:NPC = new Monk; 
+			monk.x = 13 * grid_size - 8;  
+			monk.y = 13 * grid_size - 8;   
+			npc_cont.addChild(monk); 
+			mas[13][13].unit = monk;  
+			
+			unit_cont.addChild(npc_cont);
+			
 			liza._fask.addEventListener(MouseEvent.CLICK, show_dialog);
-			liza.addEventListener(NpcEvent.MOVING, moveNpc);
-			farmer.addEventListener(NpcEvent.MOVING, moveNpc); 
-			smith._fask.addEventListener(MouseEvent.CLICK, show_dialog);
-			guard._fask.addEventListener(MouseEvent.CLICK, show_dialog);
-			farmer._fask.addEventListener(MouseEvent.CLICK, show_dialog);
+			captain._fask.addEventListener(MouseEvent.CLICK, show_dialog);
+			monk._fask.addEventListener(MouseEvent.CLICK, show_dialog);
+			professor._fask.addEventListener(MouseEvent.CLICK, show_dialog);
+			cook._fask.addEventListener(MouseEvent.CLICK, show_dialog);
+			guard1._fask.addEventListener(MouseEvent.CLICK, show_dialog);
+			guard2._fask.addEventListener(MouseEvent.CLICK, show_dialog);
+			guard3._fask.addEventListener(MouseEvent.CLICK, show_dialog);
 			fisher._fask.addEventListener(MouseEvent.CLICK, show_dialog);
+			
+			liza.addEventListener(NpcEvent.MOVING, moveNpc);  
+			professor.addEventListener(NpcEvent.MOVING, moveNpc);
+			guard3.addEventListener(NpcEvent.MOVING, moveNpc);
 		}
 		 
 		private function show_dialog(e:MouseEvent = null):void {
-			//trace(getQualifiedClassName(e.target));  
+			//trace(getQualifiedClassName(e.target)); 
+			if (walker != null) { 
+				var numX:int = (mouseX + viewXOffset) / grid_size;
+				var numY:int = (mouseY + viewYOffset) / grid_size;
+				if (numX == walker.last.x && numY == walker.last.y) return;
+			}
 			var obg:NPC;
 			if (e != null) obg = NPC(e.currentTarget.parent);
 			else obg = replic_tar;
@@ -232,7 +353,8 @@ package  {
 					replic = null;   
 				}
 				replic = new Replic;  
-				ui.addChild(replic); 
+				ui.addChild(replic);
+				setChildIndex(ui, numChildren-1);
 				replic.addEventListener(MouseEvent.CLICK, killReplic);
 				replic.y = Constants.STAGE_HEIGHT;
 				replic.x = 6;
@@ -244,8 +366,8 @@ package  {
 				if (replic.info.info.numLines > 3) replic.scrol.visible = true;
 				replic.info.info.height = replic.info.info.textHeight;
 				obg.talking(hero);
-				 
-				replicTimer = new Timer((replic.info.info.maxScrollV)*1000, 1);
+				  
+				replicTimer = new Timer(1000+(replic.info.info.maxScrollV)*1000, 1);
 				replicTimer.addEventListener(TimerEvent.TIMER_COMPLETE, killreplictick);
 				replicTimer.start();
 			}
@@ -284,19 +406,21 @@ package  {
 				} 
 				curpoint = new Point(rezPoint.x, rezPoint.y);  
 				hero.prev = gerCoord(hero.x, hero.y); 
+				if (!getPath()) return; 
 				hero.setState(Hero.MOVE);
-				getPath();
 				masPoint.splice(0, masPoint.length);  
 				var p:Point = getGoodPath(curpoint);
 				masPoint.push(p);
 				var err:int;
-				while (p!=null) {     
+				while (p!=null) {      
 					p = getGoodPath(p);      
 					masPoint.push(p);
 					err++;
 					if (err > 20) p = null;  
 				}       
 				masPoint.splice(0, 0, curpoint);
+				getSquare(curpoint.y, curpoint.x);
+				setChildIndex(ramka, numChildren-1);
 				walker = new Walke(hero, masPoint, 4, refresh); 
 				walker.addEventListener("LAST_POINT", comes);
 				replic_tar = obg;   
@@ -420,7 +544,7 @@ package  {
 				} 
 				_speedY *= .86; 
 			} 	     
-			if(scrolling && !ui.hitTestPoint(mouseX, mouseY)) updMapPos();      
+			if((scrolling && !ui.hitTestPoint(mouseX, mouseY)) || autoScroll) updMapPos();       
 			unit_cont.x = -viewXOffset;  
 			unit_cont.y = -viewYOffset;  
 		}  
@@ -467,16 +591,25 @@ package  {
 				} 
 				curpoint = new Point(numX, numY);  
 				hero.prev = gerCoord(hero.x, hero.y); 
+				if (!getPath()) return;    
 				hero.setState(Hero.MOVE);
-				getPath();        
 				masPoint.splice(0, masPoint.length);  
 				var p:Point = getGoodPath(curpoint);
-				masPoint.push(p);     
+				masPoint.push(p);
+				var er:int;
 				while (p!=null) {      
 					p = getGoodPath(p);       
-					masPoint.push(p);      
-				}       
-				masPoint.splice(0, 0, curpoint);  
+					masPoint.push(p);   
+					er++; 
+					if (er > 100) { 
+						throw new Error("опять цикл глючит");
+						p = null; 
+					}
+				}        
+				masPoint.splice(0, 0, curpoint);
+				getSquare(curpoint.y, curpoint.x);
+				setChildIndex(ramka, numChildren - 1);
+				setChildIndex(ui, numChildren-1); 
 				walker = new Walke(hero, masPoint, 4, refresh);
 				//tracking = hero;         
 				//border = 200;  
@@ -528,9 +661,13 @@ package  {
 			tar._busy = false;
 			tar.walker = null; 
 		}
-		 
+		
 		private function getSquare(y:int, x:int, color:uint=0xff0000):void {
-			var fig:DisplayObject = new Drawler(color);
+			//var fig:DisplayObject = new Drawler(color);
+			var fig:Shape = new Shape;
+			fig.graphics.beginFill(0xff0000, .8); 
+			fig.graphics.drawCircle(grid_size>>1, grid_size>>1, 4); 
+			fig.graphics.endFill(); 
 			sqCont.addChildAt(fig, 0); 
 			fig.x = x * grid_size;   
 			fig.y = y * grid_size;   
@@ -590,12 +727,15 @@ package  {
 			hero.prev = p;  
 			
 			//tracking = null;       
-			//border = 80; 
+			//border = 64; 
 			walker = null;  
 			if (replic_tar != null) show_dialog();
 		}
 		
 		private function clearSq():void {
+			while (sqCont.numChildren>0) { 
+				sqCont.removeChildAt(0); 
+			} 
 			masWater.splice(0, masWater.length);
 			clearWater();
 		}  
@@ -608,20 +748,33 @@ package  {
 			}  
 		} 
 	 
-		public function getPath():void {
+		public function getPath():Boolean {
 			var p:Point = gerCoord(hero.x, hero.y);
 			mas[p.y][p.x].water = -1;
 			mas[curpoint.y][curpoint.x].water = 99; 
 			masWater.push(p);  
-			var bol:Boolean = true;  
-			var err:int;  
+			var bol:Boolean = true;
+			var er:int;
 			while(bol) {     
-				bol = scanPath();
-				err++;
-				if(err>20) bol = false; 
-			}  
-		}      
- 
+				bol = scanPath(); 
+				er++;
+				if (er > 80) return false;
+			}
+			return true; 
+		}       
+		
+		private function getIndx(y:int, x:int, i:int):void {
+			var text:TextField = new TextField();
+			text.text = String(i);
+			text.textColor = 0xff0000;
+			var textF:TextFormat = new TextFormat();
+			textF.size = 30;
+			text.setTextFormat(textF); 
+			sqCont.addChildAt(text, 0);  
+			text.x = x * grid_size;  
+			text.y = y * grid_size;   
+		}
+		
 		private function scanPath():Boolean {
 			var timeMas:Vector.<Point> = new Vector.<Point>;
 			var b:Boolean = true; 
@@ -644,10 +797,12 @@ package  {
 							op.water = curIndex;
 							if(op.unit==undefined) { 
 								timeMas.push(new Point(dirX, dirY));
+								//getIndx(dirY, dirX, curIndex);  
 							} 
 						}
 						else if (op.water == 99) { 
 							timeMas.push(new Point(dirX, dirY));
+							//getIndx(dirY, dirX, curIndex);  
 							return false;  
 						}
 					}  
@@ -676,7 +831,8 @@ package  {
 						p.y = dirY;   
 					}
 				}  
-			} 
+			}
+			getSquare(p.y, p.x);  
 			return p; 
 		}
 		
@@ -710,8 +866,8 @@ package  {
 			var p:Point = unit_cont.localToGlobal(new Point(hero.x+10, hero.y));
 			for (var i:int; i < roofs.numChildren; i++ ) {
 				obg = roofs.getChildAt(i);
-				if (obg.hitTestPoint(p.x, p.y, true)) obg.alpha = 0;  
-				else obg.alpha = 1;  
+				if (obg.hitTestPoint(p.x, p.y, true)) obg.visible = false;  
+				else obg.visible = true;  
 			} 
 		}
 //-----

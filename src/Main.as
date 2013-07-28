@@ -13,6 +13,8 @@ package {
 	[SWF(stageWidth="800", stageHeight="480", frameRate="30")]
 	public class Main extends Sprite {
 		
+		public static const TILESIZE:uint = 15; 
+		
 		public static var selectHero:uint;
 		public static var animationManager:AnimationManager;
 		private var selectPanel:SelectPanel;
@@ -159,6 +161,22 @@ package {
 			animationManager.addAnimation("Npc_farmer_look", "npc_farmer_look");
 			animationManager.addAnimation("Npc_farmer_work", "npc_farmer_work");
 			
+			animationManager.addAnimation("Npc_prof_stay", "npc_prof_stay"); 
+			animationManager.addAnimation("Npc_prof_walk", "npc_prof_walk");    
+			animationManager.addAnimation("Npc_prof_talk", "npc_prof_talk");
+			animationManager.addAnimation("Npc_prof_look", "npc_prof_look");
+			animationManager.addAnimation("Npc_prof_work", "npc_prof_work");
+			 
+			animationManager.addAnimation("Npc_cook_stay", "npc_cook_stay"); 
+			animationManager.addAnimation("Npc_cook_talk", "npc_cook_talk");
+			animationManager.addAnimation("Npc_cook_work", "npc_cook_work");
+			 
+			animationManager.addAnimation("Npc_monk_stay", "npc_monk_stay"); 
+			animationManager.addAnimation("Npc_monk_talk", "npc_monk_talk");
+			animationManager.addAnimation("Npc_monk_work", "npc_monk_work");
+			
+			animationManager.addAnimation("Npc_pirat_stay", "npc_pirat_stay");  
+			
 			selectPanel = new SelectPanel;
 			selectPanel.x = Constants.STAGE_WIDTH >> 1;
 			selectPanel.y = Constants.STAGE_HEIGHT >> 1;
@@ -180,7 +198,7 @@ package {
 			selectHero = i;  
 			  
 			var level:Levels = new Levels;
-			var mas:Array = level.getLevel(this.level, 6);  
+			var mas:Array = level.getLevel(this.level, TILESIZE);    
 			//var mas:Array = level.getLevel(this.level, 13); 
 			var clas:Bitmap = level.getTileset(this.level);  
 			addChild(new Town(mas[0], mas[1], clas));

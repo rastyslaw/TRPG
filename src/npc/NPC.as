@@ -86,8 +86,8 @@ package npc {
 				if (Math.random() < random_work) {
 					if (anvil != null) anvil.visible = false;
 					if (bobber != null) bobber.visible = true;
-					busy = true;
-					doing("work");
+					busy = true; 
+					doing("work"); 
 				}
 			}
 			if (_look && !busy) {  
@@ -134,7 +134,9 @@ package npc {
 		}
 		
 		public function talking(unit:Hero):void {
+			trace("1111");
 			if (busy) return;
+			trace("2222");
 			check();
 			_hero = Main.animationManager.getAnimation(_type + "_talk");
 			_hero.movieLen = 8; 
@@ -184,7 +186,7 @@ package npc {
 		}
 		
 		//Abstract method    
-		protected function setClip():void {     
+		protected function setClip():void {      
 			throw new IllegalOperationError("Abstract method must be overridden in a subclass"); 
 		}
 		
