@@ -5,12 +5,9 @@ package npc {
 	 * @author waltasar
 	 */
 	public class Monk extends NPC {
-		
-		[Embed(source = "../../assets/faces/face_monk.png")]   
-		private var ico:Class; 
-		  
+		 
 		override public function getIco():Bitmap {   
-			return new ico();  
+			return FaceAssets.getIco("face_monk");
 		} 
 		
 		override public function getWords():String {        
@@ -26,7 +23,12 @@ package npc {
 		}
 		
 		override protected function setClip():void {     
-			clip = new Ppp; 
+			clip = new Ress_up; 
+		}
+		
+		override public function get dialog():Boolean {
+			if (Main.questLine == 1) return true; 
+			else return false;  
 		}
 //-----		
 	}

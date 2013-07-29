@@ -5,14 +5,11 @@ package npc {
 	 * @author waltasar
 	 */
 	public class Captain extends NPC {
-		
-		[Embed(source = "../../assets/faces/face_pirat.png")]   
-		private var ico:Class; 
-		  
+		 
 		override public function getIco():Bitmap {   
-			return new ico();  
+			return FaceAssets.getIco("face_pirat");
 		} 
-		
+		 
 		override public function getWords():String {        
 			return "I'm captain! Hoy!"; 
 		}
@@ -22,7 +19,7 @@ package npc {
 		}
 		
 		override protected function setClip():void {     
-			clip = new Ppp; 
+			clip = new Talk_up; 
 		}
 //----		
 	}

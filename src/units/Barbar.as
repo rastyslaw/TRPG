@@ -9,11 +9,8 @@ package units {
 	 */
 	public class Barbar extends Unit { 
 		
-		[Embed(source = "../../assets/faces/face_barbar.png")]   
-		private var ico:Class; 
-		  
 		override public function getIco():Bitmap {   
-			return new ico(); 
+			return FaceAssets.getIco("face_barbar");
 		}  
 		
 		override public function getName():String {   

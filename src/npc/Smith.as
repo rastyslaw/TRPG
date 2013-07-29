@@ -6,9 +6,6 @@ package npc {
 	 */
 	public class Smith extends NPC {
 		
-		[Embed(source = "../../assets/faces/face_smith.png")]   
-		private var ico:Class; 
-		 
 		public function Smith():void {
 			anvil = new Bitmap(new Anvil);
 			addChild(anvil);
@@ -16,7 +13,7 @@ package npc {
 		}
 		
 		override public function getIco():Bitmap {   
-			return new ico();  
+			return FaceAssets.getIco("face_smith");
 		}
 		
 		override public function getWords():String {        
@@ -32,7 +29,7 @@ package npc {
 		}
 		
 		override protected function setClip():void {     
-			clip = new Ggg;  
+			clip = new Trade_up;  
 		}
 //-----		
 	}

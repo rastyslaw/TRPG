@@ -11,12 +11,9 @@ package units {
 	 * @author waltasar
 	 */
 	public class HeroMage extends MageUnit { 
-		  
-		[Embed(source = "../../assets/faces/face_heromage.png")]   
-		private var ico:Class;  
-		 
+		
 		override public function getIco():Bitmap {   
-			return new ico();   
+			return FaceAssets.getIco("face_heromage");
 		}
 		 
 		override protected function setSpellMas():void {          

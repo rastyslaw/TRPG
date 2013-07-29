@@ -13,11 +13,8 @@ package units {
 	 */
 	internal class Mage extends MageUnit { 
 		
-		[Embed(source = "../../assets/faces/face_mage.png")]   
-		private var ico:Class; 
-		
 		override public function getIco():Bitmap {   
-			return new ico(); 
+			return FaceAssets.getIco("face_mage");
 		}
 		
 		override protected function setSpellMas():void {      

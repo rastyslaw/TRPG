@@ -11,11 +11,8 @@ package units {
 	 */
 	internal class Gnom extends Unit { 
 		
-		[Embed(source = "../../assets/faces/face_gnom.png")]   
-		private var ico:Class; 
-		
 		override public function getIco():Bitmap {   
-			return new ico(); 
+			return FaceAssets.getIco("face_gnom");
 		}  
 		
 		override public function getName():String {   

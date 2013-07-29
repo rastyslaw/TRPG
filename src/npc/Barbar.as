@@ -1,29 +1,26 @@
 package npc {
 	import flash.display.Bitmap;
+	import flash.geom.Point;
 	/**
 	 * ...
 	 * @author waltasar
 	 */
-	public class Guard extends NPC {
-	
-		override public function getIco():Bitmap {   
-			return FaceAssets.getIco("face_guard");
-		}
+	public class Barbar extends NPC {
+		 
+		override public function getIco():Bitmap {    
+			return FaceAssets.getIco("face_barbar");
+		}  
 		
 		override public function getWords():String {        
-			return "Go away!";
+			return "Hi, i'm soo busy";  
 		}
 		
 		override protected function setType():void {     
-			_type = "npc_guard";    
+			_type = "barbar_gir";        
 		}
 		 
-	    override protected function setPar():void {
-			_look = true;
-		}
-		
 		override protected function setClip():void {     
-			clip = new Talk_up; 
+			clip = new Talk_up;  
 		}
 //-----		
 	}

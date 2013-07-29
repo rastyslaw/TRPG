@@ -14,7 +14,7 @@ package {
 	public class Main extends Sprite {
 		
 		public static const TILESIZE:uint = 15; 
-		
+		public static var questLine:uint; 
 		public static var selectHero:uint;
 		public static var animationManager:AnimationManager;
 		private var selectPanel:SelectPanel;
@@ -66,7 +66,8 @@ package {
 			animationManager.addAnimation("Gnom_attack_r", "gnom_attack_r"); 
 			 
 			animationManager.addAnimation("Archer_stay", "archer_stay");
-			animationManager.addAnimation("Archer_walk", "archer_walk");  
+			animationManager.addAnimation("Archer_walk", "archer_walk");
+			animationManager.addAnimation("Archer_talk", "archer_talk");  
 			animationManager.addAnimation("Archer_attack_t", "archer_attack_t"); 
 			animationManager.addAnimation("Archer_attack_d", "archer_attack_d");  
 			animationManager.addAnimation("Archer_attack_l", "archer_attack_l"); 
@@ -87,14 +88,17 @@ package {
 			animationManager.addAnimation("Spider_attack_r", "spider_attack_r");
 			
 			animationManager.addAnimation("Barbar_stay", "barbar_stay");
-			animationManager.addAnimation("Barbar_walk", "barbar_walk");    
+			animationManager.addAnimation("Barbar_gir_stay", "barbar_gir_stay");
+			animationManager.addAnimation("Barbar_walk", "barbar_walk");
+			animationManager.addAnimation("Barbar_talk", "barbar_talk");    
 			animationManager.addAnimation("Barbar_attack_t", "barbar_attack_t"); 
 			animationManager.addAnimation("Barbar_attack_d", "barbar_attack_d");  
 			animationManager.addAnimation("Barbar_attack_l", "barbar_attack_l"); 
 			animationManager.addAnimation("Barbar_attack_r", "barbar_attack_r");
 			
 			animationManager.addAnimation("Mage_stay", "mage_stay");
-			animationManager.addAnimation("Mage_walk", "mage_walk");  
+			animationManager.addAnimation("Mage_walk", "mage_walk");
+			animationManager.addAnimation("Mage_talk", "mage_talk"); 
 			animationManager.addAnimation("Mage_attack_t", "mage_attack_t"); 
 			animationManager.addAnimation("Mage_attack_d", "mage_attack_d");  
 			animationManager.addAnimation("Mage_attack_l", "mage_attack_l"); 
@@ -176,6 +180,13 @@ package {
 			animationManager.addAnimation("Npc_monk_work", "npc_monk_work");
 			
 			animationManager.addAnimation("Npc_pirat_stay", "npc_pirat_stay");  
+			
+			animationManager.addAnimation("Npc_girl_stay", "npc_girl_stay");  
+			animationManager.addAnimation("Npc_girl_run", "npc_girl_run"); 
+			animationManager.addAnimation("Npc_girl_talk", "npc_girl_talk"); 
+			animationManager.addAnimation("Npc_girl_walk", "npc_girl_walk");
+			
+			var faceassets:FaceAssets = new FaceAssets;
 			
 			selectPanel = new SelectPanel;
 			selectPanel.x = Constants.STAGE_WIDTH >> 1;

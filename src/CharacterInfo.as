@@ -69,7 +69,7 @@ package  {
 			var Width:Number;
 			var Height:Number;
 			var skilmas:*;
-			var i:int;
+			var i:int; 
 			var ico:String;
 			var spe:Sprite;
 			var nam:String; 

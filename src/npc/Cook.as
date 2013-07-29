@@ -6,11 +6,8 @@ package npc {
 	 */
 	public class Cook extends NPC {
 		
-		[Embed(source = "../../assets/faces/face_cook.png")]   
-		private var ico:Class; 
-		   
 		override public function getIco():Bitmap {   
-			return new ico();  
+			return FaceAssets.getIco("face_cook");
 		} 
 		
 		override public function getWords():String {        
@@ -26,7 +23,7 @@ package npc {
 		}
 		
 		override protected function setClip():void {     
-			clip = new Ppp; 
+			clip = new Talk_up; 
 		}
 //-----		
 	}

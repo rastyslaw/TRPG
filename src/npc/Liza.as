@@ -7,15 +7,12 @@ package npc {
 	 */
 	public class Liza extends NPC {
 		
-		[Embed(source = "../../assets/faces/face_liza.png")]   
-		private var ico:Class;  
-		 
 		public function Liza() {
 			random_walk = .1;   
 		}
 		
 		override public function getIco():Bitmap {   
-			return new ico();  
+			return FaceAssets.getIco("face_liza");
 		}
 		  
 		override public function getWords():String {        
@@ -39,7 +36,7 @@ package npc {
 		}
 		
 		override protected function setClip():void {     
-			clip = new Ppp; 
+			clip = new Talk_up; 
 		}
 //-----		
 	}

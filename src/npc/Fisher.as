@@ -6,9 +6,6 @@ package npc {
 	 */
 	public class Fisher extends NPC {
 		
-		[Embed(source = "../../assets/faces/face_fisher.png")]   
-		private var ico:Class;  
-		  
 		public function Fisher():void { 
 			bobber = new Bobber();
 			this.addChild(bobber);
@@ -19,7 +16,7 @@ package npc {
 		}
 		
 		override public function getIco():Bitmap {    
-			return new ico();  
+			return FaceAssets.getIco("face_fisher");
 		}
 		
 		override public function getWords():String {        
@@ -35,7 +32,7 @@ package npc {
 		}
 		
 		override protected function setClip():void {     
-			clip = new Ppp;   
+			clip = new Talk_up;   
 		}
 //-----		
 	}

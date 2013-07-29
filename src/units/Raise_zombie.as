@@ -6,11 +6,8 @@ package units {
 	 */
 	public class Raise_zombie extends Unit { 
 		
-		[Embed(source = "../../assets/faces/face_raise.png")]   
-		private var ico:Class;  
-		
 		override public function getIco():Bitmap {   
-			return new ico(); 
+			return FaceAssets.getIco("face_raise");
 		}  
 		
 		override public function getName():String {   

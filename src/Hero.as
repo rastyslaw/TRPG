@@ -9,21 +9,13 @@ package  {
 	 * @author waltasar
 	 */
 	public class Hero extends Sprite {
-		
-		[Embed(source = "../assets/faces/face_heroarcher.png")]   
-		private var archer_ico:Class;
-		
-		[Embed(source = "../assets/faces/face_heromage.png")]   
-		private var mage_ico:Class;
-		
-		[Embed(source = "../assets/faces/face_herowarr.png")]   
-		private var warr_ico:Class; 
-		
+
 		public static const STAY:String = "stay";
 		public static const MOVE:String = "move";   
 		private var _type:String; 
 		protected var _hero:Animation; 
 		private var _prev:Point;
+		private var _isHero:Boolean = true;
 		
 		public function Hero() { 
 			switch(Main.selectHero) {
@@ -52,12 +44,12 @@ package  {
 		public function getHeroIcon():Bitmap {
 			switch(Main.selectHero) {
 				case HeroCreator.HERO_MAGE:  
-					return new mage_ico(); 
+					return FaceAssets.getIco("face_heromage");
 				break;
 				case HeroCreator.HERO_ARCHER:
-					return new archer_ico();  
+					return FaceAssets.getIco("face_heroarcher"); 
 				break;
-				default: return new warr_ico(); 
+				default: return FaceAssets.getIco("face_herowarr");
 			}
 		}
 		
@@ -98,6 +90,14 @@ package  {
 		 
 		public function set prev(value:Point):void {
 			_prev = value;
+		}
+		
+		public function get isHero():Boolean {
+			return _isHero; 
+		}
+		
+		public function set isHero(value:Boolean):void {
+			_isHero = value;
 		}
 //-----		
 	}

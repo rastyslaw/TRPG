@@ -25,9 +25,11 @@ package  {
 		private var refresh:Function;
 		private var hitt:Object;
 		private var _last:Point;
+		private var _mas:Vector.<Point>;
 		
 		public function Walke(tar:*, mas:Vector.<Point>, spd:int, func:Function=null):void {
 			unit = tar;
+			_mas = mas;
 			if(unit is NPC) unit.walker = this;
 			refresh = func; 
 			movie = unit.hero; 
@@ -42,6 +44,9 @@ package  {
 		private function correct():Boolean {
 			var s:uint;
 			index++;
+			if (unit is Hero) {
+				if (unit.isHero) redrawPath(); 
+			}
 			curStep = step; 
 			if (index < pointMas.length) { 
 				tarX = pointMas[index].x; 
@@ -72,6 +77,14 @@ package  {
 			else kill();
 			return false;
 		}  
+		
+		private function redrawPath():void {
+			Town.clearPath();
+			var total:int = _mas.length - 1; 
+			for (var p:int; p < total-index; p++ ){
+				if(_mas[p]!=null) Town.getSquare(_mas[p].y, _mas[p].x);
+			}
+		}
 		
 		private function moving(e:Event):void {
 			//compas == "x" ? unit.x += step : unit.y += step; 

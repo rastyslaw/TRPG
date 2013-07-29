@@ -9,11 +9,8 @@ package units {
 	 */
 	public class HeroWarr extends Unit { 
 		
-		[Embed(source = "../../assets/faces/face_herowarr.png")]   
-		private var ico:Class;   
-		
 		override public function getIco():Bitmap {   
-			return new ico(); 
+			return FaceAssets.getIco("face_herowarr");
 		}  
 		
 		override public function getName():String {   

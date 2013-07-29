@@ -13,11 +13,8 @@ package units {
 	 */
 	public class Priest extends MageUnit { 
 		
-		[Embed(source = "../../assets/faces/face_priest.png")]   
-		private var ico:Class; 
-		 
 		override public function getIco():Bitmap {   
-			return new ico();  
+			return FaceAssets.getIco("face_priest");
 		}
 		
 		override protected function setSpellMas():void {        

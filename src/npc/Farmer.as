@@ -7,9 +7,6 @@ package npc {
 	 */
 	public class Farmer extends NPC {
 		
-		[Embed(source = "../../assets/faces/face_farmer.png")]   
-		private var ico:Class;  
-		
 		public function Farmer():void {
 			random_work = .1;
 			random_look = .1; 
@@ -17,7 +14,7 @@ package npc {
 		}
 		
 		override public function getIco():Bitmap {    
-			return new ico();   
+			return FaceAssets.getIco("face_farmer");
 		} 
 		 
 		override public function getWords():String {        
@@ -39,7 +36,7 @@ package npc {
 		}
 		
 		override protected function setClip():void {     
-			clip = new Ppp;   
+			clip = new Talk_up;   
 		}
 //-----		
 	}

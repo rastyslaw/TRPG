@@ -33,12 +33,14 @@ package npc {
 		protected var _path:Vector.<Point>;  
 		private var fask:Sprite;
 		private var _walker:Walke;
+		private var _dialog:Boolean;
 		
 		protected var random_walk:Number = .2;
 		protected var random_work:Number = .2;
 		protected var random_look:Number = .2; 
 		
 		public function NPC() {
+			isHero = false; 
 			setType();
 			setPar();
 			setPath();
@@ -126,18 +128,16 @@ package npc {
 			if (bobber != null) bobber.visible = false; 
 		}
 		
-		private function check():void {
+		public function check():void {
 			if (_hero != null) {
 				removeChild(_hero);   
-				_hero = null; 
+				_hero = null;  
 			} 
-		}
+		} 
 		
 		public function talking(unit:Hero):void {
-			trace("1111");
 			if (busy) return;
-			trace("2222");
-			check();
+			check(); 
 			_hero = Main.animationManager.getAnimation(_type + "_talk");
 			_hero.movieLen = 8; 
 			_hero.repeat = false;
@@ -160,10 +160,14 @@ package npc {
 			_hero.addEventListener("FINISH", goBack);   
 		} 
 		
-		private function goBack(e:Event):void {
+		public function killBackLis():void { 
+			_hero.removeEventListener("FINISH", goBack);  
+		}
+		
+		private function goBack(e:Event):void {  
 			_hero.removeEventListener("FINISH", goBack);  
 			_hero.gotoAndStop(_hero.currentFrame-8);
-			timer = new Timer(2000, 1);
+			timer = new Timer(3000, 1); 
 			timer.addEventListener(TimerEvent.TIMER_COMPLETE, goStay);
 			timer.start(); 
 		}
@@ -208,6 +212,14 @@ package npc {
 		
 		public function set walker(value:Walke):void { 
 			_walker = value;
+		} 
+		
+		public function get dialog():Boolean {
+			return _dialog; 
+		}
+		 
+		public function set walk(value:Boolean):void {
+			_walk = value;
 		}
 //-----		
 	}
