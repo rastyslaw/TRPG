@@ -30,6 +30,11 @@ package npc {
 		override protected function setClip():void {     
 			clip = new Talk_up;  
 		}
+		
+		override public function get dialog():Boolean {
+			if (Main.questLine == 2) return true; 
+			else return false;  
+		}
 //-----		
 	}
 }

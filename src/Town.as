@@ -4,11 +4,13 @@ package  {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
+	import flash.display.MovieClip;
 	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
+	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
@@ -46,12 +48,15 @@ package  {
 		private var scrolling:Boolean = true;
 		public var unit_cont:Sprite = new Sprite;
 		private var npc_cont:Sprite = new Sprite;
+		private var boxCont:Sprite = new Sprite;
 		private var roofs:Sprite = new Sprite;
-		
+		private var roofsMas:Vector.<DisplayObject> = new Vector.<DisplayObject>;
+		private var boxMas:Vector.<DisplayObject> = new Vector.<DisplayObject>; 
+		private var npcMas:Vector.<Hero> = new Vector.<Hero>; 
 		private var playerObj:Object=new Object();
-		private var canvasBD:BitmapData;
+		private var canvasBD:BitmapData; 
 		private var backgroundBD:BitmapData;
-		private var backgroundRect:Rectangle;
+		private var backgroundRect:Rectangle; 
 		private var backgroundPoint:Point; 
 		public var border:int;   
 		private var aWorld:Array = []
@@ -72,7 +77,7 @@ package  {
 		private var bufferPoint:Point;
 		private var viewWidth:int;
 		private var viewHeight:int;
-		private var viewCols:int;
+		private var viewCols:int; 
 		private var viewRows:int;
 		public var viewXOffset:int;
 		public var viewYOffset:int;
@@ -102,7 +107,7 @@ package  {
 		private var hero:Hero;
 		private var curpoint:Point = new Point();
 		private var walker:Walke;
-		private var replic:Replic;
+		private var replic:Dialog;
 		private var ui:Sprite; 
 		private var replic_tar:NPC;
 		private var replicTimer:Timer;
@@ -110,6 +115,7 @@ package  {
 		private static var sqCont:Sprite = new Sprite;
 		private var dely:Boolean; 
 		private var autoScroll:Boolean;
+		private var party:PartyGr;
 		
 		public function Town(ar:Array, cofMas:Array, tiles:Bitmap) {
 			grid_size = border = Map.grid_size;  
@@ -158,7 +164,8 @@ package  {
 			gameTimer = new Timer(_period,1); 
 			gameTimer.addEventListener(TimerEvent.TIMER, runGame);
 			gameTimer.start();
-			unit_cont.addChildAt(sqCont, 0);   
+			unit_cont.addChildAt(sqCont, 0);
+			unit_cont.addChild(boxCont);
 			drawBox(); 
 			//
 			hero = new Hero; 
@@ -191,7 +198,11 @@ package  {
 			bmp.scaleX = bmp.scaleY = 0.7; 
 			face.addChild(bmp);
 			bmp.x = bmp.y = 10;
-			 
+			
+			party = new PartyGr;
+			party.x = face.width+10;
+			addChild(party);  
+			
 			addEventListener(Event.ENTER_FRAME, scanRoofs);
 			unit_cont.x = -viewXOffset;    
 			unit_cont.y = -viewYOffset;
@@ -221,13 +232,14 @@ package  {
 			var girl:NPC = new Girl; 
 			girl.x = 20 * grid_size - 8;
 			girl.y = 11 * grid_size - 8; 
-			npc_cont.addChild(girl); 
+			npc_cont.addChild(girl);
+			npcMas.push(girl);
 			girl.walk = false;
-			girl.prev = new Point(20, 11);
+			girl.prev = new Point(20, 11); 
 			mas[11][20].unit = girl;
 			Girl(girl).run();
-			var maspath:Vector.<Point> = Vector.<Point>([new Point(24, 5), new Point(24, 6), new Point(24, 7), new Point(24, 8),
-														 new Point(24, 9), new Point(23, 9), new Point(22, 9), new Point(21, 9), new Point(20, 9), null]); 
+			var maspath:Vector.<Point> = Vector.<Point>([new Point(24, 5), new Point(24, 6), new Point(24, 7),
+														 new Point(24, 8), new Point(24, 9), new Point(20, 9), null]); 
 			var walker:Walke = new Walke(girl, maspath, 4, refresh);  
 			walker.addEventListener("LAST_POINT", girlTalk);
 		} 
@@ -239,6 +251,8 @@ package  {
 			dialog.y = Constants.STAGE_HEIGHT;  
 			dialog.x = 6;   
 			tar.talking(hero);
+			tar.walker = null;
+			tar.moving = false; 
 			dialog.addEventListener("DIALOG_OFF", hero_focus);
 		}
 		
@@ -246,16 +260,17 @@ package  {
 			var tar:NPC = Dialog(e.target).target;
 			scrolling = true; 
 			addEventListener(MouseEvent.MOUSE_MOVE, moveramk);
-			addEventListener(MouseEvent.CLICK, clickedOnMap); 
+			addEventListener(MouseEvent.CLICK, clickedOnMap);  
 			face.addEventListener(MouseEvent.CLICK, face_clicked);
-			Main.questLine++;
-			var newquest:GetNewQuest = new GetNewQuest;
-			addChild(newquest);
+			Main.questLine++; 
+			var newquest:GetNewQuest = new GetNewQuest; 
+			addChild(newquest); 
+			var rmas:Array = Quests.getQuestLog(Main.questLine); 
+			newquest.nam.text = rmas[0]; 
 			newquest.x = Constants.STAGE_WIDTH >> 1;
 			newquest.y = Constants.STAGE_HEIGHT >> 1;
 			newquest.alpha = 0;
 			TweenLite.to(newquest, 0.6, {alpha:1, onComplete:onFinishTweenNewQuest, onCompleteParams:[newquest]});
-			tar.killBackLis();
 			Girl(tar).run();    
 			var maspath:Vector.<Point> = Vector.<Point>([new Point(24, 10), new Point(24, 9), new Point(24, 8), new Point(24, 7), new Point(24, 6), null]); 
 			var walker:Walke = new Walke(tar, maspath, 4, refresh);  
@@ -269,12 +284,14 @@ package  {
 		private function girlWalk(e:Event):void { 
 			var tar:NPC = Walke(e.target)._unit;
 			tar.walk = true;
-			tar.check();
-			tar.stay();  
+			tar._busy = false;  
+			tar.setState(Hero.STAY); 
+			tar.walker = null;
+			tar.moving = false; 
 			tar._fask.addEventListener(MouseEvent.CLICK, show_dialog);
 			tar.addEventListener(NpcEvent.MOVING, moveNpc);  
 		} 
-		
+		  
 		private function face_clicked(e:MouseEvent):void {
 			tracking = hero;
 			autoScroll = true;
@@ -296,32 +313,38 @@ package  {
 			var box1:Box1 = new Box1; 
 			box1.x = 9 * grid_size;
 			box1.y = 7 * grid_size;
-			unit_cont.addChild(box1);
+			boxCont.addChild(box1);
+			boxMas.push(box1);
 			mas[7][9].coff = 0;
 			var box2:Box1_empty = new Box1_empty; 
 			box2.x = 28 * grid_size;
 			box2.y = 22 * grid_size;
-			unit_cont.addChild(box2);
+			boxCont.addChild(box2);
+			boxMas.push(box2);
 			mas[22][28].coff = 0;
 			var box3:Box1 = new Box1;  
 			box3.x = 0 * grid_size;
 			box3.y = 17 * grid_size;
-			unit_cont.addChild(box3);
+			boxCont.addChild(box3);
+			boxMas.push(box3);
 			mas[17][0].coff = 0;
 			var box4:Box2 = new Box2; 
 			box4.x = 27 * grid_size;
 			box4.y = 6 * grid_size;
-			unit_cont.addChild(box4); 
+			boxCont.addChild(box4);
+			boxMas.push(box4);
 			mas[6][27].coff = 0;
 			var box5:Box2 = new Box2;  
 			box5.x = 17 * grid_size;
 			box5.y = 24 * grid_size;
-			unit_cont.addChild(box5); 
+			boxCont.addChild(box5);
+			boxMas.push(box5); 
 			mas[24][17].coff = 0; 
 			var box6:Box2_empty = new Box2_empty;  
 			box6.x = 11 * grid_size;  
 			box6.y = 14 * grid_size;  
-			unit_cont.addChild(box6); 
+			boxCont.addChild(box6); 
+			boxMas.push(box6);
 			mas[14][11].coff = 0; 
 		}
 		
@@ -329,23 +352,28 @@ package  {
 			var roof1:Roof_cook = new Roof_cook;
 			roof1.x = 10 * grid_size;
 			roof1.y = 2 * grid_size;
-			roofs.addChild(roof1); 
+			roofs.addChild(roof1);
+			roofsMas.push(roof1);
 			var roof2:Roof_alhim = new Roof_alhim;
 			roof2.x = 2 * grid_size;
 			roof2.y = 10 * grid_size; 
 			roofs.addChild(roof2);
+			roofsMas.push(roof2);
 			var roof3:Roof_home = new Roof_home;
 			roof3.x = 22 * grid_size; 
 			roof3.y = 3 * grid_size; 
 			roofs.addChild(roof3);
+			roofsMas.push(roof3);
 			var roof4:Roof_cherch = new Roof_cherch;
 			roof4.x = 12 * grid_size; 
 			roof4.y = 11 * grid_size; 
 			roofs.addChild(roof4);
+			roofsMas.push(roof4);
 			var roof5:Roof_prison = new Roof_prison;
 			roof5.x = 22 * grid_size; 
 			roof5.y = 18 * grid_size;  
-			roofs.addChild(roof5); 
+			roofs.addChild(roof5);
+			roofsMas.push(roof5); 
 			unit_cont.addChild(roofs); 
 		}
 		
@@ -353,37 +381,43 @@ package  {
 			var liza:NPC = new Liza; 
 			liza.x = 2 * grid_size - 8;
 			liza.y = 15 * grid_size - 8; 
-			npc_cont.addChild(liza); 
+			npc_cont.addChild(liza);
+			npcMas.push(liza); 
 			mas[15][2].unit = liza;    
 			
 			var guard1:NPC = new Guard; 
-			guard1.x = 25 * grid_size - 8;
+			guard1.x = 26 * grid_size - 8;
 			guard1.y = 24 * grid_size - 8;  
 			npc_cont.addChild(guard1);
-			mas[24][25].unit = guard1; 
+			npcMas.push(guard1);
+			mas[24][26].unit = guard1; 
 			
 			var guard2:NPC = new ExitGuard; 
 			guard2.x = 3 * grid_size - 8;
-			guard2.y = 1 * grid_size - 8; 
+			guard2.y = 2 * grid_size - 8; 
 			npc_cont.addChild(guard2);
-			mas[1][3].unit = guard2;  
+			npcMas.push(guard2);
+			mas[2][3].unit = guard2;  
 			 
 			var guard3:NPC = new WalkerGuard; 
 			guard3.x = 12 * grid_size - 8;
 			guard3.y = 8 * grid_size - 8; 
 			npc_cont.addChild(guard3);
+			npcMas.push(guard3);
 			mas[8][12].unit = guard3; 
 			
 			var fisher:NPC = new Fisher; 
 			fisher.x = 12 * grid_size - 8; 
 			fisher.y = 22 * grid_size - 8;  
 			npc_cont.addChild(fisher);
+			npcMas.push(fisher);
 			mas[22][12].unit = fisher;
 			
 			var captain:NPC = new Captain; 
 			captain.x = 4 * grid_size - 8; 
 			captain.y = 19 * grid_size - 8;  
-			npc_cont.addChild(captain); 
+			npc_cont.addChild(captain);
+			npcMas.push(captain);
 			captain._busy = true;   
 			mas[19][4].unit = captain; 
 			
@@ -391,25 +425,29 @@ package  {
 			cook.x = 12 * grid_size - 8; 
 			cook.y = 4 * grid_size - 8;  
 			npc_cont.addChild(cook);
+			npcMas.push(cook);
 			mas[4][12].unit = cook; 
 			
 			var professor:NPC = new Professor; 
 			professor.x = 4 * grid_size - 8;  
 			professor.y = 12 * grid_size - 8;  
-			npc_cont.addChild(professor); 
+			npc_cont.addChild(professor);
+			npcMas.push(professor);
 			mas[12][4].unit = professor;
 			
 			var monk:NPC = new Monk; 
 			monk.x = 13 * grid_size - 8;  
 			monk.y = 13 * grid_size - 8;   
-			npc_cont.addChild(monk);  
+			npc_cont.addChild(monk);
+			npcMas.push(monk); 
 			mas[13][13].unit = monk;  
 			
 			if(Main.selectHero != HeroCreator.HERO_ARCHER) {
 				var archer:NPC = new Archer; 
 				archer.x = 15 * grid_size - 8;  
 				archer.y = 4 * grid_size - 8;   
-				npc_cont.addChild(archer); 
+				npc_cont.addChild(archer);
+				npcMas.push(archer); 
 				mas[4][15].unit = archer; 
 				archer.addEventListener(NpcEvent.MOVING, moveNpc);
 				archer._fask.addEventListener(MouseEvent.CLICK, show_dialog); 
@@ -418,7 +456,8 @@ package  {
 				var mage:NPC = new Mage; 
 				mage.x = 5 * grid_size - 8;   
 				mage.y = 13 * grid_size - 8;   
-				npc_cont.addChild(mage);   
+				npc_cont.addChild(mage);
+				npcMas.push(mage); 
 				mas[13][5].unit = mage;
 				mage.addEventListener(NpcEvent.MOVING, moveNpc);
 				mage._fask.addEventListener(MouseEvent.CLICK, show_dialog);
@@ -427,8 +466,10 @@ package  {
 				var barbar:NPC = new Barbar;  
 				barbar.x = 24 * grid_size - 8;   
 				barbar.y = 20 * grid_size - 8;   
-				npc_cont.addChild(barbar); 
-				mas[20][24].unit = barbar;  
+				npc_cont.addChild(barbar);
+				npcMas.push(barbar);  
+				barbar.moving = true;
+				mas[20][24].unit = barbar;
 				barbar._fask.addEventListener(MouseEvent.CLICK, show_dialog);
 			}
 			unit_cont.addChild(npc_cont);
@@ -452,52 +493,30 @@ package  {
 			//trace(getQualifiedClassName(e.target)); 
 			if (walker != null) { 
 				var numX:int = (mouseX + viewXOffset) / grid_size;
-				var numY:int = (mouseY + viewYOffset) / grid_size;
+				var numY:int = (mouseY + viewYOffset) / grid_size; 
 				if (numX == walker.last.x && numY == walker.last.y) return;
 			}
-			var obg:NPC; 
+			var obg:NPC;
 			if (e != null) obg = NPC(e.currentTarget.parent);
-			else obg = replic_tar;
-			replic_tar = null;
-			if ( (Math.abs(hero.x - obg.x) + Math.abs(hero.y - obg.y)) == grid_size ) {
-				if (obg.dialog) {
-					var dialog:Dialog = new Dialog(obg, hero.getHeroIcon());   
-					ui.addChild(dialog);
-					dialog.y = Constants.STAGE_HEIGHT;  
-					dialog.x = 6;  
-					obg.talking(hero); 
-					return;
-				}
-				if (replic != null) { 
-					replicTimer.stop(); 
-					replicTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, killreplictick);
-					replic.removeEventListener(MouseEvent.CLICK, killReplic);
-					ui.removeChild(replic);
-					replic = null;   
-				} 
-				replic = new Replic;   
-				ui.addChild(replic);
-				replic.addEventListener(MouseEvent.CLICK, killReplic);
-				replic.y = Constants.STAGE_HEIGHT;
-				replic.x = 6;
-				TweenLite.to(replic, .6, { y:replic.y-replic.height-6}); 
-				//else replic.removeChildAt(replic.numChildren - 1);
-				replic.addChild(obg.getIco()); 
-				replic.info.info.text = obg.getWords();
-				replic.scrol.visible = false;
-				if (replic.info.info.numLines > 3) replic.scrol.visible = true;
-				replic.info.info.height = replic.info.info.textHeight;
-				obg.talking(hero);
-				  
-				replicTimer = new Timer(1000+(replic.info.info.maxScrollV)*1000, 1);
-				replicTimer.addEventListener(TimerEvent.TIMER_COMPLETE, killreplictick);
-				replicTimer.start();
+			else obg = replic_tar; 
+			replic_tar = null; 
+			if (replic != null) {
+				if (obg == replic.target) return;
+				replic.onFinishTween();
 			}
-			else if(obg.walker==null) { 
-				if (replic != null) killReplicNow(); 
-				var min:Number = Number.MAX_VALUE;  
+			if ( (Math.abs(hero.x - obg.x) + Math.abs(hero.y - obg.y)) == grid_size ) {
+				replic = new Dialog(obg, hero.getHeroIcon());   
+				ui.addChild(replic);
+				removeEventListener(MouseEvent.CLICK, clickedOnMap); 
+				replic.y = Constants.STAGE_HEIGHT;  
+				replic.x = 6;  
+				if(!obg.moving) obg.talking(hero);
+				replic.addEventListener("DIALOG_OFF", nuller);
+			} 
+			else if (obg.walker == null) { 
+				var min:Number = Number.MAX_VALUE;   
 				var dirX:Number; 
-				var dirY:Number;
+				var dirY:Number; 
 				var rast:Number;  
 				var point:Point = gerCoord(hero.x, hero.y);
 				var pointNpc:Point = gerCoord(obg.x, obg.y);
@@ -533,7 +552,7 @@ package  {
 				masPoint.splice(0, masPoint.length);  
 				var p:Point = getGoodPath(curpoint);
 				masPoint.push(p);
-				var err:int;
+				var err:int; 
 				while (p!=null) {      
 					p = getGoodPath(p);      
 					masPoint.push(p);
@@ -549,41 +568,62 @@ package  {
 			}
 		} 
 		
-		private function killreplictick(e:TimerEvent):void {
-			e.currentTarget.stop();
-			e.currentTarget.removeEventListener(TimerEvent.TIMER_COMPLETE, killreplictick);
-			if (replic == null) return;
-			killReplicNow();  
-		}
-		
-		private function killReplicNow():void {
-			replicTimer.stop(); 
-			replicTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, killreplictick);
-			replic.removeEventListener(MouseEvent.CLICK, killReplic); 
-			TweenLite.to(replic, .3, { y:Constants.STAGE_HEIGHT, onComplete:onFinishTween } );
-		}
-		 
-		private function killReplic(e:MouseEvent = null):void {
-			if (replic.scrol.visible) {
-				var i:int = replic.info.info.maxScrollV - replic.info.info.bottomScrollV;
-				if ( i * 27 != replic.info.info.y) { 
-					replic.info.info.y -= 27; 
-				}
-				else {
-					replic.scrol.visible = false; 
-					replic.removeEventListener(MouseEvent.CLICK, killReplic); 
-					TweenLite.to(replic, .3, { y:Constants.STAGE_HEIGHT, onComplete:onFinishTween}); 
-				} 
-			} 
-			else { 
-				replic.removeEventListener(MouseEvent.CLICK, killReplic); 
-				TweenLite.to(replic, .3, { y:Constants.STAGE_HEIGHT, onComplete:onFinishTween } );
+		private function nuller(e:Event):void {
+			addEventListener(MouseEvent.CLICK, clickedOnMap); 
+			var tar:NPC = Dialog(e.currentTarget).target;
+			if (!tar.moving) { 
+				tar._busy = false; 
+				tar.setState(Hero.STAY); 
 			}
-		}
+			replic = null;
+			if (!tar.dialog) return; 
+			if (tar is Monk) { 
+				Main.questLine++; 
+				var newquest:GetNewQuest = new GetNewQuest; 
+				addChild(newquest);
+				var rmas:Array = Quests.getQuestLog(Main.questLine); 
+				newquest.nam.text = rmas[0]; 
+				newquest.x = Constants.STAGE_WIDTH >> 1;
+				newquest.y = Constants.STAGE_HEIGHT >> 1;  
+				newquest.alpha = 0;
+				TweenLite.to(newquest, 0.6, {alpha:1, onComplete:onFinishTweenNewQuest, onCompleteParams:[newquest]});
+			}
+			else if (tar is Archer || tar is Barbar || tar is Mage) { 
+				Main.numParty++;
+				party.nam.text = String(Main.numParty);
+				npc_cont.removeChild(tar);
+				var p:Point = gerCoord(tar.x, tar.y);
+				mas[p.y][p.x].unit = undefined; 
+				tar.removeEventListener(MouseEvent.CLICK, show_dialog);
+				if(tar.hasEventListener(NpcEvent.MOVING)) tar.removeEventListener(NpcEvent.MOVING, moveNpc);
+				tar = null; 
+				if (Main.numParty > 2) {
+					var complquest:CompletedQuest = new CompletedQuest; 
+					addChild(complquest); 
+					var cmas:Array = Quests.getQuestLog(Main.questLine); 
+					complquest.nam.text = cmas[0];  
+					complquest.x = Constants.STAGE_WIDTH >> 1;
+					complquest.y = Constants.STAGE_HEIGHT >> 1;  
+					complquest.alpha = 0; 
+					TweenLite.to(complquest, 0.6, {alpha:1, onComplete:onFinishTweenNewQuest, onCompleteParams:[complquest]});
+					Main.questLine++;
+				}
+			}
+			else if (tar is ExitGuard) {   
+				tar.prev = new Point(3, 2);   
+				var maspath:Vector.<Point> = Vector.<Point>([new Point(2, 2), null]); 
+				var walker:Walke = new Walke(tar, maspath, 2, refresh);   
+				walker.addEventListener("LAST_POINT", guardMoves);
+				Main.questLine++;  
+			} 
+		} 
 		
-		private function onFinishTween():void {
-			ui.removeChild(replic); 
-			replic = null; 
+		private function guardMoves(e:Event):void {  
+			var tar:NPC = Walke(e.target)._unit;
+			tar._busy = false;  
+			tar.setState(Hero.STAY); 
+			tar.walker = null;
+			tar.moving = false; 
 		}
 		
 		private function runGame(e:TimerEvent):void { 
@@ -596,9 +636,11 @@ package  {
 					drawView();   
 					canvasBD.unlock();
 				}
-				if(!startDraw) {
+				if(!startDraw) { 
 					startDraw = true;
-					drawView(); 
+					canvasBD.lock();
+					drawView();
+					canvasBD.unlock();
 				}
 				
 				_afterTime = getTimer();
@@ -611,7 +653,7 @@ package  {
 				gameTimer.reset(); 
 				gameTimer.delay = _sleepTime;
 				gameTimer.start();
-			
+				
 				while (_excess > _period) {
 					updatePlayer();
 					_excess -= _period;
@@ -647,7 +689,7 @@ package  {
 		  if (curY < border) vScroll(-2); 
 		  else if (curY > viewHeight - border) 
 			vScroll(2);
-		}
+		} 
 		
 		private function updatePlayer():void {
 			if(int(_speedX)!=0) {
@@ -664,24 +706,64 @@ package  {
 				else if (viewYOffset > (worldHeight-viewHeight)-1) {
 					viewYOffset = (worldHeight-viewHeight)-1;
 				} 
-				_speedY *= .86; 
-			} 	     
-			if((scrolling && !ui.hitTestPoint(mouseX, mouseY)) || autoScroll) updMapPos();       
-			unit_cont.x = -viewXOffset;  
-			unit_cont.y = -viewYOffset;  
+				_speedY *= .86;
+			}
+			if ((scrolling && !ui.hitTestPoint(mouseX, mouseY)) || autoScroll) updMapPos();
+			clearUnit(); 
 		}  
 		
+		private function clearUnit():void {
+			var xx:int;
+			var yy:int;
+			var width:int;
+			var height:int; 
+			width =  height = grid_size>>1;
+			for each(var s:Hero in npcMas) {  
+				xx = s.x + (s.width>>1);  
+				yy = s.y + (s.height >> 1);
+				
+				if (xx < viewXOffset-width || xx > viewXOffset+Constants.STAGE_WIDTH+width ||
+					yy < viewYOffset-height || yy > viewYOffset+Constants.STAGE_HEIGHT+height) { 
+					if(npc_cont.contains(s)) npc_cont.removeChild(s); 
+				}
+				else if(!npc_cont.contains(s)) npc_cont.addChild(s);    
+			}
+			var obg:DisplayObject;
+			for each (obg in roofsMas) {  
+				width = obg.width >> 1; 
+				height = obg.height >> 1;
+				xx = obg.x + width;     
+				yy = obg.y + height;
+				if (xx < viewXOffset-width || xx > viewXOffset+Constants.STAGE_WIDTH+width ||
+					yy < viewYOffset-height || yy > viewYOffset+Constants.STAGE_HEIGHT+height) { 
+					if(roofs.contains(obg)) roofs.removeChild(obg); 
+				} 
+				else if(!roofs.contains(obg)) roofs.addChild(obg);  
+			}
+			for each (obg in boxMas) {   
+				width = obg.width >> 1; 
+				height = obg.height >> 1;
+				xx = obg.x + width;     
+				yy = obg.y + height;
+				if (xx < viewXOffset-width || xx > viewXOffset+Constants.STAGE_WIDTH+width ||
+					yy < viewYOffset-height || yy > viewYOffset+Constants.STAGE_HEIGHT+height) { 
+					if(boxCont.contains(obg)) boxCont.removeChild(obg); 
+				} 
+				else if(!boxCont.contains(obg)) boxCont.addChild(obg);  
+			} 
+		}
+			
 		private function drawView():void {
 			var tilex:int = int(viewXOffset/grid_size);
 			var tiley:int = int(viewYOffset/grid_size);
 			var tileNum:int;   
 			var rowper:int; 
-			var colper:int;
-			var obj:Unit;
+			var colper:int; 
+			var obj:Hero;
 			for (var rowCtr:int=0; rowCtr<=viewRows; rowCtr++) {
 				for (var colCtr:int=0; colCtr<=viewCols; colCtr++) {  
-					rowper = rowCtr+tiley; 
-					colper = colCtr+tilex;
+					rowper = rowCtr+tiley;  
+					colper = colCtr+tilex; 
 					if(rowper >= worldRows) rowper = worldRows-1; 
 					if(colper >= worldCols) colper = worldCols-1
 					tileNum = aWorld[rowper][colper];
@@ -695,6 +777,8 @@ package  {
 			bufferRect.x=viewXOffset % grid_size;
 			bufferRect.y=viewYOffset % grid_size;
 			canvasBD.copyPixels(bufferBD, bufferRect, bufferPoint);
+			unit_cont.x = -viewXOffset;
+			unit_cont.y = -viewYOffset;
 		}
 	 
 		private function clickedOnMap(e:MouseEvent):void {
@@ -780,7 +864,8 @@ package  {
 			//getSquare(p.y, p.x, 0x0000ff); 
 			//
 			tar._busy = false;
-			tar.walker = null; 
+			tar.walker = null;
+			tar.moving = false; 
 		}
 		
 		public static function getSquare(y:int, x:int, color:uint=0xff0000):void {   

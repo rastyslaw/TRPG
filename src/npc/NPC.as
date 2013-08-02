@@ -134,7 +134,7 @@ package npc {
 				_hero = null;  
 			} 
 		} 
-		
+		 
 		public function talking(unit:Hero):void {
 			if (busy) return;
 			check(); 
@@ -160,16 +160,12 @@ package npc {
 			_hero.addEventListener("FINISH", goBack);   
 		} 
 		
-		public function killBackLis():void { 
-			_hero.removeEventListener("FINISH", goBack);  
-		}
-		
-		private function goBack(e:Event):void {  
+		private function goBack(e:Event):void {
 			_hero.removeEventListener("FINISH", goBack);  
 			_hero.gotoAndStop(_hero.currentFrame-8);
-			timer = new Timer(3000, 1); 
-			timer.addEventListener(TimerEvent.TIMER_COMPLETE, goStay);
-			timer.start(); 
+			//timer = new Timer(1000, 1);  
+			//timer.addEventListener(TimerEvent.TIMER_COMPLETE, goStay);
+			//timer.start(); 
 		}
 		
 		private function showClip(e:MouseEvent):void {

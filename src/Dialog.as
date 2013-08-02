@@ -22,25 +22,34 @@ package  {
 		private var index:int;
 		private var _target:NPC;
 		private var replicTimer:Timer;
+		private var monolog:Boolean;
 		
 		public function Dialog(tar:NPC, bmp:Bitmap) {
 			heroImg = bmp;
 			_target = tar;
-			tarIco = tar.getIco();
-			words = DialogResourse.getReplicsMas(tar.type);
-			
 			replic = new Replic;   
 			addChild(replic);
-			replic.addChild(tarIco); 
-			replic.info.info.text = words[index];
+			var height:Number = replic.height;
+			if (tar.dialog) {
+				tarIco = tar.getIco();
+				words = DialogResourse.getReplicsMas(tar.type);
+				replic.addChild(tarIco); 
+				replic.info.info.text = words[index];
+			}
+			else {
+				monolog = true; 
+				replic.addChild(tar.getIco()); 
+				replic.info.info.text = tar.getWords(); 
+			}
+			
 			replic.scrol.visible = false;  
 			if (replic.info.info.numLines > 3) replic.scrol.visible = true;
 			replic.info.info.height = replic.info.info.textHeight;
-				
-			TweenLite.to(this, .6, { y:Constants.STAGE_HEIGHT - this.height - 6 } );
+				 
+			TweenLite.to(this, .6, { y:Constants.STAGE_HEIGHT - height - 6 } );
 			replic.addEventListener(MouseEvent.CLICK, nextWords);
 			
-			replicTimer = new Timer(4000, 1);
+			replicTimer = new Timer(3000, 1); 
 			replicTimer.addEventListener(TimerEvent.TIMER_COMPLETE, killreplictick);
 			replicTimer.start(); 
 		}
@@ -51,9 +60,15 @@ package  {
 				if ( i * 27 != replic.info.info.y) { 
 					replic.info.info.y -= 27; 
 				}
-				else traceNext(); 
+				else {
+					if (!monolog) traceNext();
+					else kill(); 
+				}
 			}   
-			else traceNext();
+			else { 
+				if (!monolog) traceNext();
+				else kill(); 
+			}
 		}
 		
 		private function traceNext():void {
@@ -64,7 +79,7 @@ package  {
 			replic.info.info.y = 0;
 			index++;
 			if (index >= words.length) {
-				kill(); 
+				kill();  
 				return; 
 			}
 			if (heroSay) replic.removeChild(heroImg);
@@ -85,11 +100,18 @@ package  {
 		private function killreplictick(e:TimerEvent):void {
 			replicTimer.stop(); 
 			replicTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, killreplictick);
-			traceNext();  
+			if (!monolog) traceNext();
+			else kill();   
 		}
 		
-		private function kill():void {  
+		public function kill():void {
+			TweenLite.to(this, .6, { y:Constants.STAGE_HEIGHT, onComplete:onFinishTween } );
+		}
+		   
+		public function onFinishTween():void {
 			dispatchEvent(new Event("DIALOG_OFF"));
+			replicTimer.stop(); 
+			replicTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, killreplictick);
 			replic.removeEventListener(MouseEvent.CLICK, nextWords);
 			this.parent.removeChild(this);
 		}

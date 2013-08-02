@@ -27,7 +27,7 @@ package npc {
 		}
 		
 		override public function get dialog():Boolean {
-			if (Main.questLine == 1) return true; 
+			if (Main.questLine == 1 || Main.questLine == 3) return true; 
 			else return false;  
 		}
 //-----		

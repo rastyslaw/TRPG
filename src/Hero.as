@@ -16,13 +16,14 @@ package  {
 		protected var _hero:Animation; 
 		private var _prev:Point;
 		private var _isHero:Boolean = true;
+		private var _moving:Boolean;
 		
 		public function Hero() { 
 			switch(Main.selectHero) {
-				case HeroCreator.HERO_WARR: 
+				case HeroCreator.HERO_WARR:  
 					type = "hero_warr";
 				break;
-				case HeroCreator.HERO_ARCHER:
+				case HeroCreator.HERO_ARCHER: 
 					type = "hero_archer"; 
 				break;
 				case HeroCreator.HERO_MAGE:
@@ -64,7 +65,8 @@ package  {
 			hero = Main.animationManager.getAnimation(type + "_walk");
 			hero.movieLen = 8;  
 			hero.delay = .05;  
-			addChild(hero);     
+			addChild(hero);
+			moving = true;  
 			hero.scaleX = hero.scaleY = 0.9; 
 		} 
 		
@@ -91,13 +93,21 @@ package  {
 		public function set prev(value:Point):void {
 			_prev = value;
 		}
-		
+		 
 		public function get isHero():Boolean {
 			return _isHero; 
 		}
 		
 		public function set isHero(value:Boolean):void {
 			_isHero = value;
+		}
+		
+		public function get moving():Boolean {
+			return _moving;
+		}
+		
+		public function set moving(value:Boolean):void {
+			_moving = value;
 		}
 //-----		
 	}

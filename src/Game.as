@@ -754,7 +754,7 @@
 				}  
 			}  
 		} 
-	 
+	     
 		public function getPath(spd:int):void { 
 			mas[curhero.y][curhero.x].water = -1; 
 			masWater.push(curhero);
@@ -769,12 +769,12 @@
 			var fig:DisplayObject = new Drawler(color);
 			sqCont.addChildAt(fig, 0); 
 			fig.x = x * grid_size;  
-			fig.y = y * grid_size;   
+			fig.y = y * grid_size;    
 		}
-		
-		private function scanPath(spd:int):Boolean {
-			var timeMas:Vector.<Point> = new Vector.<Point>;
-			var b:Boolean; 
+		 
+		private function scanPath(spd:int):Boolean { 
+			var timeMas:Vector.<Point> = new Vector.<Point>; 
+			var b:Boolean;  
 			var index:int;
 			var curIndex:int; 
 			var dirX:int;

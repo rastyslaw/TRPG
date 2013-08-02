@@ -15,9 +15,7 @@ package  {
 		
 		public static function lookLine(mas:*, s:*):int {
 			var num:int;
-			trace(s);
 			for (var i:int; i < mas.length; i++) {
-				trace(mas[i]);
 				if (mas[i] == s) num++; 
 			}
 			return num;  

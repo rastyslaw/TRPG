@@ -14,12 +14,14 @@ package {
 	public class Main extends Sprite {
 		
 		public static const TILESIZE:uint = 15; 
-		public static var questLine:uint; 
+		public static var totalGold:int;  
+		public static var questLine:uint;
+		public static var numParty:uint = 1;   
 		public static var selectHero:uint;
 		public static var animationManager:AnimationManager;
 		private var selectPanel:SelectPanel;
 		private var level:int = 1;
-		
+		 
 		public function Main():void { 
 			if (stage) init(); 
 			else addEventListener(Event.ADDED_TO_STAGE, init); 
@@ -193,8 +195,9 @@ package {
 			selectPanel.y = Constants.STAGE_HEIGHT >> 1;
 			addChild(selectPanel);
 			selectPanel.addEventListener(MouseEvent.CLICK, select);
+			
 		} 
-		  
+		
 		private function select(e:MouseEvent):void {
 			selectPanel.removeEventListener(MouseEvent.CLICK, select);
 			var i:uint; 
