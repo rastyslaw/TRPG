@@ -33,11 +33,10 @@ package  {
 			if(unit is NPC) unit.walker = this;
 			refresh = func; 
 			movie = unit.hero; 
-			step = curStep = spd;
+			step = curStep = spd; 
 			for (var i:int = mas.length-2; i >= 0; i--) {  
 				pointMas.push(new Point(mas[i].x * Map.grid_size - 8, mas[i].y * Map.grid_size - 8));
 			} 
-			_last = mas[0];   
 			if(!correct()) addEventListener(Event.ENTER_FRAME, moving); 
 		} 
 		 
@@ -45,7 +44,9 @@ package  {
 			var s:uint;
 			index++;
 			if (unit is Hero) {
-				if (unit.isHero) redrawPath(); 
+				if (unit.isHero) {
+					redrawPath(); 
+				}
 			}
 			curStep = step; 
 			if (index < pointMas.length) { 
@@ -77,15 +78,16 @@ package  {
 			else kill();
 			return false;
 		}  
-		
+		 
 		private function redrawPath():void {
-			Town.clearPath();
+			var cont:Sprite = unit.parent;  
+			IShled(cont.parent).clearPath(); 
 			var total:int = _mas.length - 1; 
 			for (var p:int; p < total-index; p++ ){
-				if(_mas[p]!=null) Town.getSquare(_mas[p].y, _mas[p].x);
+				if(_mas[p]!=null) IShled(cont.parent).getSquare(_mas[p].y, _mas[p].x);
 			}
 		}
-		
+		 
 		private function moving(e:Event):void {
 			//compas == "x" ? unit.x += step : unit.y += step; 
 			if (compas == "x") { 
@@ -159,6 +161,10 @@ package  {
 		
 		public function get last():Point {
 			return _last;
+		}
+		
+		public function set last(value:Point):void {
+			_last = value;
 		}
 //-----		
 	}

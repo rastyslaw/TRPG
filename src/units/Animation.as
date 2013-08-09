@@ -43,7 +43,7 @@
 			//units 
 			Archer_stay; Archer_talk; Archer_walk; Archer_attack_d; Archer_attack_t; Archer_attack_l; Archer_attack_r;
 			Mage_stay; Mage_talk; Mage_walk; Mage_attack_d; Mage_attack_t; Mage_attack_l; Mage_attack_r; Mage_cast_d; Mage_cast_t; Mage_cast_l; Mage_cast_r;
-			Priest_stay; Priest_walk; Priest_attack_d; Priest_attack_t; Priest_attack_l; Priest_attack_r; Priest_cast_d; Priest_cast_t; Priest_cast_l; Priest_cast_r;  
+			Priest_stay; Priest_talk; Priest_walk; Priest_attack_d; Priest_attack_t; Priest_attack_l; Priest_attack_r; Priest_cast_d; Priest_cast_t; Priest_cast_l; Priest_cast_r;  
 			Gnom_stay; Gnom_walk; Gnom_attack_d; Gnom_attack_t; Gnom_attack_l; Gnom_attack_r; 
 			Barbar_stay; Barbar_gir_stay; Barbar_talk; Barbar_walk; Barbar_attack_d; Barbar_attack_t; Barbar_attack_l; Barbar_attack_r; 
 			Raise_stay; Raise_walk; Raise_attack_d; Raise_attack_t; Raise_attack_l; Raise_attack_r;

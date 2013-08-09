@@ -44,10 +44,10 @@ package spell {
 			if (Math.random() * 100 < unit.agi) { 
 				base_damage *= 2;   
 				unit.getDamage(0, true, false);      
-			} 
-				 
-			if (mas[numY][numX].unit != undefined ) {    
-				hero = mas[numY][numX].unit;   
+			}
+			
+			if (mas[numY][numX].unit != undefined ) {
+				hero = mas[numY][numX].unit;  
 				if (hero.enemy) { 
 					 cof = 1 - mas[dirY][dirX].def * .1; 
 					damage = (base_damage - hero.def) * cof;   
@@ -56,7 +56,9 @@ package spell {
 					unit.healing(int(damage/2));  
 					if(hero.hp <= 0) game.killUnit(hero); 
 				}
-			}   
+			}
+			else return;
+			
 			unit.exp = damage;   
 			var s:String;
 			var p:Point = Game.gerCoord(unit.x, unit.y); 

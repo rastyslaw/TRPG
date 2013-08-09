@@ -8,8 +8,10 @@ package  {
 	 */
 	public class UI extends Sprite {
 		
+		private var _endTurn:EndTurn;
+		
 		public function UI(main:Game) { 
-			var endTurn:EndTurn = new EndTurn;  
+			endTurn = new EndTurn;   
 			endTurn.y = endTurn.height;
 			endTurn.x = Constants.STAGE_WIDTH - endTurn.width; 
 			addChild(endTurn);
@@ -18,6 +20,14 @@ package  {
 		 
 		private function clickTurn(e:MouseEvent):void {
 			dispatchEvent(new Event("END_TURN"));  
+		}
+		 
+		public function get endTurn():EndTurn {
+			return _endTurn;
+		}
+		
+		public function set endTurn(value:EndTurn):void {
+			_endTurn = value;
 		}
 //-----	 
 	}

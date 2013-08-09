@@ -1,6 +1,8 @@
 package {
+	import boxes.*;
 	import flash.display.Bitmap;
-	import flash.display.Sprite;
+	import flash.display.Sprite; 
+	import flash.errors.IOError;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import units.AnimationManager;
@@ -14,11 +16,15 @@ package {
 	public class Main extends Sprite {
 		
 		public static const TILESIZE:uint = 15; 
-		public static var totalGold:int;  
+		public static var totalGold:int;
+		public static var boxTypes:Array = [Container1, Container2];
 		public static var questLine:uint;
-		public static var numParty:uint = 1;   
+		public static const FRAME_RATE:int = 30;
+		public static var numParty:uint = 1;
+		public static var masParty:Array = [HeroCreator.ARCHER, HeroCreator.MAGE]; 
+		public static var gold:uint;   
 		public static var selectHero:uint;
-		public static var animationManager:AnimationManager;
+		public static var animationManager:AnimationManager; 
 		private var selectPanel:SelectPanel;
 		private var level:int = 1;
 		 
@@ -111,7 +117,8 @@ package {
 			animationManager.addAnimation("Mage_cast_r", "mage_cast_r");
 			
 			animationManager.addAnimation("Priest_stay", "priest_stay"); 
-			animationManager.addAnimation("Priest_walk", "priest_walk");  
+			animationManager.addAnimation("Priest_walk", "priest_walk");
+			animationManager.addAnimation("Priest_talk", "priest_talk"); 
 			animationManager.addAnimation("Priest_attack_t", "priest_attack_t"); 
 			animationManager.addAnimation("Priest_attack_d", "priest_attack_d");  
 			animationManager.addAnimation("Priest_attack_l", "priest_attack_l"); 
@@ -198,6 +205,37 @@ package {
 			
 		} 
 		
+		public function drawRoad(obg:Town):void {
+			removeChild(obg);
+			obg = null;
+			var level:Levels = new Levels;
+			var mas:Array = level.getLevel("road1", TILESIZE);    
+			var clas:Bitmap = level.getTileset("road1");   
+			addChild(new Road(mas[0], mas[1], clas, 1));
+		}
+		
+		public function drawBattle(obg:Road):void {
+			removeChild(obg);
+			obg = null;
+			var level:Levels = new Levels;
+			var mas:Array = level.getLevel("battle1", TILESIZE);    
+			var clas:Bitmap = level.getTileset("battle1");    
+			
+			var game:Game = new Game(1); 
+			game.setMap(mas[0], mas[1], clas);   
+			addChild(game);
+			game.init();  
+		}
+		
+		public function goToTown(obg:Game, s:String):void {
+			removeChild(obg); 
+			obg = null; 
+			var level:Levels = new Levels;
+			var mas:Array = level.getLevel("town1", TILESIZE);    
+			var clas:Bitmap = level.getTileset("town1");   
+			addChild(new Town(mas[0], mas[1], clas, s));  
+		}
+		
 		private function select(e:MouseEvent):void {
 			selectPanel.removeEventListener(MouseEvent.CLICK, select);
 			var i:uint; 
@@ -212,19 +250,15 @@ package {
 			selectHero = i;  
 			  
 			var level:Levels = new Levels;
-			var mas:Array = level.getLevel(this.level, TILESIZE);    
-			//var mas:Array = level.getLevel(this.level, 13); 
-			var clas:Bitmap = level.getTileset(this.level);  
-			addChild(new Town(mas[0], mas[1], clas));
+			var mas:Array = level.getLevel("battle1", TILESIZE);    
+			var clas:Bitmap = level.getTileset("battle1");    
 			
-			/*
-			var game:Game = new Game;
+			var game:Game = new Game(1); 
 			game.setMap(mas[0], mas[1], clas);   
 			addChild(game);
-			game.init(); 
-			*/
-		}
-		
+			game.init();  
+		} 
+
 //-----
 	}
 }

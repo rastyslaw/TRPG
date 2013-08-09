@@ -29,7 +29,7 @@ package spell {
 		}
 		 
 		public function get baff():String {
-			return null;        
+			return "massbad";        
 		}
 		
 		public function get ress():String {

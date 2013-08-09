@@ -11,7 +11,7 @@ package npc {
 		} 
 		
 		override public function getWords():String {        
-			return "Hi, my son";  
+			return "Hi, my son";   
 		}
 		
 		override protected function setType():void {     

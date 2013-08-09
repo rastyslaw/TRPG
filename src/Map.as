@@ -47,11 +47,10 @@ package  {
 		private var sprites64x64:BitmapData;
 		private var sprites_perRow:int;
 		
-		private var _speedX:int;  
-		private var _speedY:int;  
-		private var canvasBitmap:Bitmap;
-		public static const FRAME_RATE:int = 30;
-		private var _period:Number = 1000 / FRAME_RATE;
+		public var _speedX:int;  
+		public var _speedY:int;   
+		private var canvasBitmap:Bitmap; 
+		private var _period:Number = 1000 / Main.FRAME_RATE;
 		private var _beforeTime:int = 0;
 		private var _afterTime:int = 0;
 		private var _timeDiff:int = 0;
@@ -61,7 +60,7 @@ package  {
 		private var gameTimer:Timer;
 		private var game:Game;
 		private var ui:UI;
-		public var tracking:Unit; 
+		public var tracking:*;  
 		 
 		public function Map(ar:Array, cofmas:Array, cont:Game, tiles:Bitmap) {   
 			aWorld = ar;
@@ -114,10 +113,21 @@ package  {
 			gameTimer.start();  
 		}
 		 
+		public function invert():void { 
+			var k:int; 
+			for(var i:int=0; i<worldRows; i++){ 
+				for (var j:int = 0; j < worldCols; j++) {
+					k = mas[i][j].coff;
+					if (k != 9) k = 1;  
+					mas[i][j].coff = k;
+				}   
+			}
+		}
+		 
 		private function getCof(mas:Array, value:int):int {
 			var j:int; 
 			var n:int = 1;
-			if(value == 2 || value == 3) return 3;  
+			if(value == 0) return 3;   
 			for (var i:int=1; i < mas.length; i++) {
 				j = mas[i];  
 				if (value < j) return n;
@@ -245,7 +255,7 @@ package  {
 			var tileNum:int;   
 			var rowper:int; 
 			var colper:int;
-			var obj:Unit;
+			var obj:*;
 			for (var rowCtr:int=0; rowCtr<=viewRows; rowCtr++) {
 				for (var colCtr:int=0; colCtr<=viewCols; colCtr++) {  
 					rowper = rowCtr+tiley; 

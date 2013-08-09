@@ -28,7 +28,7 @@ package  {
 		 
 		[Embed(source = "../assets/spell.xml", mimeType = "application/octet-stream")]
 		public static const ImgXMLData:Class;
- 
+		 
 		[Embed(source = "../assets/spell.png")]  
 		public static const ImgData:Class;
 		
@@ -57,7 +57,7 @@ package  {
 			addChild(main); 
 			bg = main.bg;
 			init(); 
-			if(!unit.enemy) createPanels();   
+			createPanels();   
 			main.close.addEventListener(MouseEvent.CLICK, closed);
 			state = "atr";  
 		}
@@ -69,7 +69,7 @@ package  {
 			var Width:Number;
 			var Height:Number;
 			var skilmas:*;
-			var i:int; 
+			var i:int;  
 			var ico:String;
 			var spe:Sprite;
 			var nam:String; 
@@ -230,12 +230,12 @@ package  {
 			bg.at.text = String(unit.att); 
 			bg.infoSpell.visible = bg.infoSpell.mouseEnable = false;
 			bg.infoEffect.visible = bg.infoEffect.mouseEnable = false; 
-			if(!unit.enemy) {
+			if(!unit.enemy) { 
 				bg.addChild(cont); 
-				bg.addChild(contEffect);
-				bg.setChildIndex(bg.infoSpell, bg.numChildren-1); 
-				bg.setChildIndex(bg.infoEffect, bg.numChildren-1);  
-			} 
+				//bg.setChildIndex(bg.infoSpell, bg.numChildren-1); 
+				//bg.setChildIndex(bg.infoEffect, bg.numChildren-1);  
+			}
+			bg.addChild(contEffect);
 			if (!unit.summon && !unit.enemy) main.inventory.addEventListener(MouseEvent.CLICK, inv_open); 
 			else main.inventory.visible = false; 
 		}

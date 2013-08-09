@@ -24,7 +24,7 @@ package {
 			switch(s) { 
 				case "monk":
 					if(Main.questLine == 1) return monkReplic1;	  
-					else  return monkReplic2;	   
+					else return monkReplic2;	    
 				break;
 				case "girl":  
 					return girlReplic;	  

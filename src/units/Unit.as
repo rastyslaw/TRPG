@@ -331,7 +331,7 @@ package units {
 		public function get exp():uint { return _exp; }
 		public function set exp(value:uint):void { 
 			_exp += value;
-			if (_exp >= 100) {
+			if (_exp >= 100) { 
 				_exp = 0;
 				level++; 
 			}
@@ -340,8 +340,7 @@ package units {
 		public function get description():String { return _description; }
 		
 		public function get sname():String {
-			if (level < 10) return _sname;
-			else return _sname+"_dual";  
+			return _sname;
 		} 
 		public function set sname(value:String):void { _sname = value; }
 		
